@@ -2,6 +2,7 @@
     <x-mary-header title="Expediente: {{ $expedient->expedient_code }}" subtitle="Detalles y movimientos físicos" separator>
         <x-slot:actions>
             <x-mary-button icon="o-arrow-left" class="btn-ghost" link="{{ route('expedients.index') }}">Volver</x-mary-button>
+            <x-mary-button icon="o-document-text" class="btn-secondary" link="{{ route('loans.request', ['expedient' => $expedient->id]) }}">Solicitar</x-mary-button>
             <x-mary-button icon="o-pencil" class="btn-primary" link="{{ route('expedients.edit', $expedient) }}">Editar</x-mary-button>
         </x-slot:actions>
     </x-mary-header>

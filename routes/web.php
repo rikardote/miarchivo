@@ -21,6 +21,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/expedients/create', \App\Livewire\Expedients\Create::class)->name('expedients.create');
     Route::get('/expedients/{expedient}', \App\Livewire\Expedients\Show::class)->name('expedients.show');
     Route::get('/expedients/{expedient}/edit', \App\Livewire\Expedients\Edit::class)->name('expedients.edit');
+    
+    // Loans
+    Route::get('/loans', \App\Livewire\Loans\Index::class)->name('loans.index');
+    Route::get('/loans/request', \App\Livewire\Loans\Request::class)->name('loans.request');
+    Route::get('/loans/{loan}/manage', \App\Livewire\Loans\Manage::class)->name('loans.manage');
 });
 
 require __DIR__.'/auth.php';

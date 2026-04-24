@@ -51,9 +51,9 @@
                 </x-mary-menu-sub>
 
                 <x-mary-menu-sub title="Préstamos" icon="o-document-text">
-                    <x-mary-menu-item title="Mis Solicitudes" icon="o-inbox" link="#" />
+                    <x-mary-menu-item title="Mis Solicitudes" icon="o-inbox" link="{{ route('loans.index') }}" />
                     @can('loans.approve')
-                        <x-mary-menu-item title="Gestión de Préstamos" icon="o-clipboard-document-check" link="#" />
+                        <x-mary-menu-item title="Gestión de Préstamos" icon="o-clipboard-document-check" link="{{ route('loans.index') }}" />
                     @endcan
                 </x-mary-menu-sub>
 
