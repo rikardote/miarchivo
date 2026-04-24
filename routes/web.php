@@ -25,7 +25,9 @@ Route::middleware('auth')->group(function () {
     // Loans
     Route::get('/loans', \App\Livewire\Loans\Index::class)->name('loans.index');
     Route::get('/loans/request', \App\Livewire\Loans\Request::class)->name('loans.request');
-    Route::get('/loans/{loan}/manage', \App\Livewire\Loans\Manage::class)->name('loans.manage');
+    // Employees
+    Route::get('/employees', \App\Livewire\Employees\Index::class)->name('employees.index');
+    Route::get('/employees/{employee}', \App\Livewire\Employees\Show::class)->name('employees.show');
 });
 
 require __DIR__.'/auth.php';

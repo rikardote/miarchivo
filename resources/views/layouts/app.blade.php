@@ -57,7 +57,7 @@
                     @endcan
                 </x-mary-menu-sub>
 
-                <x-mary-menu-item title="Empleados" icon="o-users" link="#" />
+                <x-mary-menu-item title="Empleados" icon="o-users" link="{{ route('employees.index') }}" />
 
                 @can('locations.view')
                     <x-mary-menu-item title="Ubicaciones" icon="o-map-pin" link="#" />
