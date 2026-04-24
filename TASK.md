@@ -16,6 +16,17 @@
 
 ---
 
+## Credenciales de Acceso (Entorno Local)
+Puedes probar el sistema con cualquiera de estos usuarios. La contraseña para todos y para las verificaciones **SUDO** es `password`.
+
+| Rol | Correo / Usuario | Contraseña | Nivel de Acceso |
+|---|---|---|---|
+| **Superusuario** | `admin@archivo.local` | `password` | Acceso Total (Aprobación, Entrega y SUDO) |
+| **Admin RH** | `rh@archivo.local` | `password` | Gestión regular |
+| **Usuario Básico** | `usuario@archivo.local` | `password` | Solo lectura y solicitudes de expedientes |
+
+---
+
 ## 1. Paquetes e Instalación
 - [x] Instalar Laravel Breeze
 - [x] Instalar Livewire 4
