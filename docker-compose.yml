@@ -17,6 +17,8 @@ services:
       - db
     networks:
       - archivo-net
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   web:
     image: nginx:alpine

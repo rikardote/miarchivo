@@ -13,8 +13,12 @@ RUN apt-get update && apt-get install -y \
     libicu-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
-    nodejs \
-    npm
+    ca-certificates \
+    gnupg
+
+# Install Node.js 22 from nodesource
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
