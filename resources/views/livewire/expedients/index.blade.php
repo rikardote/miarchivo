@@ -1,7 +1,9 @@
 <div>
     <x-mary-header title="Expedientes" subtitle="Gestión y búsqueda de expedientes físicos">
         <x-slot:actions>
-            <x-mary-button icon="o-plus" class="btn-primary" link="{{ route('expedients.create') }}">Nuevo Expediente</x-mary-button>
+            @can('create', \App\Models\Expedient::class)
+                <x-mary-button icon="o-plus" class="btn-primary" link="{{ route('expedients.create') }}">Nuevo Expediente</x-mary-button>
+            @endcan
         </x-slot:actions>
     </x-mary-header>
 
@@ -42,7 +44,9 @@
             @scope('cell_actions', $expedient)
                 <div class="flex space-x-2">
                     <x-mary-button icon="o-eye" link="{{ route('expedients.show', $expedient) }}" class="btn-sm btn-ghost" tooltip="Ver detalles" />
-                    <x-mary-button icon="o-pencil" link="{{ route('expedients.edit', $expedient) }}" class="btn-sm btn-ghost" tooltip="Editar" />
+                    @can('update', $expedient)
+                        <x-mary-button icon="o-pencil" link="{{ route('expedients.edit', $expedient) }}" class="btn-sm btn-ghost" tooltip="Editar" />
+                    @endcan
                 </div>
             @endscope
 

@@ -42,6 +42,8 @@ class LoanService
                 'Estado cambiado a Solicitado'
             );
 
+            \App\Events\LoanRequested::dispatch($loan);
+
             return $loan;
         });
     }
@@ -62,7 +64,10 @@ class LoanService
                 'approved_at' => now(),
             ]);
             
+            
             $loan->expedient->update(['current_status' => ExpedientStatus::Reserved]);
+
+            \App\Events\LoanApproved::dispatch($loan);
         });
     }
 
@@ -76,7 +81,7 @@ class LoanService
         }
 
         DB::transaction(function () use ($loan) {
-            $defaultDays = config('services.loan.default_due_days', env('LOAN_DEFAULT_DUE_DAYS', 7));
+            $defaultDays = (int) config('services.loan.default_due_days', env('LOAN_DEFAULT_DUE_DAYS', 7));
 
             $loan->update([
                 'status' => LoanStatus::Delivered,
@@ -99,6 +104,8 @@ class LoanService
                 $oldLocation, // Logical location doesn't change, just holder
                 'Entregado a ' . $loan->requester->name
             );
+
+            \App\Events\LoanDelivered::dispatch($loan);
         });
     }
 
@@ -133,6 +140,8 @@ class LoanService
                 $location,
                 'Devuelto por ' . $loan->requester->name . ($returnNotes ? " - Notas: {$returnNotes}" : '')
             );
+
+            \App\Events\LoanReturned::dispatch($loan);
         });
     }
 

@@ -22,13 +22,15 @@ class EmployeeApiService
     public function search(string $query): array
     {
         try {
-            $response = Http::get("{$this->baseUrl}/employees/search", [
+            $response = Http::timeout(5)->get("{$this->baseUrl}/employees/search", [
                 'q' => $query,
                 'per_page' => 15,
             ]);
 
             if ($response->successful()) {
-                return $response->json('data') ?? [];
+                $data = $response->json();
+                // If it's a wrapped response return the data, otherwise return the whole response
+                return $data['data'] ?? $data ?? [];
             }
 
             Log::warning("EmployeeApiService: Failed to search '{$query}'. Status: {$response->status()}");

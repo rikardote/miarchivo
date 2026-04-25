@@ -11,8 +11,6 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600&display=swap" rel="stylesheet" />
 
-    <!-- Alpine Plugins (Livewire 3 compatibility) -->
-    <script src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
     
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -23,6 +21,7 @@
             <div class="font-bold text-xl ml-2">Archivo</div>
         </x-slot:brand>
         <x-slot:actions>
+            <livewire:notifications-bell />
             <label for="main-drawer" class="lg:hidden">
                 <x-mary-icon name="o-bars-3" class="cursor-pointer" />
             </label>
@@ -34,6 +33,7 @@
         <x-slot:sidebar drawer="main-drawer" collapsible class="bg-base-100">
             <div class="hidden lg:flex items-center justify-between p-4 mb-4 border-b border-base-300">
                 <div class="font-bold text-xl tracking-widest text-primary">ARCHIVO</div>
+                <livewire:notifications-bell />
             </div>
 
             <x-mary-menu activate-by-route>
@@ -43,12 +43,14 @@
                 
                 <x-mary-menu-item title="Dashboard" icon="o-chart-pie" link="{{ route('dashboard') }}" />
 
+                @can('expedients.view')
                 <x-mary-menu-sub title="Expedientes" icon="o-folder">
                     <x-mary-menu-item title="Buscar" icon="o-magnifying-glass" link="{{ route('expedients.index') }}" />
                     @can('expedients.create')
-                        <x-mary-menu-item title="Crear Nuevo" icon="o-plus" link="#" />
+                        <x-mary-menu-item title="Crear Nuevo" icon="o-plus" link="{{ route('expedients.create') }}" />
                     @endcan
                 </x-mary-menu-sub>
+                @endcan
 
                 <x-mary-menu-sub title="Préstamos" icon="o-document-text">
                     <x-mary-menu-item title="Mis Solicitudes" icon="o-inbox" link="{{ route('loans.index') }}" />
@@ -57,14 +59,16 @@
                     @endcan
                 </x-mary-menu-sub>
 
-                <x-mary-menu-item title="Empleados" icon="o-users" link="{{ route('employees.index') }}" />
+                @can('employees.view')
+                    <x-mary-menu-item title="Empleados" icon="o-users" link="{{ route('employees.index') }}" />
+                @endcan
 
                 @can('locations.view')
-                    <x-mary-menu-item title="Ubicaciones" icon="o-map-pin" link="#" />
+                    <x-mary-menu-item title="Ubicaciones" icon="o-map-pin" link="{{ route('locations.index') }}" />
                 @endcan
 
                 @can('users.view')
-                    <x-mary-menu-item title="Usuarios" icon="o-shield-check" link="#" />
+                    <x-mary-menu-item title="Usuarios" icon="o-shield-check" link="{{ route('users.index') }}" />
                 @endcan
 
                 <x-mary-menu-separator />

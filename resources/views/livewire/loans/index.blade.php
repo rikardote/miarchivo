@@ -24,18 +24,26 @@
             ['key' => 'actions', 'label' => '', 'class' => 'w-1']
         ]" :rows="$loans" :sort-by="$sortBy" with-pagination>
 
+            @scope('cell_expedient.expedient_code', $loan)
+                <span class="font-bold">{{ $loan->expedient->expedient_code ?? 'ELIMINADO' }}</span>
+            @endscope
+
+            @scope('cell_requester.name', $loan)
+                {{ $loan->requester->name ?? 'Usuario desconocido' }}
+            @endscope
+
             @scope('cell_status', $loan)
-                <x-mary-badge :value="$loan->status->label()" class="badge-{{ $loan->status->color() }}" />
+                <x-mary-badge :value="optional($loan->status)->label() ?? 'Desconocido'" class="badge-{{ optional($loan->status)->color() ?? 'neutral' }}" />
             @endscope
 
             @scope('cell_requested_at', $loan)
-                {{ $loan->requested_at->format('d/m/Y H:i') }}
+                {{ optional($loan->requested_at)->format('d/m/Y H:i') ?? 'N/A' }}
             @endscope
 
             @scope('cell_due_date', $loan)
                 @if($loan->due_date)
                     <span class="{{ $loan->isOverdue() ? 'text-error font-bold' : '' }}">
-                        {{ $loan->due_date->format('d/m/Y') }}
+                        {{ \Carbon\Carbon::parse($loan->due_date)->format('d/m/Y') }}
                     </span>
                 @else
                     -

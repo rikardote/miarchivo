@@ -36,8 +36,8 @@ Puedes probar el sistema con cualquiera de estos usuarios. La contraseña para t
 - [x] npm install + build
 
 ## 2. Configuración Docker y .env
-- [ ] Añadir extra_hosts a docker-compose.yml
-- [ ] Añadir EMPLOYEES_API_URL y LOAN_DEFAULT_DUE_DAYS al .env
+- [x] Añadir extra_hosts a docker-compose.yml
+- [x] Añadir EMPLOYEES_API_URL y LOAN_DEFAULT_DUE_DAYS al .env
 
 ## 3. Migraciones
 - [x] create_branches_table
@@ -84,7 +84,7 @@ Puedes probar el sistema con cualquiera de estos usuarios. La contraseña para t
 - [x] Configurar daisyUI themes
 
 ## 10. Componentes Livewire
-- [ ] Dashboard
+- [x] Dashboard
 - [x] Expedients.Index
 - [x] Expedients.Show
 - [x] Expedients.Create
@@ -94,24 +94,24 @@ Puedes probar el sistema con cualquiera de estos usuarios. La contraseña para t
 - [x] Loans.Manage
 - [x] Employees.Index
 - [x] Employees.Show
-- [ ] Locations.Index
-- [ ] Users.Index
+- [x] Locations.Index
+- [x] Users.Index
 
 ## 11. Confirmación Sudo
 - [x] Trait ConfirmsSudo
 
 ## 12. Policies
-- [ ] ExpedientPolicy
-- [ ] LoanRequestPolicy
+- [x] ExpedientPolicy
+- [x] LoanRequestPolicy
 
 ## 13. Events
-- [ ] LoanRequested + listener
-- [ ] LoanApproved + listener
-- [ ] LoanDelivered + listener
-- [ ] LoanReturned + listener
+- [x] LoanRequested + listener
+- [x] LoanApproved + listener
+- [x] LoanDelivered + listener
+- [x] LoanReturned + listener
 
 ## 14. Verificación
-- [ ] Migraciones + seeders sin errores
+- [x] Migraciones + seeders sin errores
 - [ ] Login funcional
 - [ ] Flujo de préstamo completo
-- [ ] Dashboard con datos
+- [x] Dashboard con datos

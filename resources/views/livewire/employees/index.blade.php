@@ -3,8 +3,13 @@
     </x-mary-header>
 
     <x-mary-card>
-        <div class="mb-6">
-            <x-mary-input wire:model.live.debounce.300ms="search" icon="o-magnifying-glass" placeholder="Buscar por RFC, número o nombre..." />
+        <div class="mb-6 flex flex-col md:flex-row md:items-end gap-4">
+            <div class="flex-1">
+                <x-mary-input wire:model.live.debounce.300ms="search" icon="o-magnifying-glass" placeholder="Buscar por RFC, número o nombre..." />
+            </div>
+            <div class="pb-1">
+                <x-mary-toggle label="Solo con Expediente" wire:model.live="onlyWithExpedient" class="checkbox-primary" tight />
+            </div>
         </div>
 
         <x-mary-table :headers="[
@@ -23,6 +28,9 @@
 
             @scope('cell_actions', $employee)
                 <div class="flex space-x-2">
+                    @if($employee->expedients->count() > 0)
+                        <x-mary-button icon="o-folder-open" link="{{ route('expedients.show', $employee->expedients->first()) }}" class="btn-sm btn-info btn-outline" tooltip="Ver Expediente" />
+                    @endif
                     <x-mary-button icon="o-eye" link="{{ route('employees.show', $employee) }}" class="btn-sm btn-ghost" tooltip="Ver Perfil" />
                 </div>
             @endscope

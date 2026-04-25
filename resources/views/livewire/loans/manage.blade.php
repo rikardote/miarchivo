@@ -1,5 +1,5 @@
 <div>
-    <x-mary-header title="Gestionar Préstamo" subtitle="Solicitud de {{ $loan->requester->name }}" separator>
+    <x-mary-header title="Gestionar Préstamo" subtitle="Solicitud de {{ $loan->requester->name ?? 'Usuario desconocido' }}" separator>
         <x-slot:actions>
             <x-mary-button icon="o-arrow-left" class="btn-ghost" link="{{ route('loans.index') }}">Volver</x-mary-button>
         </x-slot:actions>
@@ -13,15 +13,15 @@
                 <div class="grid grid-cols-1 gap-4">
                     <div class="flex justify-between items-center border-b pb-2">
                         <span class="text-gray-500">Estado</span>
-                        <x-mary-badge :value="$loan->status->label()" class="badge-{{ $loan->status->color() }} font-bold" />
+                        <x-mary-badge :value="optional($loan->status)->label() ?? 'Desconocido'" class="badge-{{ optional($loan->status)->color() ?? 'neutral' }} font-bold" />
                     </div>
                     
-                    <x-mary-stat title="Expediente" value="{{ $loan->expedient->expedient_code }}" icon="o-folder" />
-                    <x-mary-stat title="Solicitante" value="{{ $loan->requester->name }}" icon="o-user" />
-                    <x-mary-stat title="Fecha Solicitud" value="{{ $loan->requested_at->format('d/m/Y H:i') }}" icon="o-calendar" />
+                    <x-mary-stat title="Expediente" value="{{ $loan->expedient->expedient_code ?? 'N/A' }}" icon="o-folder" />
+                    <x-mary-stat title="Solicitante" value="{{ $loan->requester->name ?? 'Usuario Eliminado' }}" icon="o-user" />
+                    <x-mary-stat title="Fecha Solicitud" value="{{ optional($loan->requested_at)->format('d/m/Y H:i') ?? 'N/A' }}" icon="o-calendar" />
                     
                     @if($loan->due_date)
-                        <x-mary-stat title="Vencimiento" value="{{ $loan->due_date->format('d/m/Y') }}" icon="o-clock" 
+                        <x-mary-stat title="Vencimiento" value="{{ \Carbon\Carbon::parse($loan->due_date)->format('d/m/Y') }}" icon="o-clock" 
                             color="{{ $loan->isOverdue() ? 'text-error' : '' }}" />
                     @endif
 
@@ -39,7 +39,11 @@
         <div>
             <x-mary-card title="Acciones Disponibles" class="bg-base-200/50">
                 
-                @if($loan->status === \App\Enums\LoanStatus::Pending)
+                @if(!$loan->expedient)
+                    <x-mary-alert icon="o-exclamation-triangle" title="Expediente no encontrado" class="alert-error">
+                        El expediente asociado a esta solicitud ya no existe en la base de datos.
+                    </x-mary-alert>
+                @elseif($loan->status === \App\Enums\LoanStatus::Pending)
                     <div class="space-y-4">
                         <p class="text-sm text-gray-600">La solicitud está pendiente de revisión. Puedes aprobarla para reservar el expediente, o cancelarla.</p>
                         <div class="flex space-x-2">

@@ -34,7 +34,7 @@ class LoanRequest extends Model
         'reserved_at' => 'datetime',
         'delivered_at' => 'datetime',
         'returned_at' => 'datetime',
-        'due_date' => 'date',
+        'due_date' => 'datetime',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -59,6 +59,11 @@ class LoanRequest extends Model
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->requester();
     }
 
     // Helpers
