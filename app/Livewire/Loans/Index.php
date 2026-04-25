@@ -14,7 +14,17 @@ class Index extends Component
     use WithPagination;
 
     public string $status = '';
+    public bool $myLoansOnly = false;
     public array $sortBy = ['column' => 'created_at', 'direction' => 'desc'];
+
+    protected $queryString = ['myLoansOnly' => ['except' => false, 'as' => 'mine']];
+
+    public function mount()
+    {
+        if (request()->has('mine')) {
+            $this->myLoansOnly = request()->boolean('mine');
+        }
+    }
 
     public function updatingStatus()
     {
@@ -24,9 +34,11 @@ class Index extends Component
     public function render()
     {
         $query = LoanRequest::query()->with(['expedient.employee', 'requester', 'approver']);
+        $user = Auth::user();
 
-        // Check if user is admin/approver, otherwise only show their own
-        if (!Auth::user()->can('loans.approve')) {
+        // If user is not admin, they ALWAYS only see theirs.
+        // If they ARE admin but requested 'mine' view, only show theirs.
+        if (!$user->can('loans.approve') || $this->myLoansOnly) {
             $query->where('requester_id', Auth::id());
         }
 

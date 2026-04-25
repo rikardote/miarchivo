@@ -45,24 +45,40 @@
                     </x-mary-alert>
                 @elseif($loan->status === \App\Enums\LoanStatus::Pending)
                     <div class="space-y-4">
-                        <p class="text-sm text-gray-600">La solicitud está pendiente de revisión. Puedes aprobarla para reservar el expediente, o cancelarla.</p>
-                        <div class="flex space-x-2">
-                            <x-mary-button label="Aprobar" icon="o-check" class="btn-success" wire:click="triggerAction('approve')" spinner />
-                            <x-mary-button label="Rechazar" icon="o-x-mark" class="btn-error" wire:click="triggerAction('cancel')" spinner />
-                        </div>
+                        @can('loans.approve')
+                            <p class="text-sm text-gray-600">La solicitud está pendiente de revisión. Puedes aprobarla para reservar el expediente, o cancelarla.</p>
+                            <div class="flex space-x-2">
+                                <x-mary-button label="Aprobar" icon="o-check" class="btn-success" wire:click="triggerAction('approve')" spinner />
+                                <x-mary-button label="Rechazar" icon="o-x-mark" class="btn-error" wire:click="triggerAction('cancel')" spinner />
+                            </div>
+                        @else
+                            <x-mary-alert icon="o-clock" title="En espera" class="alert-info">
+                                Tu solicitud está siendo revisada por el departamento de archivo. Te notificaremos cuando sea aprobada.
+                            </x-mary-alert>
+                        @endcan
                     </div>
                 @elseif($loan->status === \App\Enums\LoanStatus::Approved || $loan->status === \App\Enums\LoanStatus::Reserved)
                     <div class="space-y-4">
-                        <p class="text-sm text-gray-600">El expediente está reservado. Requiere verificación con contraseña (SUDO) al momento de entregarlo físicamente.</p>
-                        <x-mary-button label="Entregar Expediente" icon="o-hand-raised" class="btn-primary w-full" wire:click="triggerAction('deliver')" spinner />
+                        @can('loans.deliver')
+                            <p class="text-sm text-gray-600">El expediente está reservado. Requiere verificación con contraseña (SUDO) al momento de entregarlo físicamente.</p>
+                            <x-mary-button label="Entregar Expediente" icon="o-hand-raised" class="btn-primary w-full" wire:click="triggerAction('deliver')" spinner />
+                        @else
+                            <x-mary-alert icon="o-check-circle" title="¡Aprobado!" class="alert-success">
+                                Tu solicitud ha sido aprobada. Por favor, acude al archivo físico para recoger tu expediente.
+                            </x-mary-alert>
+                        @endcan
                     </div>
                 @elseif($loan->status === \App\Enums\LoanStatus::Delivered)
                     <div class="space-y-4">
-                        <p class="text-sm text-gray-600">El expediente está actualmente en posesión del solicitante. Requiere verificación con contraseña (SUDO) para recibirlo de vuelta en el archivo.</p>
-                        
-                        <x-mary-textarea wire:model="notes" label="Notas de devolución (opcional)" placeholder="Ej. Faltan hojas, carpeta dañada..." rows="2" />
-
-                        <x-mary-button label="Registrar Devolución" icon="o-arrow-uturn-down" class="btn-accent w-full" wire:click="triggerAction('return')" spinner />
+                        @can('loans.return')
+                            <p class="text-sm text-gray-600">El expediente está actualmente en posesión del solicitante. Requiere verificación con contraseña (SUDO) para recibirlo de vuelta en el archivo.</p>
+                            <x-mary-textarea wire:model="notes" label="Notas de devolución (opcional)" placeholder="Ej. Faltan hojas, carpeta dañada..." rows="2" />
+                            <x-mary-button label="Registrar Devolución" icon="o-arrow-uturn-down" class="btn-accent w-full" wire:click="triggerAction('return')" spinner />
+                        @else
+                            <x-mary-alert icon="o-briefcase" title="En tu posesión" class="alert-primary">
+                                Tienes este expediente en tu poder. Recuerda devolverlo a tiempo para evitar sanciones.
+                            </x-mary-alert>
+                        @endcan
                     </div>
                 @else
                     <div class="text-center py-6 text-gray-500 flex flex-col items-center">

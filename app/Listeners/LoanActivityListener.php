@@ -20,9 +20,9 @@ class LoanActivityListener
                 ->performedOn($loanRequest)
                 ->log("Solicitud de préstamo creada para el expediente {$expedient->expedient_code} ({$employee->full_name})");
 
-            // Notify Admins and Superusers
-            $admins = \App\Models\User::role(['admin', 'superuser'])->get();
-            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewLoanRequestNotification($loanRequest));
+            // Notify Admins and Superusers - TEMPORARILY DISABLED DUE TO DB TABLE ISSUE
+            // $admins = \App\Models\User::role(['admin', 'superuser'])->get();
+            // \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewLoanRequestNotification($loanRequest));
         }
 
         if ($event instanceof LoanApproved) {

@@ -1,7 +1,7 @@
 <div>
     <x-mary-header title="Usuarios" subtitle="Gestión de accesos y roles del sistema">
         <x-slot:actions>
-            <x-mary-button icon="o-plus" class="btn-primary">Nuevo Usuario</x-mary-button>
+            <x-mary-button icon="o-plus" class="btn-primary" wire:click="createUser">Nuevo Usuario</x-mary-button>
         </x-slot:actions>
     </x-mary-header>
 
@@ -32,10 +32,39 @@
 
             @scope('cell_actions', $user)
                 <div class="flex space-x-2">
-                    <x-mary-button icon="o-pencil" class="btn-sm btn-ghost" tooltip="Editar" />
+                    <x-mary-button icon="o-pencil" class="btn-sm btn-ghost" tooltip="Editar" wire:click="editUser({{ $user->id }})" />
                 </div>
             @endscope
 
         </x-mary-table>
     </x-mary-card>
+
+    <!-- Modal para Usuarios -->
+    <x-mary-modal wire:model="userModal" title="{{ $editingUser ? 'Editar Usuario' : 'Nuevo Usuario' }}" separator>
+        <x-mary-form wire:submit="saveUser">
+            <x-mary-input label="Nombre" wire:model="name" icon="o-user" />
+            <x-mary-input label="Correo Electrónico" wire:model="email" icon="o-envelope" />
+            <x-mary-input label="Contraseña" wire:model="password" type="password" icon="o-key" hint="{{ $editingUser ? 'Dejar en blanco para mantener actual' : '' }}" />
+            
+            <div class="mt-4">
+                <x-mary-radio 
+                    label="Nivel de Acceso (Rol)" 
+                    wire:model="selectedRole" 
+                    :options="$roles"
+                    option-label="name"
+                    option-value="name"
+                    hint="Define el nivel de permisos del usuario"
+                />
+            </div>
+
+            <x-slot:actions>
+                <x-mary-button label="Cancelar" @click="$wire.userModal = false" />
+                <x-mary-button label="Guardar" type="submit" icon="o-check" class="btn-primary" spinner="saveUser" />
+            </x-slot:actions>
+        </x-mary-form>
+    </x-mary-modal>
+
+    @if(session('success'))
+        <x-mary-toast />
+    @endif
 </div>

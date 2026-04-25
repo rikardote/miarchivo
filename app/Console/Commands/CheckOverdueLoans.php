@@ -33,8 +33,8 @@ class CheckOverdueLoans extends Command
             /** @var \App\Models\LoanRequest $loan */
             $this->warn("Loan for expedient {$loan->expedient->expedient_code} is overdue.");
             
-            // Notify admins
-            Notification::send($admins, new LoanOverdueNotification($loan));
+            // Notify admins - TEMPORARILY DISABLED
+            // Notification::send($admins, new LoanOverdueNotification($loan));
             
             // Log activity
             activity('loans')

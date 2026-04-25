@@ -9,12 +9,14 @@ class NotificationsBell extends Component
 {
     public function getNotificationsProperty()
     {
-        return Auth::user()->notifications()->latest()->limit(5)->get();
+        return collect(); // Temporarily disabled while table is created
+        // return Auth::user()->notifications()->latest()->limit(5)->get();
     }
 
     public function getUnreadCountProperty()
     {
-        return Auth::user()->unreadNotifications()->count();
+        return 0; // Temporarily disabled while table is created
+        // return Auth::user()->unreadNotifications()->count();
     }
 
     public function markAsRead()
