@@ -1,11 +1,11 @@
 <section>
     <header>
         <h2 class="text-xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter">
-            {{ __('Profile Information') }}
+            Información del Perfil
         </h2>
 
         <p class="mt-1 text-[10px] font-black uppercase tracking-widest text-primary">
-            {{ __("Update your account's profile information and email address.") }}
+            Actualiza la información de tu cuenta y dirección de correo electrónico.
         </p>
     </header>
 
@@ -18,13 +18,13 @@
         @method('patch')
 
         <div>
-            <x-input-label for="name" :value="__('Name')" />
+            <x-input-label for="name" value="Nombre Completo" />
             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
         <div>
-            <x-input-label for="email" :value="__('Email')" />
+            <x-input-label for="email" value="Correo Electrónico" />
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
@@ -48,7 +48,7 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Save') }}</x-primary-button>
+            <x-primary-button>Guardar Cambios</x-primary-button>
 
             @if (session('status') === 'profile-updated')
                 <p
@@ -56,8 +56,8 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
-                >{{ __('Saved.') }}</p>
+                    class="text-sm font-bold text-emerald-600"
+                >Guardado correctamente.</p>
             @endif
         </div>
     </form>
