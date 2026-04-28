@@ -6,11 +6,12 @@ use App\Enums\LoanStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\Support\LogOptions;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 
 class LoanRequest extends Model
 {
-    use LogsActivity;
+    use LogsActivity, HasFactory;
 
     protected $fillable = [
         'expedient_id',
@@ -42,7 +43,6 @@ class LoanRequest extends Model
         return LogOptions::defaults()
             ->logOnly(['status', 'approved_by', 'delivered_at', 'returned_at'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
                 'created' => "Solicitud de préstamo creada para {$this->expedient->expedient_code}",
                 'updated' => "Préstamo actualizado para {$this->expedient->expedient_code} (Estado: {$this->status->label()})",

@@ -8,11 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Support\LogOptions;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 
 class Expedient extends Model
 {
-    use SoftDeletes, LogsActivity;
+    use SoftDeletes, LogsActivity, HasFactory;
 
     protected $fillable = [
         'employee_id',
@@ -41,7 +42,6 @@ class Expedient extends Model
         return LogOptions::defaults()
             ->logOnly(['current_status', 'current_location_id', 'current_holder_id'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
                 'created' => "Expediente creado: {$this->expedient_code}",
                 'updated' => "Expediente actualizado: {$this->expedient_code}",

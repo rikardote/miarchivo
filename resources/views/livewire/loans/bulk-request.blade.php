@@ -8,6 +8,20 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Panel de Escaneo -->
         <div class="lg:col-span-1 space-y-6">
+            <x-mary-card title="Destinatario" shadow separator>
+                <div class="space-y-4">
+                    <x-mary-choices 
+                        label="Responsable del Préstamo" 
+                        wire:model="user_id" 
+                        :options="$users" 
+                        single 
+                        searchable 
+                        icon="o-user"
+                        placeholder="Buscar usuario..." 
+                        hint="A nombre de quién se registrará este lote de expedientes." />
+                </div>
+            </x-mary-card>
+
             <x-mary-card title="Scanner" shadow separator>
                 <div class="space-y-4">
                     <p class="text-xs text-gray-500">Haz clic en el campo y comienza a escanear. El sistema detectará automáticamente cada código al presionar Enter.</p>
@@ -39,7 +53,7 @@
                             class="btn-primary w-full" 
                             wire:click="save" 
                             spinner="save"
-                            :disabled="count(collect($items)->filter(fn($i) => $i['isValid'])) === 0"
+                            :disabled="count(collect($items)->filter(fn($i) => $i['isValid'])) === 0 || !$user_id"
                         />
                     </div>
                 </div>

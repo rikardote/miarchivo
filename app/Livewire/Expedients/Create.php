@@ -19,9 +19,21 @@ class Create extends Component
     public string $searchEmployee = '';
     public array $apiResults = [];
 
-    public function mount()
+    public function mount($employee = null)
     {
         $this->authorize('create', Expedient::class);
+
+        if ($employee) {
+            $found = Employee::where('id', $employee)
+                ->orWhere('employee_number', $employee)
+                ->orWhere('rfc', $employee)
+                ->first();
+
+            if ($found) {
+                $this->employee_id = $found->id;
+                $this->searchEmployee = $found->full_name;
+            }
+        }
     }
 
     public function updatedSearchEmployee($value)

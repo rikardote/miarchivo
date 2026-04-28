@@ -14,10 +14,12 @@ class BulkRequest extends Component
 
     public string $scannedCode = '';
     public array $items = [];
+    public ?int $user_id = null;
     public ?string $observations = null;
 
     protected $rules = [
         'items' => 'required|array|min:1',
+        'user_id' => 'required|exists:users,id',
         'observations' => 'nullable|string|max:255',
     ];
 
@@ -86,7 +88,7 @@ class BulkRequest extends Component
             $count = 0;
             foreach ($validItems as $item) {
                 $expedient = Expedient::find($item['id']);
-                $loanService->requestLoan($expedient, $this->observations);
+                $loanService->requestLoan($expedient, $this->observations, $this->user_id);
                 $count++;
             }
 
@@ -100,6 +102,8 @@ class BulkRequest extends Component
 
     public function render()
     {
-        return view('livewire.loans.bulk-request');
+        return view('livewire.loans.bulk-request', [
+            'users' => \App\Models\User::all()
+        ]);
     }
 }

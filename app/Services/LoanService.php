@@ -17,18 +17,18 @@ class LoanService
     /**
      * User requests an expedient loan.
      */
-    public function requestLoan(Expedient $expedient, ?string $observations = null): LoanRequest
+    public function requestLoan(Expedient $expedient, ?string $observations = null, ?int $requesterId = null): LoanRequest
     {
         if (! $expedient->isAvailable()) {
             throw new \Exception('El expediente no está disponible para préstamo.');
         }
 
-        return DB::transaction(function () use ($expedient, $observations) {
+        return DB::transaction(function () use ($expedient, $observations, $requesterId) {
             $expedient->update(['current_status' => ExpedientStatus::Requested]);
 
             $loan = LoanRequest::create([
                 'expedient_id' => $expedient->id,
-                'requester_id' => Auth::id(),
+                'requester_id' => $requesterId ?? Auth::id(),
                 'status' => LoanStatus::Pending,
                 'requested_at' => now(),
                 'observations' => $observations,

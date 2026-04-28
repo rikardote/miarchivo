@@ -34,6 +34,8 @@
                 <div class="flex space-x-2">
                     @if($employee->expedients->count() > 0)
                         <x-mary-button icon="o-folder-open" link="{{ route('expedients.show', $employee->expedients->first()) }}" class="btn-sm btn-info btn-outline" tooltip="Ver Expediente" />
+                    @else
+                        <x-mary-button icon="o-folder-plus" link="{{ route('expedients.create', $employee) }}" class="btn-sm btn-primary btn-outline" tooltip="Nuevo Expediente" />
                     @endif
                     <x-mary-button icon="o-eye" link="{{ route('employees.show', $employee) }}" class="btn-sm btn-ghost" tooltip="Ver Perfil" />
                 </div>

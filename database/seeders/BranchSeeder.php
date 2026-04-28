@@ -10,9 +10,8 @@ class BranchSeeder extends Seeder
     public function run(): void
     {
         $branches = [
-            ['name' => 'RH Mexicali', 'code' => 'MEX', 'address' => 'Mexicali, Baja California'],
-            ['name' => 'RH Tijuana', 'code' => 'TIJ', 'address' => 'Tijuana, Baja California'],
-            ['name' => 'RH Central', 'code' => 'CEN', 'address' => 'Oficinas Centrales'],
+            ['name' => 'RH DELEGACION ESTATAL', 'code' => 'MEX', 'address' => 'Mexicali, Baja California'],
+            ['name' => 'RH Almancen', 'code' => 'CEN', 'address' => 'Oficinas Centrales'],
         ];
 
         foreach ($branches as $branch) {
