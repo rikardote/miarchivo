@@ -11,15 +11,25 @@
         <div class="lg:col-span-1 space-y-6">
             <x-mary-card title="Destinatario" shadow separator>
                 <div class="space-y-4">
-                    <x-mary-choices 
-                        label="Responsable del Préstamo" 
-                        wire:model.live="user_id" 
-                        :options="$users" 
-                        single 
-                        searchable 
-                        icon="o-user"
-                        placeholder="Buscar usuario..." 
-                        hint="A nombre de quién se registrará este lote de expedientes." />
+                    <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">Responsable del Préstamo</label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
+                            <x-mary-icon name="o-user" class="w-5 h-5" />
+                        </div>
+                        <select 
+                            wire:model.live="user_id"
+                            class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl h-16 pl-14 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none"
+                        >
+                            <option value="">Buscar usuario...</option>
+                            @foreach($users as $user)
+                                <option value="{{ $user['id'] }}">{{ $user['name'] }}</option>
+                            @endforeach
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+                            <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
+                        </div>
+                    </div>
+                    <p class="text-[10px] font-bold text-slate-400 pl-2">A nombre de quién se registrará este lote de expedientes.</p>
                 </div>
             </x-mary-card>
 
@@ -41,23 +51,30 @@
                     <p class="text-xs text-gray-500">Haz clic en el campo y comienza a escanear. El sistema detectará automáticamente cada código al presionar Enter.</p>
                     
                     <form wire:submit.prevent="processScan" wire:ignore>
-                        <x-mary-input 
-                            wire:model="scannedCode" 
-                            id="bulk-scanner-input"
-                            placeholder="Escanear código aquí..." 
-                            icon="o-qr-code" 
-                            autocomplete="off"
-                            autofocus
-                        />
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
+                                <x-mary-icon name="o-qr-code" class="w-5 h-5" />
+                            </div>
+                            <input 
+                                id="bulk-scanner-input"
+                                type="text"
+                                placeholder="Escanear código aquí..." 
+                                wire:model="scannedCode" 
+                                autocomplete="off"
+                                autofocus
+                                class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl h-16 pl-14 pr-6 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none"
+                            />
+                        </div>
                     </form>
 
-                    <div class="pt-4 border-t border-base-200">
-                        <x-mary-textarea 
-                            label="Observaciones Generales" 
+                    <div class="pt-4 border-t border-base-200 space-y-3">
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">Observaciones Generales</label>
+                        <textarea 
                             wire:model.live="observations" 
                             placeholder="Ej. Revisión trimestral de expedientes..." 
-                            rows="3" 
-                        />
+                            rows="3"
+                            class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl p-5 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none resize-none"
+                        ></textarea>
                     </div>
 
                     <div class="pt-4">

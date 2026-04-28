@@ -9,31 +9,101 @@
         </x-slot:actions>
     </x-mary-header>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Info Principal -->
-        <div class="md:col-span-2 space-y-6">
-            <x-mary-card title="Información del Empleado">
-                <div class="grid grid-cols-2 gap-4">
-                    <x-mary-stat title="Nombre Completo" value="{{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}" icon="o-user" />
-                    <x-mary-stat title="RFC" value="{{ $expedient->employee->rfc }}" icon="o-identification" />
-                    <x-mary-stat title="Sucursal" value="{{ $expedient->employee->branch->name ?? 'N/A' }}" icon="o-building-storefront" />
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Información del Empleado -->
+            <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 overflow-hidden">
+                <div class="p-4 space-y-6">
+                    <h3 class="text-xl font-black text-slate-800 dark:text-slate-100 mb-6">Información del Empleado</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="flex items-center gap-5 group">
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-user" class="w-7 h-7 text-slate-500 group-hover:text-primary" />
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Nombre Completo</p>
+                                <p class="text-lg font-black text-slate-800 dark:text-slate-100 leading-tight">
+                                    {{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-5 group">
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-identification" class="w-7 h-7 text-slate-500 group-hover:text-primary" />
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">RFC</p>
+                                <p class="text-lg font-black text-slate-800 dark:text-slate-100">{{ $expedient->employee->rfc }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-5 group">
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-building-storefront" class="w-7 h-7 text-slate-500 group-hover:text-primary" />
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Sucursal</p>
+                                <p class="text-lg font-black text-slate-800 dark:text-slate-100 leading-tight">
+                                    {{ $expedient->employee->branch->name ?? 'N/A' }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </x-mary-card>
 
-            <x-mary-card title="Detalles del Archivo">
-                <div class="grid grid-cols-2 gap-4">
-                    <x-mary-stat title="Código" value="{{ $expedient->expedient_code }}" icon="o-qr-code" />
-                    <x-mary-stat title="Tomo" value="{{ $expedient->volume_number }}" icon="o-book-open" />
-                    <x-mary-stat title="Ubicación Física" value="{{ $expedient->currentLocation->full_label ?? 'Sin asignar' }}" icon="o-map-pin" />
+            <!-- Detalles del Archivo -->
+            <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 overflow-hidden">
+                <div class="p-4 space-y-6">
+                    <h3 class="text-xl font-black text-slate-800 dark:text-slate-100 mb-6">Detalles del Archivo</h3>
                     
-                    <div class="stat">
-                        <div class="stat-figure text-secondary">
-                            <x-mary-icon name="o-tag" class="w-8 h-8" />
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="flex items-center gap-5 group">
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-qr-code" class="w-7 h-7 text-slate-500 group-hover:text-primary" />
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Código</p>
+                                <p class="text-lg font-black text-slate-800 dark:text-slate-100">{{ $expedient->expedient_code }}</p>
+                            </div>
                         </div>
-                        <div class="stat-title">Estado</div>
-                        <div class="stat-value text-{{ $expedient->current_status->color() }} text-xl mt-2">
-                            {{ $expedient->current_status->label() }}
+
+                        <div class="flex items-center gap-5 group">
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-book-open" class="w-7 h-7 text-slate-500 group-hover:text-primary" />
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Tomo</p>
+                                <p class="text-lg font-black text-slate-800 dark:text-slate-100">{{ $expedient->volume_number }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-5 group md:col-span-2">
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-map-pin" class="w-7 h-7 text-slate-500 group-hover:text-primary" />
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Ubicación Física</p>
+                                <p class="text-lg font-black text-slate-800 dark:text-slate-100">
+                                    {{ $expedient->currentLocation->full_label ?? 'Sin asignar' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-5 group pt-4 border-t border-slate-100 md:col-span-2">
+                            <div class="p-3 bg-{{ $expedient->current_status->color() }}/10 rounded-2xl">
+                                <x-mary-icon name="o-tag" class="w-7 h-7 text-{{ $expedient->current_status->color() }}" />
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Estado</p>
+                                <p class="text-xl font-black text-{{ $expedient->current_status->color() }}">
+                                    {{ $expedient->current_status->label() }}
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -41,45 +111,62 @@
         </div>
 
         <!-- Sidebar Detalles -->
-        <div class="space-y-6">
-            <x-mary-card title="Identificación Física" class="text-center shadow-sm">
-                <div class="flex justify-center mb-4 bg-white p-2 rounded-lg inline-block mx-auto border border-base-200">
-                    {!! QrCode::size(120)->generate($expedient->qr_content) !!}
+        <div class="space-y-8">
+            <!-- Identificación Física (QR) -->
+            <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 text-center">
+                <div class="p-4">
+                    <h3 class="text-sm font-black text-slate-800 dark:text-slate-100 mb-6 uppercase tracking-widest">Identificación Física</h3>
+                    <div class="flex justify-center mb-6 bg-white p-4 rounded-3xl inline-block mx-auto border-4 border-slate-50 shadow-inner">
+                        {!! QrCode::size(140)->generate($expedient->qr_content) !!}
+                    </div>
+                    <div class="text-xs font-black tracking-[0.2em] text-slate-400 mb-8">{{ $expedient->expedient_code }}</div>
+                    <x-mary-button label="Imprimir Etiqueta" icon="o-printer" link="{{ route('expedients.print', $expedient) }}" external class="btn-primary btn-outline w-full rounded-2xl h-12" />
                 </div>
-                <div class="text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-4">{{ $expedient->expedient_code }}</div>
-                <x-mary-button label="Imprimir Etiqueta" icon="o-printer" link="{{ route('expedients.print', $expedient) }}" external class="btn-outline btn-sm w-full" />
             </x-mary-card>
 
+            <!-- En Posesión De -->
             @if($expedient->currentHolder)
-                <x-mary-card title="En Posesión De" class="bg-primary/10 border-primary">
-                    <div class="flex items-center space-x-4">
-                        <x-mary-icon name="o-user-circle" class="w-12 h-12 text-primary" />
-                        <div>
-                            <p class="font-bold">{{ $expedient->currentHolder->name }}</p>
-                            <p class="text-sm text-gray-500">{{ $expedient->currentHolder->email }}</p>
+                <x-mary-card shadow class="border-none shadow-xl shadow-primary/10 bg-primary/5">
+                    <div class="p-4">
+                        <h3 class="text-[10px] font-black text-primary mb-4 uppercase tracking-widest">En Posesión De</h3>
+                        <div class="flex items-center gap-4">
+                            <div class="p-3 bg-white rounded-2xl shadow-sm">
+                                <x-mary-icon name="o-user-circle" class="w-8 h-8 text-primary" />
+                            </div>
+                            <div>
+                                <p class="font-black text-slate-800 dark:text-slate-100 leading-tight">{{ $expedient->currentHolder->name }}</p>
+                                <p class="text-xs text-slate-500 font-medium">{{ $expedient->currentHolder->email }}</p>
+                            </div>
                         </div>
                     </div>
                 </x-mary-card>
             @endif
 
-            <x-mary-card title="Historial Reciente" separator>
-                <div class="overflow-y-auto max-h-96 pr-2">
-                    <ul class="steps steps-vertical w-full">
-                        @forelse($expedient->movements->take(5) as $movement)
-                            <li class="step step-primary" data-content="✓">
-                                <div class="text-left py-2">
-                                    <div class="font-semibold">{{ $movement->movement_type->value }}</div>
-                                    <div class="text-xs text-gray-500">{{ $movement->created_at->format('d/m/Y H:i') }}</div>
-                                    <div class="text-sm mt-1">Por: {{ $movement->user->name ?? 'Sistema' }}</div>
+            <!-- Historial Reciente -->
+            <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50">
+                <div class="p-4">
+                    <h3 class="text-sm font-black text-slate-800 dark:text-slate-100 mb-6 uppercase tracking-widest">Historial Reciente</h3>
+                    <div class="overflow-y-auto max-h-96 pr-2">
+                        <div class="space-y-6">
+                            @forelse($expedient->movements->take(5) as $movement)
+                                <div class="relative pl-8 border-l-2 border-slate-100 pb-1 last:pb-0">
+                                    <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-primary border-4 border-white"></div>
+                                    <div class="mb-1">
+                                        <span class="text-xs font-black uppercase tracking-wider text-primary">{{ $movement->movement_type->value }}</span>
+                                        <span class="text-[10px] font-bold text-slate-400 ml-2">{{ $movement->created_at->format('d/m/Y H:i') }}</span>
+                                    </div>
+                                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">Por: {{ $movement->user->name ?? 'Sistema' }}</p>
                                     @if($movement->notes)
-                                        <div class="text-xs mt-1 italic">"{{ $movement->notes }}"</div>
+                                        <div class="mt-2 text-[11px] italic text-slate-500 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                            "{{ $movement->notes }}"
+                                        </div>
                                     @endif
                                 </div>
-                            </li>
-                        @empty
-                            <li class="text-sm text-gray-500">No hay movimientos registrados.</li>
-                        @endforelse
-                    </ul>
+                            @empty
+                                <p class="text-sm text-center text-slate-400 py-8">No hay movimientos registrados.</p>
+                            @endforelse
+                        </div>
+                    </div>
                 </div>
             </x-mary-card>
         </div>

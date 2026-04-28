@@ -9,8 +9,10 @@
         
         <!-- Detalles de la Solicitud -->
         <div class="space-y-6">
-            <x-mary-card title="Detalles del Préstamo" shadow class="border-none shadow-xl shadow-slate-200/50">
-                <div class="space-y-6 p-2">
+            <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50">
+                <div class="space-y-6 p-4">
+                    <h3 class="text-xl font-black text-slate-800 dark:text-slate-100 mb-2">Detalles del Préstamo</h3>
+                    
                     <!-- Estado -->
                     <div class="flex justify-between items-center border-b border-slate-100 pb-4">
                         <div>
@@ -115,8 +117,16 @@
                     <div class="space-y-4">
                         @can('loans.return')
                             <p class="text-sm text-gray-600">El expediente está actualmente en posesión del solicitante. Requiere verificación con contraseña (SUDO) para recibirlo de vuelta en el archivo.</p>
-                            <x-mary-textarea wire:model="notes" label="Notas de devolución (opcional)" placeholder="Ej. Faltan hojas, carpeta dañada..." rows="2" />
-                            <x-mary-button label="Registrar Devolución" icon="o-arrow-uturn-down" class="btn-accent w-full" wire:click="triggerAction('return')" spinner />
+                            <div class="space-y-3">
+                                <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">Notas de devolución (opcional)</label>
+                                <textarea 
+                                    wire:model="notes" 
+                                    placeholder="Ej. Faltan hojas, carpeta dañada..." 
+                                    rows="2"
+                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl p-5 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none resize-none"
+                                ></textarea>
+                            </div>
+                            <x-mary-button label="Registrar Devolución" icon="o-arrow-uturn-down" class="btn-accent w-full h-14 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-accent/20" wire:click="triggerAction('return')" spinner />
                         @else
                             <x-mary-alert icon="o-briefcase" title="En tu posesión" class="alert-primary">
                                 Tienes este expediente en tu poder. Recuerda devolverlo a tiempo para evitar sanciones.
@@ -138,7 +148,20 @@
     <x-mary-modal wire:model="sudoModalOpen" title="Verificación de Identidad Requerida" separator>
         <div class="py-4">
             <p class="mb-4 text-sm text-gray-600">Para continuar con esta acción crítica, por favor confirma tu identidad ingresando tu contraseña.</p>
-            <x-mary-input label="Tu Contraseña" wire:model="sudoPassword" type="password" icon="o-key" placeholder="Contraseña..." />
+            <div class="space-y-3">
+                <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">Tu Contraseña</label>
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
+                        <x-mary-icon name="o-key" class="w-5 h-5" />
+                    </div>
+                    <input 
+                        type="password"
+                        wire:model="sudoPassword" 
+                        placeholder="Contraseña..." 
+                        class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl h-16 pl-14 pr-6 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none"
+                    />
+                </div>
+            </div>
         </div>
         <x-slot:actions>
             <x-mary-button label="Cancelar" wire:click="$set('sudoModalOpen', false)" class="btn-ghost" />
