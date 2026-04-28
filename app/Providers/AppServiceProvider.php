@@ -29,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
             \App\Events\LoanApproved::class,
             \App\Events\LoanDelivered::class,
             \App\Events\LoanReturned::class,
+            \App\Events\LoanCancelled::class,
         ], \App\Listeners\LoanActivityListener::class);
     }
 }

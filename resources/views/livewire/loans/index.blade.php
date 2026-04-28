@@ -1,7 +1,8 @@
 <div>
     <x-mary-header title="Préstamos" subtitle="Listado de solicitudes de expedientes">
         <x-slot:actions>
-            <x-mary-button icon="o-plus" class="btn-primary" link="{{ route('loans.request') }}">Nueva Solicitud</x-mary-button>
+            <x-mary-button icon="o-document-arrow-down" wire:click="exportActiveLoans" class="btn-outline btn-sm" spinner>Exportar Préstamos</x-mary-button>
+            <x-mary-button icon="o-plus" class="btn-primary btn-sm" link="{{ route('loans.request') }}">Nueva Solicitud</x-mary-button>
         </x-slot:actions>
     </x-mary-header>
 

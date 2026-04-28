@@ -16,38 +16,59 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased min-h-screen bg-base-200">
-    <x-mary-nav sticky class="lg:hidden">
+    <x-mary-nav sticky class="bg-base-100 border-b border-base-300 z-[60]">
         <x-slot:brand>
             <div class="font-bold text-xl ml-2">Archivo</div>
         </x-slot:brand>
         <x-slot:actions>
-            <livewire:notifications-bell />
-            <label for="main-drawer" class="lg:hidden">
-                <x-mary-icon name="o-bars-3" class="cursor-pointer" />
-            </label>
+            <div class="flex items-center gap-2 md:gap-4">
+                <livewire:notifications-bell />
+                
+                <x-mary-dropdown right class="btn-ghost">
+                    <x-slot:label>
+                        <div class="flex items-center gap-3">
+                            <div class="hidden md:flex flex-col items-end">
+                                <span class="text-xs font-bold leading-none">{{ Auth::user()->name }}</span>
+                                <span class="text-[10px] opacity-60 uppercase tracking-tighter">{{ Auth::user()->getRoleNames()->first() }}</span>
+                            </div>
+                            <x-mary-icon name="o-user-circle" class="w-8 h-8 opacity-70" />
+                        </div>
+                    </x-slot:label>
+                    
+                    <x-mary-menu-item title="Mi Perfil" icon="o-user" link="/profile" />
+                    <x-mary-menu-separator />
+                    <x-mary-menu-item icon="o-arrow-right-on-rectangle" class="text-error">
+                        <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                            @csrf
+                            <button type="submit" class="w-full text-left">Cerrar Sesión</button>
+                        </form>
+                    </x-mary-menu-item>
+                </x-mary-dropdown>
+
+                <label for="main-drawer" class="lg:hidden btn btn-ghost btn-sm btn-circle">
+                    <x-mary-icon name="o-bars-3" />
+                </label>
+            </div>
         </x-slot:actions>
     </x-mary-nav>
 
     <x-mary-main with-nav full-width>
         <!-- Sidebar -->
-        <x-slot:sidebar drawer="main-drawer" collapsible class="bg-base-100">
-            <div class="hidden lg:flex items-center justify-between p-4 mb-4 border-b border-base-300">
+        <x-slot:sidebar drawer="main-drawer" collapsible class="bg-base-100 z-50">
+            <div class="hidden lg:flex items-center p-4 mb-4 border-b border-base-300">
                 <div class="font-bold text-xl tracking-widest text-primary">ARCHIVO</div>
-                <livewire:notifications-bell />
             </div>
 
             <x-mary-menu activate-by-route>
-                @if(Auth::user() && Auth::user()->name)
-                    <x-mary-menu-item title="{{ Auth::user()->name }}" icon="o-user" link="/profile" class="mb-4 text-sm font-medium" />
-                @endif
-                
                 <x-mary-menu-item title="Dashboard" icon="o-chart-pie" link="{{ route('dashboard') }}" />
 
                 @can('expedients.view')
                 <x-mary-menu-sub title="Expedientes" icon="o-folder">
                     <x-mary-menu-item title="Buscar" icon="o-magnifying-glass" link="{{ route('expedients.index') }}" />
                     <x-mary-menu-item title="Escanear QR" icon="o-qr-code" link="{{ route('expedients.scanner') }}" />
-                    <x-mary-menu-item title="Auditoría / Inventario" icon="o-check-badge" link="{{ route('expedients.audit') }}" />
+                    @can('expedients.change-location')
+                        <x-mary-menu-item title="Auditoría / Inventario" icon="o-check-badge" link="{{ route('expedients.audit') }}" />
+                    @endcan
                     @can('expedients.create')
                         <x-mary-menu-item title="Crear Nuevo" icon="o-plus" link="{{ route('expedients.create') }}" />
                     @endcan
@@ -77,13 +98,6 @@
                 <x-mary-menu-separator />
 
                 <x-mary-theme-toggle darkTheme="dark" lightTheme="light" class="btn btn-sm btn-ghost w-full justify-start mt-2" />
-                
-                <form method="POST" action="{{ route('logout') }}" class="mt-2">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-error btn-outline w-full justify-start">
-                        <x-mary-icon name="o-arrow-right-on-rectangle" /> Salir
-                    </button>
-                </form>
             </x-mary-menu>
         </x-slot:sidebar>
 

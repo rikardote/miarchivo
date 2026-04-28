@@ -3,6 +3,23 @@
 
     @if($isAdmin)
         <!-- Dashboard ADMINISTRADOR -->
+        @if($pendingTransfersCount > 0)
+            <div class="mb-6">
+                <x-mary-card class="bg-warning/10 border-warning/30 shadow-lg border-2">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-warning/20 rounded-full">
+                            <x-mary-icon name="o-truck" class="w-8 h-8 text-warning" />
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-black text-warning">Traslados Pendientes a Almacén</h3>
+                            <p class="text-sm opacity-80">Se detectaron **{{ $pendingTransfersCount }}** expedientes de personal de baja que aún figuran físicamente en Delegación. Se recomienda iniciar el traslado al archivo de concentración.</p>
+                        </div>
+                        <x-mary-button label="Gestionar Traslados" icon="o-arrow-right" link="{{ route('expedients.index', ['filter' => 'pending_transfer']) }}" class="btn-warning" />
+                    </div>
+                </x-mary-card>
+            </div>
+        @endif
+
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <x-mary-stat title="Total Expedientes" value="{{ $totalExpedients }}" icon="o-folder" class="bg-base-100 shadow-sm" />
             <x-mary-stat title="En Préstamo" value="{{ $loanedExpedients }}" icon="o-arrow-path" class="bg-primary/5 text-primary shadow-sm" />

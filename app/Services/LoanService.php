@@ -170,6 +170,8 @@ class LoanService
                 $expedient->current_location_id,
                 'Préstamo cancelado.'
             );
+
+            \App\Events\LoanCancelled::dispatch($loan);
         });
     }
 }

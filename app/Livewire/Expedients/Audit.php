@@ -17,6 +17,11 @@ class Audit extends Component
     
     public bool $is_auditing = false;
 
+    public function mount()
+    {
+        $this->authorize('changeLocation', \App\Models\Expedient::class);
+    }
+
     public function startAudit()
     {
         $this->validate([
@@ -45,7 +50,25 @@ class Audit extends Component
         $this->reset(['location_id', 'scanned_codes', 'is_auditing', 'current_scan']);
     }
 
-    public function render()
+    public function fixMisplaced(int $expedientId, \App\Services\ExpedientService $service)
+    {
+        $expedient = Expedient::findOrFail($expedientId);
+        $service->changeLocation($expedient, $this->location_id, "Corregido durante auditoría de ubicación ID: {$this->location_id}");
+        $this->success("Ubicación corregida para: {$expedient->expedient_code}");
+    }
+
+    public function fixAllMisplaced(\App\Services\ExpedientService $service)
+    {
+        $misplaced = $this->getResults()['misplaced'];
+        
+        foreach ($misplaced as $exp) {
+            $service->changeLocation($exp, $this->location_id, "Corregido masivamente durante auditoría");
+        }
+
+        $this->success("Se corrigieron " . count($misplaced) . " expedientes.");
+    }
+
+    private function getResults()
     {
         $expectedExpedients = $this->location_id 
             ? Expedient::where('current_location_id', $this->location_id)->get()
@@ -58,10 +81,8 @@ class Audit extends Component
         ];
 
         if ($this->is_auditing) {
-            // Check scanned against expected
             foreach ($this->scanned_codes as $code) {
                 $expedient = Expedient::where('expedient_code', $code)->first();
-                
                 if ($expedient) {
                     if ($expedient->current_location_id == $this->location_id) {
                         $results['correct'][] = $expedient;
@@ -71,7 +92,6 @@ class Audit extends Component
                 }
             }
 
-            // Check what's missing from expected
             foreach ($expectedExpedients as $exp) {
                 if (!in_array($exp->expedient_code, $this->scanned_codes)) {
                     $results['missing'][] = $exp;
@@ -79,10 +99,19 @@ class Audit extends Component
             }
         }
 
+        return $results;
+    }
+
+    public function render()
+    {
+        $expectedCount = $this->location_id 
+            ? Expedient::where('current_location_id', $this->location_id)->count()
+            : 0;
+
         return view('livewire.expedients.audit', [
             'locations' => ArchiveLocation::with('branch')->get(),
-            'results' => $results,
-            'expectedCount' => $expectedExpedients->count(),
+            'results' => $this->getResults(),
+            'expectedCount' => $expectedCount,
         ]);
     }
 }

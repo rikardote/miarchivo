@@ -84,11 +84,18 @@
                 <div class="space-y-4">
                     @if(count($results['misplaced']) > 0)
                         <x-mary-card title="Fuera de Lugar ({{ count($results['misplaced']) }})" class="border-l-4 border-warning shadow-sm">
+                            <x-slot:actions>
+                                <x-mary-button label="Corregir Todos" icon="o-check-circle" wire:click="fixAllMisplaced" class="btn-sm btn-warning" spinner="fixAllMisplaced" />
+                            </x-slot:actions>
+
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                                 @foreach($results['misplaced'] as $exp)
-                                    <div class="p-2 bg-warning/5 rounded border border-warning/10 text-xs">
-                                        <div class="font-bold">{{ $exp->expedient_code }}</div>
-                                        <div class="text-gray-500">Debería estar en: {{ $exp->currentLocation->full_label ?? 'Sin ubicación' }}</div>
+                                    <div class="p-3 bg-warning/5 rounded-lg border border-warning/10 flex justify-between items-center group">
+                                        <div>
+                                            <div class="font-bold text-sm">{{ $exp->expedient_code }}</div>
+                                            <div class="text-[10px] text-gray-500 uppercase">Sistema dice: {{ $exp->currentLocation->full_label ?? 'Sin ubicación' }}</div>
+                                        </div>
+                                        <x-mary-button icon="o-map-pin" wire:click="fixMisplaced({{ $exp->id }})" class="btn-xs btn-warning btn-outline opacity-0 group-hover:opacity-100 transition-opacity" tooltip="Traer a esta ubicación" spinner />
                                     </div>
                                 @endforeach
                             </div>

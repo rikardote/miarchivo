@@ -50,42 +50,45 @@ class EmployeeApiService
             return null;
         }
 
-        // Determine branch based on city or work center (basic mapping)
-        $branchId = $this->determineBranch($apiData);
+        // Determine status from API (map 'ACTIVO' to 'active', otherwise 'inactive')
+        $apiStatus = strtoupper($apiData['estado_empleado'] ?? $apiData['estatus'] ?? 'ACTIVO');
+        $status = (str_contains($apiStatus, 'ACTIVO')) ? 'active' : 'inactive';
 
-        return Employee::updateOrCreate(
-            ['rfc' => $apiData['id_legal']],
-            [
-                'external_api_id' => $apiData['id'] ?? null,
-                'employee_number' => $apiData['id_empleado'] ?? null,
-                'first_name' => $apiData['nombre'] ?? '',
-                'last_name' => trim(($apiData['apellido_1'] ?? '') . ' ' . ($apiData['apellido_2'] ?? '')),
-                'position' => $apiData['n_puesto_plaza'] ?? null,
-                'work_center' => $apiData['n_centro_trabajo'] ?? null,
-                'city' => $apiData['poblacion'] ?? null,
-                'branch_id' => $branchId,
-                'employment_status' => 'active', // Assuming active if in API, could map cancelado field if needed
-                'last_synced_at' => now(),
-            ]
-        );
+        $employee = Employee::where('rfc', $apiData['id_legal'])->first();
+
+        $data = [
+            'external_api_id' => $apiData['id'] ?? null,
+            'employee_number' => $apiData['id_empleado'] ?? null,
+            'first_name' => $apiData['nombre'] ?? '',
+            'last_name' => trim(($apiData['apellido_1'] ?? '') . ' ' . ($apiData['apellido_2'] ?? '')),
+            'position' => $apiData['n_puesto_plaza'] ?? null,
+            'work_center' => $apiData['n_centro_trabajo'] ?? null,
+            'city' => $apiData['poblacion'] ?? null,
+            'employment_status' => $status,
+            'last_synced_at' => now(),
+        ];
+
+        // Only assign branch if it's a new employee
+        if (!$employee) {
+            $data['branch_id'] = $this->determineBranch($apiData, $status);
+            return Employee::create(array_merge(['rfc' => $apiData['id_legal']], $data));
+        }
+
+        $employee->update($data);
+        return $employee;
     }
 
     /**
-     * Helper to guess the branch based on location data.
+     * Helper to guess the branch for NEW employees only.
      */
-    protected function determineBranch(array $apiData): ?int
+    protected function determineBranch(array $apiData, string $status): ?int
     {
-        $city = strtoupper($apiData['poblacion'] ?? '');
-        $workCenter = strtoupper($apiData['n_centro_trabajo'] ?? '');
-
-        if (str_contains($city, 'MEXICALI') || str_contains($workCenter, 'MEXICALI')) {
-            return Branch::where('code', 'MEX')->value('id');
+        // If employee is inactive (baja), they go to RH ALMANCEN (CEN)
+        if ($status === 'inactive') {
+            return Branch::where('code', 'CEN')->value('id');
         }
 
-        if (str_contains($city, 'TIJUANA') || str_contains($workCenter, 'TIJUANA')) {
-            return Branch::where('code', 'TIJ')->value('id');
-        }
-
-        return Branch::where('code', 'CEN')->value('id');
+        // Active employees go to RH DELEGACION ESTATAL (MEX)
+        return Branch::where('code', 'MEX')->value('id');
     }
 }

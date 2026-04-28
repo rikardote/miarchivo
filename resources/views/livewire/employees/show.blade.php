@@ -30,11 +30,17 @@
 
         <div class="md:col-span-2 space-y-6">
             <x-mary-card title="Expedientes de Archivo" icon="o-folder-open">
+                <x-slot:actions>
+                    @if($employee->expedients->isNotEmpty())
+                        <x-mary-button icon="o-plus" label="Nuevo Tomo" link="{{ route('expedients.create', $employee) }}" class="btn-sm btn-primary btn-outline" />
+                    @endif
+                </x-slot:actions>
+
                 @if($employee->expedients->isEmpty())
                     <div class="text-center py-8 text-gray-500">
                         <x-mary-icon name="o-inbox" class="w-12 h-12 mb-2 opacity-50" />
                         <p>No hay expedientes registrados para este empleado.</p>
-                        <x-mary-button class="btn-primary mt-4" icon="o-plus" link="{{ route('expedients.create') }}">Crear Expediente</x-mary-button>
+                        <x-mary-button class="btn-primary mt-4" icon="o-plus" link="{{ route('expedients.create', $employee) }}">Crear Expediente</x-mary-button>
                     </div>
                 @else
                     <div class="overflow-x-auto">

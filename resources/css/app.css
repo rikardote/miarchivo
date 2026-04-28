@@ -1,1 +1,11 @@
 @import "tailwindcss";
+
+/* Fix for Mary UI dropdowns in fixed/sticky headers */
+.mary-dropdown-content {
+    z-index: 9999 !important;
+}
+
+/* Ensure navbar doesn't clip content */
+nav.sticky {
+    overflow: visible !important;
+}

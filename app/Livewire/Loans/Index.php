@@ -31,6 +31,42 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function exportActiveLoans()
+    {
+        $loans = LoanRequest::whereIn('status', ['delivered', 'approved'])
+            ->with(['expedient.employee', 'requester'])
+            ->get();
+
+        $headers = [
+            'Content-type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename=prestamos_activos_' . now()->format('Y-m-d') . '.csv',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0'
+        ];
+
+        $callback = function() use ($loans) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['ID Solicitud', 'Expediente', 'Empleado', 'Solicitante', 'Fecha Entrega', 'Fecha Vencimiento', 'Estado']);
+
+            foreach ($loans as $loan) {
+                fputcsv($file, [
+                    $loan->id,
+                    $loan->expedient->expedient_code,
+                    $loan->expedient->employee->full_name,
+                    $loan->requester->name,
+                    $loan->delivered_at?->format('Y-m-d H:i') ?? 'N/A',
+                    $loan->due_date?->format('Y-m-d') ?? 'N/A',
+                    $loan->status
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
     public function render()
     {
         $query = LoanRequest::query()->with(['expedient.employee', 'requester', 'approver']);

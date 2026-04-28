@@ -20,27 +20,48 @@ class LoanActivityListener
                 ->performedOn($loanRequest)
                 ->log("Solicitud de préstamo creada para el expediente {$expedient->expedient_code} ({$employee->full_name})");
 
-            // Notify Admins and Superusers - TEMPORARILY DISABLED DUE TO DB TABLE ISSUE
-            // $admins = \App\Models\User::role(['admin', 'superuser'])->get();
-            // \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewLoanRequestNotification($loanRequest));
+            // Notify Admins and Superusers
+            $admins = \App\Models\User::role(['admin', 'superuser'])->get();
+            $message = "Nueva solicitud: {$expedient->expedient_code} por {$loanRequest->requester->name}";
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\LoanStatusNotification($loanRequest, $message, 'info'));
+            }
         }
 
         if ($event instanceof LoanApproved) {
             activity('loans')
                 ->performedOn($loanRequest)
                 ->log("Préstamo aprobado para el expediente {$expedient->expedient_code}");
+
+            // Notify Requester
+            $message = "¡Tu solicitud del expediente {$expedient->expedient_code} ha sido APROBADA!";
+            $loanRequest->requester->notify(new \App\Notifications\LoanStatusNotification($loanRequest, $message, 'success'));
         }
 
         if ($event instanceof LoanDelivered) {
             activity('loans')
                 ->performedOn($loanRequest)
                 ->log("Expediente {$expedient->expedient_code} entregado a {$employee->full_name}");
+
+            // Notify Requester
+            $message = "Has recibido físicamente el expediente {$expedient->expedient_code}.";
+            $loanRequest->requester->notify(new \App\Notifications\LoanStatusNotification($loanRequest, $message, 'info'));
         }
 
         if ($event instanceof LoanReturned) {
             activity('loans')
                 ->performedOn($loanRequest)
                 ->log("Expediente {$expedient->expedient_code} devuelto al archivo");
+        }
+
+        if ($event instanceof \App\Events\LoanCancelled) {
+            activity('loans')
+                ->performedOn($loanRequest)
+                ->log("Solicitud cancelada para el expediente {$expedient->expedient_code}");
+
+            // Notify Requester
+            $message = "Tu solicitud del expediente {$expedient->expedient_code} ha sido CANCELADA.";
+            $loanRequest->requester->notify(new \App\Notifications\LoanStatusNotification($loanRequest, $message, 'error'));
         }
     }
 }

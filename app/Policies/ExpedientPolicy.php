@@ -23,17 +23,17 @@ class ExpedientPolicy
         return $user->hasPermissionTo('expedients.create');
     }
 
-    public function update(User $user, Expedient $expedient): bool
+    public function update(User $user, ?Expedient $expedient = null): bool
     {
         return $user->hasPermissionTo('expedients.update');
     }
 
-    public function delete(User $user, Expedient $expedient): bool
+    public function delete(User $user, ?Expedient $expedient = null): bool
     {
         return $user->hasPermissionTo('expedients.delete');
     }
 
-    public function changeLocation(User $user, Expedient $expedient): bool
+    public function changeLocation(User $user, ?Expedient $expedient = null): bool
     {
         return $user->hasPermissionTo('expedients.change-location');
     }

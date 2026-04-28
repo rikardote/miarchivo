@@ -31,6 +31,9 @@ class Index extends Component
     #[Url]
     public ?int $department_id = null;
 
+    #[Url]
+    public string $filter = '';
+
     public array $sortBy = ['column' => 'created_at', 'direction' => 'desc'];
 
     public function updatingSearch()
@@ -99,6 +102,10 @@ class Index extends Component
             ->with(['employee.branch', 'employee.department', 'currentLocation'])
             ->when($this->search, fn (Builder $q) => $q->search($this->search))
             ->when($this->status, fn (Builder $q) => $q->where('current_status', $this->status))
+            ->when($this->filter === 'pending_transfer', function($q) {
+                $q->whereHas('employee', fn($e) => $e->where('employment_status', 'inactive'))
+                  ->whereHas('currentLocation.branch', fn($b) => $b->where('code', 'MEX'));
+            })
             ->when($this->branch_id, fn (Builder $q) => $q->whereHas('employee', fn($e) => $e->where('branch_id', $this->branch_id)))
             ->when($this->department_id, fn (Builder $q) => $q->whereHas('employee', fn($e) => $e->where('department_id', $this->department_id)))
             ->orderBy($this->sortBy['column'], $this->sortBy['direction'])

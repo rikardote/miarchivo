@@ -40,6 +40,11 @@ class Dashboard extends Component
                     ->limit(5)
                     ->get(),
                 'totalEmployees' => Employee::count(),
+                'pendingTransfersCount' => Expedient::whereHas('employee', function($q) {
+                    $q->where('employment_status', 'inactive');
+                })->whereHas('currentLocation.branch', function($q) {
+                    $q->where('code', 'MEX');
+                })->count(),
                 'branchStats' => \App\Models\Branch::withCount('employees')->get(),
                 'statusStats' => collect(ExpedientStatus::cases())->map(fn($status) => [
                     'label' => $status->label(),
