@@ -1,5 +1,5 @@
 <div>
-    <x-mary-header title="Dashboard" subtitle="Resumen general del sistema de archivo" />
+    <x-mary-header title="Tablero de Control" subtitle="Resumen general del sistema de archivo" />
 
     @if($isAdmin)
         <!-- Dashboard ADMINISTRADOR -->
@@ -32,6 +32,9 @@
                 </x-mary-card>
 
                 <x-mary-card title="Estado de Carpetas" subtitle="Estatus operativo actual">
+                    <x-slot:actions>
+                        <x-mary-button icon="o-information-circle" class="btn-ghost btn-sm text-primary" @click="$dispatch('open-glossary')" tooltip="¿Qué significan estos estados?" />
+                    </x-slot:actions>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                         @foreach($statusStats as $stat)
                             <div class="p-3 bg-{{ $stat['color'] }}/10 rounded-xl border border-{{ $stat['color'] }}/20 text-center">
@@ -44,6 +47,25 @@
             </div>
 
             <div class="space-y-8">
+                @if($overdueLoans->count() > 0)
+                    <x-mary-card title="Alertas de Vencimiento" subtitle="Préstamos fuera de tiempo" class="border-l-4 border-error">
+                        <div class="space-y-4">
+                            @foreach($overdueLoans as $loan)
+                                <div class="p-2 bg-error/5 rounded-lg border border-error/10">
+                                    <div class="flex justify-between items-start">
+                                        <span class="font-bold text-sm">{{ $loan->expedient->expedient_code }}</span>
+                                        <span class="text-[10px] text-error font-bold uppercase">{{ $loan->due_date->diffForHumans() }}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-500">Solicitado por: {{ $loan->requester->name }}</p>
+                                    <div class="mt-2 text-right">
+                                        <x-mary-button label="Gestionar" icon="o-pencil-square" link="{{ route('loans.manage', $loan) }}" class="btn-xs btn-error btn-outline" />
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </x-mary-card>
+                @endif
+
                 <x-mary-card title="Actividad Reciente" subtitle="Historial de movimientos">
                     <div class="space-y-4">
                         @forelse($recentActivities as $activity)
@@ -65,6 +87,7 @@
                 <x-mary-card title="Accesos Directos">
                     <div class="grid grid-cols-1 gap-2">
                         <x-mary-button label="Nuevo Expediente" icon="o-plus" link="{{ route('expedients.create') }}" class="btn-outline btn-sm w-full justify-start" />
+                        <x-mary-button label="Solicitud Masiva" icon="o-rectangle-stack" link="{{ route('loans.bulk') }}" class="btn-outline btn-sm w-full justify-start" />
                         <x-mary-button label="Ver Préstamos" icon="o-clipboard-document-check" link="{{ route('loans.index') }}" class="btn-outline btn-sm w-full justify-start" />
                         <x-mary-button label="Sincronizar API" icon="o-arrow-path" class="btn-outline btn-sm w-full justify-start" />
                     </div>
@@ -109,4 +132,57 @@
             </x-mary-card>
         </div>
     @endif
+
+    <!-- Glosario de Estados -->
+    <x-mary-modal wire:model="showGlossary" title="Glosario de Estados" separator>
+        <div class="space-y-4">
+            <p class="text-sm text-gray-500 mb-4">A continuación se detalla el significado de cada estado operativo de los expedientes:</p>
+            
+            <div class="grid grid-cols-1 gap-3">
+                <div class="flex items-center gap-3 p-2 rounded-lg border border-success/20 bg-success/5">
+                    <x-mary-badge value="Disponible" class="badge-success whitespace-nowrap flex-shrink-0" />
+                    <p class="text-xs">El expediente se encuentra físicamente en su ubicación asignada en el archivo.</p>
+                </div>
+                
+                <div class="flex items-center gap-3 p-2 rounded-lg border border-warning/20 bg-warning/5">
+                    <x-mary-badge value="Solicitado" class="badge-warning whitespace-nowrap flex-shrink-0" />
+                    <p class="text-xs">Un usuario ha pedido el expediente. Está esperando aprobación del personal de archivo.</p>
+                </div>
+                
+                <div class="flex items-center gap-3 p-2 rounded-lg border border-info/20 bg-info/5">
+                    <x-mary-badge value="Reservado" class="badge-info whitespace-nowrap flex-shrink-0" />
+                    <p class="text-xs">La solicitud fue aprobada. El expediente está separado y listo para ser recogido.</p>
+                </div>
+                
+                <div class="flex items-center gap-3 p-2 rounded-lg border border-primary/20 bg-primary/5">
+                    <x-mary-badge value="Prestado" class="badge-primary whitespace-nowrap flex-shrink-0" />
+                    <p class="text-xs">El expediente ha sido entregado físicamente al usuario solicitante.</p>
+                </div>
+                
+                <div class="flex items-center gap-3 p-2 rounded-lg border border-accent/20 bg-accent/5">
+                    <x-mary-badge value="Devuelto" class="badge-accent whitespace-nowrap flex-shrink-0" />
+                    <p class="text-xs">El expediente regresó al archivo, pero aún no se ha guardado en su estante definitivo.</p>
+                </div>
+                
+                <div class="flex items-center gap-3 p-2 rounded-lg border border-secondary/20 bg-secondary/5">
+                    <x-mary-badge value="En almacén" class="badge-secondary whitespace-nowrap flex-shrink-0" />
+                    <p class="text-xs">El expediente se encuentra en una zona de tránsito o depósito temporal.</p>
+                </div>
+
+                <div class="flex items-center gap-3 p-2 rounded-lg border border-neutral/20 bg-neutral/5">
+                    <x-mary-badge value="Archivado" class="badge-neutral whitespace-nowrap flex-shrink-0" />
+                    <p class="text-xs">El expediente ha sido enviado a un archivo de concentración o baja definitiva.</p>
+                </div>
+                
+                <div class="flex items-center gap-3 p-2 rounded-lg border border-error/20 bg-error/5">
+                    <x-mary-badge value="Extraviado" class="badge-error whitespace-nowrap flex-shrink-0" />
+                    <p class="text-xs text-error font-medium">El expediente no ha sido localizado físicamente ni se tiene registro de préstamo activo.</p>
+                </div>
+            </div>
+        </div>
+
+        <x-slot:actions>
+            <x-mary-button label="Entendido" wire:click="$set('showGlossary', false)" class="btn-primary" />
+        </x-slot:actions>
+    </x-mary-modal>
 </div>

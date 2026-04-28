@@ -40,7 +40,14 @@ class Expedient extends Model
     {
         return LogOptions::defaults()
             ->logOnly(['current_status', 'current_location_id', 'current_holder_id'])
-            ->logOnlyDirty();
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
+                'created' => "Expediente creado: {$this->expedient_code}",
+                'updated' => "Expediente actualizado: {$this->expedient_code}",
+                'deleted' => "Expediente eliminado: {$this->expedient_code}",
+                default => "Actividad en expediente: {$eventName}"
+            });
     }
 
     // Relationships
@@ -122,5 +129,10 @@ class Expedient extends Model
             ->whereIn('status', ['pending', 'approved', 'reserved', 'delivered'])
             ->latest()
             ->first();
+    }
+
+    public function getQrContentAttribute(): string
+    {
+        return $this->expedient_code;
     }
 }

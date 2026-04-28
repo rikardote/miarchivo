@@ -46,6 +46,8 @@
                 @can('expedients.view')
                 <x-mary-menu-sub title="Expedientes" icon="o-folder">
                     <x-mary-menu-item title="Buscar" icon="o-magnifying-glass" link="{{ route('expedients.index') }}" />
+                    <x-mary-menu-item title="Escanear QR" icon="o-qr-code" link="{{ route('expedients.scanner') }}" />
+                    <x-mary-menu-item title="Auditoría / Inventario" icon="o-check-badge" link="{{ route('expedients.audit') }}" />
                     @can('expedients.create')
                         <x-mary-menu-item title="Crear Nuevo" icon="o-plus" link="{{ route('expedients.create') }}" />
                     @endcan
@@ -54,6 +56,7 @@
 
                 <x-mary-menu-sub title="Préstamos" icon="o-document-text">
                     <x-mary-menu-item title="Mis Solicitudes" icon="o-inbox" link="{{ route('loans.index', ['mine' => 1]) }}" />
+                    <x-mary-menu-item title="Préstamo Masivo" icon="o-rectangle-stack" link="{{ route('loans.bulk') }}" />
                     @can('loans.approve')
                         <x-mary-menu-item title="Gestión de Préstamos" icon="o-clipboard-document-check" link="{{ route('loans.index') }}" />
                     @endcan

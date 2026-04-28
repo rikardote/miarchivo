@@ -23,7 +23,11 @@
         ]" :rows="$employees" :sort-by="$sortBy" with-pagination>
 
             @scope('cell_employment_status', $employee)
-                <x-mary-badge :value="ucfirst($employee->employment_status)" class="badge-{{ $employee->employment_status === 'active' ? 'success' : 'neutral' }}" />
+                @php
+                    $statusLabel = $employee->employment_status === 'active' ? 'Activo' : 'Inactivo';
+                    $statusColor = $employee->employment_status === 'active' ? 'success' : 'neutral';
+                @endphp
+                <x-mary-badge :value="$statusLabel" class="badge-{{ $statusColor }}" />
             @endscope
 
             @scope('cell_actions', $employee)

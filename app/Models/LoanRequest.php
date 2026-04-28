@@ -41,7 +41,14 @@ class LoanRequest extends Model
     {
         return LogOptions::defaults()
             ->logOnly(['status', 'approved_by', 'delivered_at', 'returned_at'])
-            ->logOnlyDirty();
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
+                'created' => "Solicitud de préstamo creada para {$this->expedient->expedient_code}",
+                'updated' => "Préstamo actualizado para {$this->expedient->expedient_code} (Estado: {$this->status->label()})",
+                'deleted' => "Solicitud de préstamo eliminada",
+                default => "Actividad en préstamo: {$eventName}"
+            });
     }
 
     // Relationships

@@ -15,7 +15,6 @@
                 <div class="grid grid-cols-2 gap-4">
                     <x-mary-stat title="Nombre Completo" value="{{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}" icon="o-user" />
                     <x-mary-stat title="RFC" value="{{ $expedient->employee->rfc }}" icon="o-identification" />
-                    <x-mary-stat title="Departamento" value="{{ $expedient->employee->department->name ?? 'N/A' }}" icon="o-building-office" />
                     <x-mary-stat title="Sucursal" value="{{ $expedient->employee->branch->name ?? 'N/A' }}" icon="o-building-storefront" />
                 </div>
             </x-mary-card>
@@ -41,6 +40,14 @@
 
         <!-- Sidebar Detalles -->
         <div class="space-y-6">
+            <x-mary-card title="Identificación Física" class="text-center shadow-sm">
+                <div class="flex justify-center mb-4 bg-white p-2 rounded-lg inline-block mx-auto border border-base-200">
+                    {!! QrCode::size(120)->generate($expedient->qr_content) !!}
+                </div>
+                <div class="text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-4">{{ $expedient->expedient_code }}</div>
+                <x-mary-button label="Imprimir Etiqueta" icon="o-printer" link="{{ route('expedients.print', $expedient) }}" external class="btn-outline btn-sm w-full" />
+            </x-mary-card>
+
             @if($expedient->currentHolder)
                 <x-mary-card title="En Posesión De" class="bg-primary/10 border-primary">
                     <div class="flex items-center space-x-4">

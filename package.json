@@ -17,6 +17,7 @@
         "vite": "^8.0.0"
     },
     "dependencies": {
-        "cssesc": "^3.0.0"
+        "cssesc": "^3.0.0",
+        "html5-qrcode": "^2.3.8"
     }
 }

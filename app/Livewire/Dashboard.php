@@ -8,10 +8,19 @@ use App\Models\Employee;
 use App\Enums\ExpedientStatus;
 use App\Enums\LoanStatus;
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Auth;
 
 class Dashboard extends Component
 {
+    public bool $showGlossary = false;
+
+    #[On('open-glossary')]
+    public function openGlossary()
+    {
+        $this->showGlossary = true;
+    }
+
     public function render()
     {
         $user = Auth::user();
@@ -25,19 +34,43 @@ class Dashboard extends Component
                 'overdueLoansCount' => LoanRequest::where('status', LoanStatus::Delivered)
                     ->where('due_date', '<', now())
                     ->count(),
+                'overdueLoans' => LoanRequest::with(['expedient', 'requester'])
+                    ->where('status', LoanStatus::Delivered)
+                    ->where('due_date', '<', now())
+                    ->limit(5)
+                    ->get(),
                 'totalEmployees' => Employee::count(),
                 'branchStats' => \App\Models\Branch::withCount('employees')->get(),
                 'statusStats' => collect(ExpedientStatus::cases())->map(fn($status) => [
-                    'label' => $status->value,
+                    'label' => $status->label(),
                     'count' => Expedient::where('current_status', $status)->count(),
-                    'color' => match($status) {
-                        ExpedientStatus::Available => 'success',
-                        ExpedientStatus::Loaned => 'primary',
-                        ExpedientStatus::Reserved => 'warning',
-                        default => 'neutral'
-                    }
+                    'color' => $status->color()
                 ]),
-                'recentActivities' => \Spatie\Activitylog\Models\Activity::latest()->limit(8)->get(),
+                'recentActivities' => \Spatie\Activitylog\Models\Activity::latest()->limit(8)->get()->map(function($activity) {
+                    if (in_array($activity->description, ['created', 'updated', 'deleted'])) {
+                        $rawType = str_replace('App\\Models\\', '', $activity->subject_type);
+                        $subjectType = match($rawType) {
+                            'Expedient' => 'Expediente',
+                            'LoanRequest' => 'Préstamo',
+                            'User' => 'Usuario',
+                            'ArchiveLocation' => 'Ubicación',
+                            'Employee' => 'Empleado',
+                            default => $rawType
+                        };
+                        
+                        $subjectName = $activity->subject ? ($activity->subject->expedient_code ?? $activity->subject->full_name ?? $activity->subject->name ?? "#{$activity->subject_id}") : "#{$activity->subject_id}";
+                        
+                        $action = match($activity->description) {
+                            'created' => 'creó',
+                            'updated' => 'actualizó',
+                            'deleted' => 'eliminó',
+                            default => $activity->description
+                        };
+                        
+                        $activity->description = "Se {$action} el {$subjectType}: {$subjectName}";
+                    }
+                    return $activity;
+                }),
                 'isAdmin' => true
             ];
         } else {
@@ -52,7 +85,31 @@ class Dashboard extends Component
                     ->where('status', LoanStatus::Delivered)
                     ->where('due_date', '<', now())
                     ->count(),
-                'recentActivities' => \Spatie\Activitylog\Models\Activity::where('causer_id', $user->id)->latest()->limit(5)->get(),
+                'recentActivities' => \Spatie\Activitylog\Models\Activity::where('causer_id', $user->id)->latest()->limit(5)->get()->map(function($activity) {
+                    if (in_array($activity->description, ['created', 'updated', 'deleted'])) {
+                        $rawType = str_replace('App\\Models\\', '', $activity->subject_type);
+                        $subjectType = match($rawType) {
+                            'Expedient' => 'Expediente',
+                            'LoanRequest' => 'Préstamo',
+                            'User' => 'Usuario',
+                            'ArchiveLocation' => 'Ubicación',
+                            'Employee' => 'Empleado',
+                            default => $rawType
+                        };
+                        
+                        $subjectName = $activity->subject ? ($activity->subject->expedient_code ?? $activity->subject->full_name ?? $activity->subject->name ?? "#{$activity->subject_id}") : "#{$activity->subject_id}";
+                        
+                        $action = match($activity->description) {
+                            'created' => 'creó',
+                            'updated' => 'actualizó',
+                            'deleted' => 'eliminó',
+                            default => $activity->description
+                        };
+                        
+                        $activity->description = "Se {$action} el {$subjectType}: {$subjectName}";
+                    }
+                    return $activity;
+                }),
                 'isAdmin' => false
             ];
         }

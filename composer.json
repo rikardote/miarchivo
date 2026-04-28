@@ -10,7 +10,9 @@
         "laravel/framework": "^13.0",
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^4.2",
+        "picqer/php-barcode-generator": "^3.2",
         "robsontenorio/mary": "^2.8",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-activitylog": "^5.0",
         "spatie/laravel-permission": "^7.3"
     },
