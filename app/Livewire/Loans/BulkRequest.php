@@ -23,11 +23,45 @@ class BulkRequest extends Component
         'observations' => 'nullable|string|max:255',
     ];
 
-    public function processScan()
+    public function mount()
     {
-        $code = trim($this->scannedCode);
+        $this->items = \Illuminate\Support\Facades\Cache::get('bulk_items_' . auth()->id(), []);
+        $this->user_id = \Illuminate\Support\Facades\Cache::get('bulk_user_' . auth()->id());
+        $this->observations = \Illuminate\Support\Facades\Cache::get('bulk_obs_' . auth()->id());
+    }
+
+    public function updated($property)
+    {
+        if ($property === 'user_id' || $property === 'observations') {
+            \Illuminate\Support\Facades\Cache::put('bulk_user_' . auth()->id(), $this->user_id, 3600);
+            \Illuminate\Support\Facades\Cache::put('bulk_obs_' . auth()->id(), $this->observations, 3600);
+        }
+    }
+
+    /**
+     * Sincronizar items desde el caché (usado por wire:poll)
+     */
+    public function syncItems()
+    {
+        $this->items = \Illuminate\Support\Facades\Cache::get('bulk_items_' . auth()->id(), []);
+    }
+
+    #[\Livewire\Attributes\On('code-scanned')]
+    public function processScan($code = null)
+    {
+        $code = $code ?? $this->scannedCode;
+        $code = trim($code);
         
         if (empty($code)) return;
+
+        // Limpiar y extraer código si es una URL (compatibilidad con QR)
+        if (str_contains($code, '/')) {
+            $parts = explode('/', rtrim($code, '/'));
+            $code = end($parts);
+        }
+
+        // Recargar items de caché antes de verificar duplicados
+        $this->items = \Illuminate\Support\Facades\Cache::get('bulk_items_' . auth()->id(), []);
 
         // Verificar si ya está en la lista
         if (collect($this->items)->contains('code', $code)) {
@@ -46,7 +80,6 @@ class BulkRequest extends Component
 
         if (!$expedient->isAvailable()) {
             $this->warning("El expediente {$code} no está disponible (Estatus: {$expedient->current_status->label()}).");
-            // Aún así lo agregamos pero marcado como inválido para que el usuario decida
             $this->addItem($expedient, false);
         } else {
             $this->addItem($expedient, true);
@@ -65,12 +98,22 @@ class BulkRequest extends Component
             'status_color' => $expedient->current_status->color(),
             'isValid' => $isValid
         ]);
+
+        \Illuminate\Support\Facades\Cache::put('bulk_items_' . auth()->id(), $this->items, 3600);
     }
 
     public function removeItem($index)
     {
         unset($this->items[$index]);
         $this->items = array_values($this->items);
+        \Illuminate\Support\Facades\Cache::put('bulk_items_' . auth()->id(), $this->items, 3600);
+    }
+
+    public function clearList()
+    {
+        $this->items = [];
+        \Illuminate\Support\Facades\Cache::forget('bulk_items_' . auth()->id());
+        $this->success("Lista limpiada.");
     }
 
     public function save(LoanService $loanService)
@@ -91,6 +134,11 @@ class BulkRequest extends Component
                 $loanService->requestLoan($expedient, $this->observations, $this->user_id);
                 $count++;
             }
+
+            // Limpiar caché tras éxito
+            \Illuminate\Support\Facades\Cache::forget('bulk_items_' . auth()->id());
+            \Illuminate\Support\Facades\Cache::forget('bulk_user_' . auth()->id());
+            \Illuminate\Support\Facades\Cache::forget('bulk_obs_' . auth()->id());
 
             $this->success("Se han generado {$count} solicitudes de préstamo exitosamente.");
             return redirect()->route('loans.index');

@@ -12,11 +12,16 @@ class Request extends Component
     use Toast;
 
     public ?int $expedient_id = null;
+    public ?Expedient $preSelectedExpedient = null;
     public string $observations = '';
 
     public function mount(?int $expedient = null)
     {
         $this->expedient_id = $expedient;
+        
+        if ($this->expedient_id) {
+            $this->preSelectedExpedient = Expedient::with('employee')->find($this->expedient_id);
+        }
     }
 
     public function save(LoanService $loanService)

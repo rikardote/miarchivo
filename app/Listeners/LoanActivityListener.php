@@ -41,7 +41,7 @@ class LoanActivityListener
         if ($event instanceof LoanDelivered) {
             activity('loans')
                 ->performedOn($loanRequest)
-                ->log("Expediente {$expedient->expedient_code} entregado a {$employee->full_name}");
+                ->log("Expediente {$expedient->expedient_code} entregado a {$loanRequest->requester->name}");
 
             // Notify Requester
             $message = "Has recibido físicamente el expediente {$expedient->expedient_code}.";

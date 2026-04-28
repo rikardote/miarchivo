@@ -3,7 +3,9 @@
         <x-slot:actions>
             <x-mary-button icon="o-arrow-left" class="btn-ghost" link="{{ route('expedients.index') }}">Volver</x-mary-button>
             <x-mary-button icon="o-document-text" class="btn-secondary" link="{{ route('loans.request', ['expedient' => $expedient->id]) }}">Solicitar</x-mary-button>
-            <x-mary-button icon="o-pencil" class="btn-primary" link="{{ route('expedients.edit', $expedient) }}">Editar</x-mary-button>
+            @can('update', $expedient)
+                <x-mary-button icon="o-pencil" class="btn-primary" link="{{ route('expedients.edit', $expedient) }}">Editar</x-mary-button>
+            @endcan
         </x-slot:actions>
     </x-mary-header>
 

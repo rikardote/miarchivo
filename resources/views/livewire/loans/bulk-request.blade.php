@@ -1,6 +1,7 @@
-<div>
+<div wire:poll.5s="syncItems">
     <x-mary-header title="Solicitud Masiva" subtitle="Escanea múltiples expedientes para solicitar préstamo por lote" separator>
         <x-slot:actions>
+            <x-mary-button icon="o-trash" class="btn-ghost text-error" wire:click="clearList" confirm="¿Estás seguro de limpiar toda la lista?">Limpiar Lista</x-mary-button>
             <x-mary-button icon="o-arrow-left" class="btn-ghost" link="{{ route('loans.index') }}">Cancelar</x-mary-button>
         </x-slot:actions>
     </x-mary-header>
@@ -12,7 +13,7 @@
                 <div class="space-y-4">
                     <x-mary-choices 
                         label="Responsable del Préstamo" 
-                        wire:model="user_id" 
+                        wire:model.live="user_id" 
                         :options="$users" 
                         single 
                         searchable 
@@ -24,9 +25,22 @@
 
             <x-mary-card title="Scanner" shadow separator>
                 <div class="space-y-4">
+                    <!-- Botón para móviles -->
+                    <div class="lg:hidden mb-4">
+                        <button onclick="startScanner()" class="btn btn-primary w-full rounded-2xl h-14 shadow-xl shadow-primary/20">
+                            <x-mary-icon name="o-camera" class="mr-2" />
+                            Abrir Cámara
+                        </button>
+                    </div>
+
+                    <div id="reader-container" class="hidden mb-4 overflow-hidden rounded-2xl border-4 border-primary/20" wire:ignore>
+                        <div id="reader"></div>
+                        <button onclick="stopScanner()" class="btn btn-ghost btn-sm w-full">Cerrar Cámara</button>
+                    </div>
+
                     <p class="text-xs text-gray-500">Haz clic en el campo y comienza a escanear. El sistema detectará automáticamente cada código al presionar Enter.</p>
                     
-                    <form wire:submit.prevent="processScan">
+                    <form wire:submit.prevent="processScan" wire:ignore>
                         <x-mary-input 
                             wire:model="scannedCode" 
                             id="bulk-scanner-input"
@@ -40,7 +54,7 @@
                     <div class="pt-4 border-t border-base-200">
                         <x-mary-textarea 
                             label="Observaciones Generales" 
-                            wire:model="observations" 
+                            wire:model.live="observations" 
                             placeholder="Ej. Revisión trimestral de expedientes..." 
                             rows="3" 
                         />
@@ -103,25 +117,56 @@
         </div>
     </div>
 
+    @push('scripts')
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
+        let html5QrCode = null;
+        let isScanning = false;
+
+        function startScanner() {
+            document.getElementById('reader-container').classList.remove('hidden');
+            html5QrCode = new Html5Qrcode("reader");
+            const config = { fps: 15, qrbox: { width: 250, height: 250 } };
+
+            const onSuccess = (decodedText) => {
+                if (isScanning) return; // Evitar ráfagas
+                
+                isScanning = true;
+                console.log("Escaneado masivo:", decodedText);
+                
+                @this.dispatch('code-scanned', { code: decodedText });
+                
+                // Pequeña pausa para feedback visual y evitar re-escaneos
+                setTimeout(() => { isScanning = false; }, 1500);
+            };
+
+            html5QrCode.start({ facingMode: "environment" }, config, onSuccess)
+                .catch(err => alert("Error de cámara: " + err));
+        }
+
+        function stopScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('reader-container').classList.add('hidden');
+                });
+            }
+        }
+
         document.addEventListener('livewire:initialized', () => {
             const input = document.getElementById('bulk-scanner-input');
             
-            // Re-enfocar el input después de cada acción de Livewire
             Livewire.hook('request', ({ respond }) => {
                 respond(() => {
-                    setTimeout(() => {
-                        input.focus();
-                    }, 50);
+                    setTimeout(() => { if(input) input.focus(); }, 50);
                 });
             });
 
-            // Mantener el foco incluso si se hace clic fuera (opcional, pero útil para escaneo rápido)
             document.addEventListener('click', (e) => {
-                if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
+                if (input && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA' && e.target.tagName !== 'BUTTON') {
                     input.focus();
                 }
             });
         });
     </script>
+    @endpush
 </div>

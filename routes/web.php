@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 });
 
 Route::get('/dashboard', \App\Livewire\Dashboard::class)->middleware(['auth', 'verified'])->name('dashboard');
@@ -33,7 +33,7 @@ Route::middleware('auth')->group(function () {
     // Loans
     Route::get('/loans', \App\Livewire\Loans\Index::class)->name('loans.index');
     Route::get('/loans/bulk', \App\Livewire\Loans\BulkRequest::class)->name('loans.bulk');
-    Route::get('/loans/request', \App\Livewire\Loans\Request::class)->name('loans.request');
+    Route::get('/loans/request/{expedient?}', \App\Livewire\Loans\Request::class)->name('loans.request');
     Route::get('/loans/{loan}/manage', \App\Livewire\Loans\Manage::class)->name('loans.manage');
 
     // Employees

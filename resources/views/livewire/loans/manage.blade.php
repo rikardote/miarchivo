@@ -9,26 +9,69 @@
         
         <!-- Detalles de la Solicitud -->
         <div class="space-y-6">
-            <x-mary-card title="Detalles del Préstamo">
-                <div class="grid grid-cols-1 gap-4">
-                    <div class="flex justify-between items-center border-b pb-2">
-                        <span class="text-gray-500">Estado</span>
-                        <x-mary-badge :value="optional($loan->status)->label() ?? 'Desconocido'" class="badge-{{ optional($loan->status)->color() ?? 'neutral' }} font-bold" />
+            <x-mary-card title="Detalles del Préstamo" shadow class="border-none shadow-xl shadow-slate-200/50">
+                <div class="space-y-6 p-2">
+                    <!-- Estado -->
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+                        <div>
+                            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Estado Actual</p>
+                        </div>
+                        <x-mary-badge :value="optional($loan->status)->label() ?? 'Desconocido'" class="badge-{{ optional($loan->status)->color() ?? 'neutral' }} font-black px-4 py-3" />
                     </div>
                     
-                    <x-mary-stat title="Expediente" value="{{ $loan->expedient->expedient_code ?? 'N/A' }}" icon="o-folder" />
-                    <x-mary-stat title="Solicitante" value="{{ $loan->requester->name ?? 'Usuario Eliminado' }}" icon="o-user" />
-                    <x-mary-stat title="Fecha Solicitud" value="{{ optional($loan->requested_at)->format('d/m/Y H:i') ?? 'N/A' }}" icon="o-calendar" />
-                    
-                    @if($loan->due_date)
-                        <x-mary-stat title="Vencimiento" value="{{ \Carbon\Carbon::parse($loan->due_date)->format('d/m/Y') }}" icon="o-clock" 
-                            color="{{ $loan->isOverdue() ? 'text-error' : '' }}" />
-                    @endif
+                    <!-- Grid de información -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-5 group">
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-folder" class="w-6 h-6 text-slate-500 group-hover:text-primary" />
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Expediente</p>
+                                <p class="text-lg font-black text-slate-800 dark:text-slate-100">{{ $loan->expedient->expedient_code ?? 'N/A' }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-5 group">
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-user" class="w-6 h-6 text-slate-500 group-hover:text-primary" />
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Solicitante</p>
+                                <p class="text-lg font-black text-slate-800 dark:text-slate-100">{{ $loan->requester->name ?? 'Usuario Eliminado' }}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-5 group">
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-calendar" class="w-6 h-6 text-slate-500 group-hover:text-primary" />
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Fecha Solicitud</p>
+                                <p class="text-lg font-black text-slate-800 dark:text-slate-100">{{ optional($loan->requested_at)->format('d/m/Y H:i') ?? 'N/A' }}</p>
+                            </div>
+                        </div>
+
+                        @if($loan->due_date)
+                        <div class="flex items-center gap-5 group">
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-clock" class="w-6 h-6 text-slate-500 group-hover:text-primary" />
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Vencimiento</p>
+                                <p class="text-lg font-black {{ $loan->isOverdue() ? 'text-error' : 'text-slate-800 dark:text-slate-100' }}">
+                                    {{ \Carbon\Carbon::parse($loan->due_date)->format('d/m/Y') }}
+                                </p>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
 
                     @if($loan->observations)
-                        <div class="mt-4">
-                            <p class="text-sm text-gray-500">Observaciones del solicitante:</p>
-                            <p class="text-sm italic bg-base-200 p-3 rounded mt-1">"{{ $loan->observations }}"</p>
+                        <div class="mt-8 pt-6 border-t border-slate-100">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Observaciones del solicitante</p>
+                            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-white/5">
+                                <p class="text-sm italic text-slate-600 dark:text-slate-300 leading-relaxed font-medium">"{{ $loan->observations }}"</p>
+                            </div>
                         </div>
                     @endif
                 </div>

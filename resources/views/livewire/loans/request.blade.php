@@ -8,17 +8,33 @@
     <div class="max-w-2xl mx-auto">
         <x-mary-form wire:submit="save">
             
-            <x-mary-choices 
-                label="Expediente" 
-                wire:model="expedient_id" 
-                :options="$expedients" 
-                option-label="expedient_code" 
-                option-sub-label="employee.full_name"
-                icon="o-folder" 
-                single 
-                searchable
-                placeholder="Busca un expediente disponible..." 
-                hint="Sólo se muestran los expedientes actualmente disponibles en el archivo." />
+            @if($preSelectedExpedient)
+                <div class="bg-primary/5 border border-primary/20 rounded-2xl p-6 mb-6 flex items-center gap-6">
+                    <div class="w-14 h-14 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                        <x-mary-icon name="o-folder" class="w-8 h-8" />
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Expediente Seleccionado</span>
+                            <span class="text-xl font-black text-slate-900 dark:text-white mt-1">{{ $preSelectedExpedient->expedient_code }}</span>
+                            <span class="text-sm font-bold text-slate-500 mt-1">{{ $preSelectedExpedient->employee->first_name }} {{ $preSelectedExpedient->employee->last_name }}</span>
+                        </div>
+                    </div>
+                    <input type="hidden" wire:model="expedient_id">
+                </div>
+            @else
+                <x-mary-choices 
+                    label="Expediente" 
+                    wire:model="expedient_id" 
+                    :options="$expedients" 
+                    option-label="expedient_code" 
+                    option-sub-label="employee.full_name"
+                    icon="o-folder" 
+                    single 
+                    searchable
+                    placeholder="Busca un expediente disponible..." 
+                    hint="Sólo se muestran los expedientes actualmente disponibles en el archivo." />
+            @endif
 
             <x-mary-textarea 
                 label="Observaciones / Motivo" 

@@ -1,29 +1,61 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="light">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Archivo') }}</title>
 
         <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-                </a>
+    <body class="font-sans antialiased bg-slate-50 text-slate-900">
+        <div class="min-h-screen flex flex-col md:flex-row">
+            <!-- Left Side: Visual/Branding -->
+            <div class="hidden md:flex md:w-1/2 bg-primary items-center justify-center p-12 relative overflow-hidden">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15)_0%,transparent_50%)]"></div>
+                <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+                <div class="absolute -top-24 -right-24 w-96 h-96 bg-black/10 rounded-full blur-3xl"></div>
+                
+                <div class="relative z-10 text-white max-w-lg">
+                    <div class="mb-8">
+                        <img src="{{ asset('60issste.png') }}" alt="Logo" class="h-24 w-auto brightness-0 invert" />
+                    </div>
+                    <h2 class="text-5xl font-black tracking-tight leading-tight mb-6">Sistema Integral de Gestión de Archivo</h2>
+                    <p class="text-xl text-white/80 font-medium leading-relaxed">Control eficiente, seguro y digitalizado para el resguardo de expedientes institucionales.</p>
+                    
+                    <div class="mt-12 flex items-center gap-4">
+                        <div class="flex -space-x-3">
+                            @for($i = 1; $i <= 4; $i++)
+                                <div class="w-10 h-10 rounded-full border-2 border-primary bg-slate-200"></div>
+                            @endfor
+                        </div>
+                        <span class="text-sm font-bold text-white/70 tracking-wide uppercase italic">+2,500 Expedientes Resguardados</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
-                {{ $slot }}
+            <!-- Right Side: Login Form -->
+            <div class="w-full md:w-1/2 flex items-center justify-center p-8 bg-white md:bg-slate-50">
+                <div class="w-full max-w-md">
+                    <div class="md:hidden mb-10 flex justify-center">
+                        <img src="{{ asset('60issste.png') }}" alt="Logo" class="h-16 w-auto" />
+                    </div>
+                    
+                    <div class="bg-white md:shadow-2xl md:shadow-slate-200/50 rounded-[2.5rem] p-8 md:p-12 border border-transparent md:border-slate-100">
+                        {{ $slot }}
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">2026 ISSSTE BAJA CALIFORNIA</p>
+                    </div>
+                </div>
             </div>
         </div>
     </body>
