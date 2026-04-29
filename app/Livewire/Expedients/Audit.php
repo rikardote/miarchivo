@@ -12,6 +12,8 @@ class Audit extends Component
     use Toast;
 
     public ?int $location_id = null;
+    public ?int $selectedBranch = null;
+    public ?string $selectedType = null;
     public array $scanned_codes = [];
     public string $current_scan = '';
     
@@ -110,8 +112,18 @@ class Audit extends Component
             ? Expedient::where('current_location_id', $this->location_id)->count()
             : 0;
 
+        $locationsQuery = ArchiveLocation::with('branch')
+            ->when($this->selectedBranch, fn($q) => $q->where('branch_id', $this->selectedBranch))
+            ->when($this->selectedType, fn($q) => $q->where('location_type', $this->selectedType));
+
         return view('livewire.expedients.audit', [
-            'locations' => ArchiveLocation::with('branch')->get(),
+            'branches' => \App\Models\Branch::all(),
+            'types' => [
+                ['id' => 'Archivo Muerto', 'name' => 'Archivo Muerto'],
+                ['id' => 'Archivo Activo', 'name' => 'Archivo Activo'],
+                ['id' => 'Almacén Central', 'name' => 'Almacén Central'],
+            ],
+            'locations' => $locationsQuery->get(),
             'results' => $this->getResults(),
             'expectedCount' => $expectedCount,
         ]);

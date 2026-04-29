@@ -52,4 +52,16 @@ class ArchiveLocation extends Model
 
         return implode(' › ', $parts);
     }
+
+    public function getShortLabelAttribute(): string
+    {
+        $parts = array_filter([
+            $this->archive_name,
+            $this->cabinet ? "Gaveta {$this->cabinet}" : null,
+            $this->drawer ? "Cajón {$this->drawer}" : null,
+            $this->alpha_range ? "({$this->alpha_range})" : null,
+        ]);
+
+        return implode(' - ', $parts);
+    }
 }

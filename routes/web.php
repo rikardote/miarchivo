@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
 
     // Admin
     Route::get('/locations', \App\Livewire\Locations\Index::class)->name('locations.index');
+    Route::get('/reports/inventory', \App\Livewire\Reports\Inventory::class)->name('reports.inventory');
     Route::get('/users', \App\Livewire\Users\Index::class)->name('users.index');
 });
 

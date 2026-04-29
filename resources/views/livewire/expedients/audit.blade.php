@@ -17,25 +17,77 @@
                         <p class="text-[10px] font-black uppercase tracking-widest text-primary">Paso 1: Seleccione ubicación</p>
                     </div>
 
-                    <div class="space-y-4">
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">Ubicación a auditar</label>
-                        <div class="relative group">
-                            <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
-                                <x-mary-icon name="o-map-pin" class="w-5 h-5" />
+                    <div class="space-y-6">
+                        <!-- Stage 1: Branch -->
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">1. Seleccione Sede</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
+                                    <x-mary-icon name="o-building-office" class="w-5 h-5" />
+                                </div>
+                                <select 
+                                    wire:model.live="selectedBranch"
+                                    @if($is_auditing) disabled @endif
+                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl h-16 pl-14 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none disabled:opacity-50 disabled:cursor-not-allowed font-bold"
+                                >
+                                    <option value="">-- Todas las Sedes --</option>
+                                    @foreach($branches as $branch)
+                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+                                    <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
+                                </div>
                             </div>
-                            <select 
-                                wire:model="location_id"
-                                @if($is_auditing) disabled @endif
-                                class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl h-16 pl-14 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <option value="">Seleccione ubicación...</option>
-                                @foreach($locations as $location)
-                                    <option value="{{ $location['id'] }}">{{ $location['full_label'] }}</option>
-                                @endforeach
-                            </select>
-                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
-                                <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
+                        </div>
+
+                        <!-- Stage 2: Type -->
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">2. Tipo de Archivo</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
+                                    <x-mary-icon name="o-tag" class="w-5 h-5" />
+                                </div>
+                                <select 
+                                    wire:model.live="selectedType"
+                                    @if($is_auditing) disabled @endif
+                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl h-16 pl-14 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none disabled:opacity-50 disabled:cursor-not-allowed font-bold"
+                                >
+                                    <option value="">-- Todos los Tipos --</option>
+                                    @foreach($types as $type)
+                                        <option value="{{ $type['id'] }}">{{ $type['name'] }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+                                    <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
+                                </div>
                             </div>
+                        </div>
+
+                        <!-- Stage 3: Specific Location -->
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase tracking-widest text-primary block font-black">3. Ubicación Específica</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
+                                    <x-mary-icon name="o-map-pin" class="w-5 h-5" />
+                                </div>
+                                <select 
+                                    wire:model="location_id"
+                                    @if($is_auditing) disabled @endif
+                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl h-16 pl-14 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none disabled:opacity-50 disabled:cursor-not-allowed font-bold"
+                                >
+                                    <option value="">-- Seleccione Gabinete/Cajón --</option>
+                                    @foreach($locations as $location)
+                                        <option value="{{ $location['id'] }}">{{ $location['short_label'] }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+                                    <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
+                                </div>
+                            </div>
+                            @if(count($locations) == 0)
+                                <p class="text-[10px] text-amber-600 font-bold mt-1">No hay ubicaciones registradas con estos filtros.</p>
+                            @endif
                         </div>
                     </div>
                     

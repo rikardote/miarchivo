@@ -29,4 +29,9 @@ class Branch extends Model
     {
         return $this->hasMany(ArchiveLocation::class);
     }
+
+    public function locations(): HasMany
+    {
+        return $this->hasMany(ArchiveLocation::class);
+    }
 }

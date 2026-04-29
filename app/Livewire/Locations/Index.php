@@ -15,7 +15,8 @@ class Index extends Component
     public string $search = '';
     public array $sortBy = ['column' => 'archive_name', 'direction' => 'asc'];
 
-    // Modal & Form state
+    public string $branch_filter = '';
+    public string $type_filter = '';
     public bool $locationModal = false;
     public ?ArchiveLocation $editing = null;
     
@@ -85,7 +86,7 @@ class Index extends Component
 
     public function clearFilters()
     {
-        $this->reset(['search']);
+        $this->reset(['search', 'branch_filter', 'type_filter']);
         $this->resetPage();
     }
 
@@ -95,12 +96,14 @@ class Index extends Component
 
         $query = ArchiveLocation::with('branch')
             ->when($this->search, function ($query) {
-                $query->where('archive_name', 'like', "%{$this->search}%")
-                      ->orWhere('location_type', 'like', "%{$this->search}%")
-                      ->orWhereHas('branch', function ($q) {
-                          $q->where('name', 'like', "%{$this->search}%");
-                      });
+                $query->where(function($q) {
+                    $q->where('archive_name', 'like', "%{$this->search}%")
+                      ->orWhere('cabinet', 'like', "%{$this->search}%")
+                      ->orWhere('drawer', 'like', "%{$this->search}%");
+                });
             })
+            ->when($this->branch_filter, fn($q) => $q->where('branch_id', $this->branch_filter))
+            ->when($this->type_filter, fn($q) => $q->where('location_type', $this->type_filter))
             ->orderBy($this->sortBy['column'], $this->sortBy['direction']);
 
         return view('livewire.locations.index', [
