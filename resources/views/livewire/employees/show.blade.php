@@ -13,9 +13,12 @@
                 <div class="p-4 space-y-6">
                     <div class="flex justify-between items-start mb-6">
                         <h3 class="text-xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter">Información General</h3>
-                        <div class="relative group">
-                            <div class="absolute -inset-1 bg-gradient-to-r from-primary to-blue-600 rounded-full blur opacity-25 group-hover:opacity-50 transition-premium"></div>
-                            <x-mary-avatar image="https://ui-avatars.com/api/?name={{ urlencode($employee->full_name) }}&background=0284c7&color=fff&bold=true" class="!w-16 relative" />
+                        <div class="relative">
+                            <div class="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-white relative">
+                                <span class="text-xl font-black tracking-tighter">
+                                    {{ strtoupper(substr($employee->first_name, 0, 1) . substr($employee->last_name, 0, 1)) }}
+                                </span>
+                            </div>
                         </div>
                     </div>
                     
@@ -48,18 +51,6 @@
                                 <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Puesto</p>
                                 <p class="text-sm font-black text-slate-800 dark:text-slate-100 leading-tight">
                                     {{ htmlspecialchars_decode($employee->position ?? 'No especificado') }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-5 group">
-                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
-                                <x-mary-icon name="o-building-office" class="w-6 h-6 text-slate-500 group-hover:text-primary" />
-                            </div>
-                            <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Departamento</p>
-                                <p class="text-sm font-black text-slate-800 dark:text-slate-100 leading-tight">
-                                    {{ $employee->department->name ?? 'Sin departamento' }}
                                 </p>
                             </div>
                         </div>

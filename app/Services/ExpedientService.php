@@ -73,6 +73,46 @@ class ExpedientService
     }
 
     /**
+     * Mark an expedient as lost.
+     */
+    public function reportLost(Expedient $expedient, ?string $notes = null): void
+    {
+        DB::transaction(function () use ($expedient, $notes) {
+            $expedient->update([
+                'current_status' => ExpedientStatus::Lost,
+            ]);
+
+            $this->recordMovement(
+                $expedient,
+                MovementType::Lost,
+                $expedient->current_location_id,
+                $expedient->current_location_id,
+                $notes ?? 'Marcado como extraviado manualmente.'
+            );
+        });
+    }
+
+    /**
+     * Mark a lost expedient as found.
+     */
+    public function reportFound(Expedient $expedient, ?string $notes = null): void
+    {
+        DB::transaction(function () use ($expedient, $notes) {
+            $expedient->update([
+                'current_status' => ExpedientStatus::Available,
+            ]);
+
+            $this->recordMovement(
+                $expedient,
+                MovementType::Found,
+                $expedient->current_location_id,
+                $expedient->current_location_id,
+                $notes ?? 'Expediente recuperado y marcado como disponible.'
+            );
+        });
+    }
+
+    /**
      * Internal helper to record an immutable movement.
      */
     public function recordMovement(

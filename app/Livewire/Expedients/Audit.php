@@ -71,7 +71,9 @@ class Audit extends Component
     private function getResults()
     {
         $expectedExpedients = $this->location_id 
-            ? Expedient::where('current_location_id', $this->location_id)->get()
+            ? Expedient::where('current_location_id', $this->location_id)
+                ->whereIn('current_status', ['available', 'returned', 'archived', 'in_storage', 'reserved'])
+                ->get()
             : collect();
 
         $results = [

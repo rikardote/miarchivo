@@ -102,7 +102,7 @@ class LoanService
                 MovementType::Loaned,
                 $oldLocation,
                 $oldLocation, // Logical location doesn't change, just holder
-                'Entregado a ' . $loan->requester->name
+                'Iniciado préstamo a ' . $loan->requester->name
             );
 
             \App\Events\LoanDelivered::dispatch($loan);
@@ -138,7 +138,7 @@ class LoanService
                 MovementType::Returned,
                 $location,
                 $location,
-                'Devuelto por ' . $loan->requester->name . ($returnNotes ? " - Notas: {$returnNotes}" : '')
+                'Reingresado por ' . $loan->requester->name . ($returnNotes ? " - Notas: {$returnNotes}" : '')
             );
 
             \App\Events\LoanReturned::dispatch($loan);

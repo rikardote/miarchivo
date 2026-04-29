@@ -14,6 +14,19 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        /* Desactivar el botón de cierre (X) por defecto de los modales */
+        .modal-box > label.btn-circle {
+            display: none !important;
+        }
+        
+        /* Ajuste para modales anchos */
+        .modal-wide .modal-box {
+            max-width: 1000px !important;
+            width: 95% !important;
+        }
+    </style>
 </head>
 <body class="font-sans antialiased min-h-screen">
     <x-mary-nav sticky class="glass border-b border-slate-200 dark:border-white/10 z-[60] px-6 !h-20">

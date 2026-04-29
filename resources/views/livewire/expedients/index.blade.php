@@ -41,9 +41,6 @@
                 <x-mary-select wire:model.live="branch_id" :options="$branches" option-label="name" option-value="id" placeholder="Sede" />
             </div>
             <div>
-                <x-mary-select wire:model.live="department_id" :options="$departments" option-label="name" option-value="id" placeholder="Depto" />
-            </div>
-            <div>
                 <x-mary-button wire:click="clearFilters" icon="o-x-mark" class="btn-ghost w-full rounded-2xl h-14 font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-premium border border-transparent hover:border-slate-100">Limpiar</x-mary-button>
             </div>
         </div>
@@ -99,36 +96,23 @@
     </x-mary-card>
     
     <!-- Bulk Move Modal -->
-    <x-mary-modal wire:model="bulkMoveModal" title="Mover Selección" class="p-6">
-        <div class="space-y-8 mt-4">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-primary text-white rounded-2xl flex items-center justify-center font-black text-xl shadow-xl shadow-primary/30">
-                    {{ count($selected) }}
-                </div>
-                <div>
-                    <h3 class="text-2xl font-black text-slate-900 dark:text-white dark:text-white tracking-tighter leading-none">Traslado Masivo</h3>
-                    <p class="text-[10px] font-black text-slate-500 dark:text-slate-400 dark:text-slate-400 uppercase tracking-widest mt-1">Definir nueva ubicación física</p>
-                </div>
+    <x-mary-modal wire:model="bulkMoveModal" class="p-8 modal-wide">
+        <div class="flex items-center gap-6 mb-8 border-b border-slate-100 pb-6">
+            <div class="w-16 h-16 bg-primary text-white rounded-2xl flex items-center justify-center font-black text-2xl shadow-xl shadow-primary/20">
+                {{ count($selected) }}
             </div>
+            <div>
+                <h3 class="text-2xl font-black text-slate-900 dark:text-white tracking-tighter leading-none mb-1">Mover Selección</h3>
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Relocalización masiva de expedientes</p>
+            </div>
+        </div>
 
-            <x-mary-select 
-                label="Nueva Ubicación de Destino" 
-                wire:model="targetLocationId" 
-                :options="$locations" 
-                option-label="full_label" 
-                placeholder="Seleccione el estante/caja..." 
-                icon="o-map-pin" 
-                class="rounded-2xl h-14 px-5 border-slate-100 focus:border-primary/40 shadow-sm" />
+        <div class="space-y-6">
+            <x-mary-select label="Nueva Ubicación de Destino" wire:model="targetLocationId" :options="$locations" option-label="full_label" placeholder="Seleccione el nuevo estante..." icon="o-map-pin" class="rounded-2xl h-14 px-5 border-slate-100" />
             
-            <div class="p-6 bg-primary/5 rounded-[1.5rem] border border-primary/10 flex gap-6 group">
-                <div class="p-3 bg-primary text-white rounded-2xl h-fit transform group-hover:rotate-6 transition-premium shadow-lg shadow-primary/30">
-                    <x-mary-icon name="o-information-circle" class="w-6 h-6" />
-                </div>
-                <div>
-                    <p class="text-xs font-black text-primary uppercase tracking-[0.2em] mb-2">Protocolo de Movimiento</p>
-                    <p class="text-xs text-slate-600 dark:text-slate-300 dark:text-slate-500 leading-relaxed font-medium">Esta acción actualizará la ubicación física de todos los expedientes seleccionados y generará automáticamente un registro de auditoría en el historial individual de cada carpeta.</p>
-                </div>
-            </div>
+            <x-mary-alert icon="o-information-circle" class="alert-info bg-primary/5 text-primary border-none text-xs font-bold leading-relaxed rounded-2xl">
+                Se registrará un movimiento histórico automático para cada uno de los {{ count($selected) }} expedientes seleccionados.
+            </x-mary-alert>
         </div>
 
         <x-slot:actions>

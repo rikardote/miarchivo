@@ -57,7 +57,7 @@ class Index extends Component
                     $loan->requester->name,
                     $loan->delivered_at?->format('Y-m-d H:i') ?? 'N/A',
                     $loan->due_date?->format('Y-m-d') ?? 'N/A',
-                    $loan->status
+                    optional($loan->status)->label() ?? 'N/A'
                 ]);
             }
 
@@ -86,7 +86,10 @@ class Index extends Component
 
         return view('livewire.loans.index', [
             'loans' => $query->paginate(10),
-            'statuses' => LoanStatus::cases(),
+            'statuses' => collect(LoanStatus::cases())->map(fn($status) => [
+                'name' => $status->label(),
+                'value' => $status->value,
+            ]),
         ]);
     }
 }

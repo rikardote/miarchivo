@@ -41,7 +41,7 @@ class LoanActivityListener
         if ($event instanceof LoanDelivered) {
             activity('loans')
                 ->performedOn($loanRequest)
-                ->log("Expediente {$expedient->expedient_code} entregado a {$loanRequest->requester->name}");
+                ->log("Expediente {$expedient->expedient_code} marcado como En Préstamo a {$loanRequest->requester->name}");
 
             // Notify Requester
             $message = "Has recibido físicamente el expediente {$expedient->expedient_code}.";
@@ -51,7 +51,11 @@ class LoanActivityListener
         if ($event instanceof LoanReturned) {
             activity('loans')
                 ->performedOn($loanRequest)
-                ->log("Expediente {$expedient->expedient_code} devuelto al archivo");
+                ->log("Expediente {$expedient->expedient_code} reingresado al archivo");
+
+            // Notify Requester
+            $message = "El expediente {$expedient->expedient_code} ha sido devuelto y recibido correctamente en el archivo.";
+            $loanRequest->requester->notify(new \App\Notifications\LoanStatusNotification($loanRequest, $message, 'success'));
         }
 
         if ($event instanceof \App\Events\LoanCancelled) {

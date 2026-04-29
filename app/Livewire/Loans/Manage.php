@@ -56,11 +56,11 @@ class Manage extends Component
                     break;
                 case 'deliver':
                     $service->deliverLoan($this->loan);
-                    $this->success('Expediente entregado físicamente.');
+                    $this->success('Expediente marcado como En Préstamo.');
                     break;
                 case 'return':
                     $service->returnLoan($this->loan, $this->notes);
-                    $this->success('Expediente devuelto al archivo.');
+                    $this->success('Expediente devuelto y reingresado al archivo.');
                     break;
                 case 'cancel':
                     $service->cancelLoan($this->loan, $this->notes);

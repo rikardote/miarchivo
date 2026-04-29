@@ -73,45 +73,47 @@
     </x-mary-card>
 
     <!-- Modal Form -->
-    <x-mary-modal wire:model="locationModal" class="p-6">
-        <div class="space-y-8 mt-4">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-primary text-white rounded-2xl flex items-center justify-center font-black text-xl shadow-xl shadow-primary/30">
-                    <x-mary-icon name="o-map-pin" class="w-7 h-7" />
+    <x-mary-modal wire:model="locationModal" class="p-8 modal-wide">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-10 border-b border-slate-100 pb-8">
+                <div class="flex-1">
+                    <h3 class="text-3xl font-black text-slate-900 dark:text-white tracking-tighter leading-none mb-1">{{ $editing ? 'Editar Ubicación' : 'Nueva Ubicación' }}</h3>
+                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Configuración técnica de espacio físico en archivo</p>
                 </div>
-                <div>
-                    <h3 class="text-2xl font-black text-slate-900 dark:text-white dark:text-white tracking-tighter leading-none">{{ $editing ? 'Editar Ubicación' : 'Nueva Ubicación' }}</h3>
-                    <p class="text-[10px] font-black text-slate-500 dark:text-slate-400 dark:text-slate-400 uppercase tracking-widest mt-1">Configuración de espacio físico</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 gap-6">
-                <x-mary-select label="Sucursal / Sede" wire:model="branch_id" :options="$branches" placeholder="Seleccione la sede física..." icon="o-building-office" class="rounded-2xl h-14 px-5 border-slate-100" />
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <x-mary-select label="Tipo de Archivo" wire:model="location_type" :options="$types" placeholder="Seleccione tipo..." icon="o-tag" class="rounded-2xl h-14 px-5 border-slate-100" />
-                    <x-mary-input label="Nombre del Archivo" wire:model="archive_name" placeholder="Ej: Archivo Central" icon="o-pencil" class="rounded-2xl h-14 px-5 border-slate-100" />
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <x-mary-input label="Gaveta / Mueble" wire:model="cabinet" placeholder="Ej: A-01" icon="o-archive-box" class="rounded-2xl h-14 px-5 border-slate-100" />
-                    <x-mary-input label="Cajón / Nivel" wire:model="drawer" placeholder="Ej: 3" icon="o-list-bullet" class="rounded-2xl h-14 px-5 border-slate-100" />
-                </div>
-
-                <x-mary-input label="Rango Alfabético (Opcional)" wire:model="alpha_range" placeholder="Ej: A-M" icon="o-language" class="rounded-2xl h-14 px-5 border-slate-100" />
-                
-                <x-mary-textarea label="Notas Operativas" wire:model="notes" placeholder="Información adicional relevante..." rows="3" class="rounded-2xl border-slate-100 p-4" />
-
-                <div class="p-6 bg-slate-50 dark:bg-white/5 rounded-[1.5rem] border border-slate-100 dark:border-white/5">
-                    <x-mary-checkbox label="Esta ubicación está disponible para uso activo" wire:model="is_active" class="checkbox-primary" />
+                <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex-shrink-0 flex items-center justify-center font-black text-2xl shadow-sm border border-slate-200">
+                    <x-mary-icon name="o-map-pin" class="w-8 h-8" />
                 </div>
             </div>
-        </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                <div class="space-y-8">
+                    <x-mary-select label="Sucursal / Sede" wire:model="branch_id" :options="$branches" placeholder="Seleccione sede..." icon="o-building-office" class="rounded-2xl h-14 px-5 border-slate-100" />
+                    
+                    <div class="grid grid-cols-2 gap-6">
+                        <x-mary-select label="Tipo" wire:model="location_type" :options="$types" placeholder="Tipo..." icon="o-tag" class="rounded-2xl h-14 px-5 border-slate-100" />
+                        <x-mary-input label="Nombre" wire:model="archive_name" placeholder="Archivo..." icon="o-pencil" class="rounded-2xl h-14 px-5 border-slate-100" />
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <x-mary-input label="Gaveta" wire:model="cabinet" placeholder="Ej: A-01" icon="o-archive-box" class="rounded-2xl h-14 px-5 border-slate-100" />
+                        <x-mary-input label="Cajón" wire:model="drawer" placeholder="Ej: 3" icon="o-list-bullet" class="rounded-2xl h-14 px-5 border-slate-100" />
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <x-mary-input label="Rango Alfabético" wire:model="alpha_range" placeholder="Ej: A-M" icon="o-language" class="rounded-2xl h-14 px-5 border-slate-100" />
+                    
+                    <x-mary-textarea label="Notas Operativas" wire:model="notes" placeholder="Información adicional..." rows="4" class="rounded-2xl border-slate-100 p-4 h-[120px]" />
+
+                    <div class="p-6 bg-slate-50 dark:bg-white/5 rounded-[1.5rem] border border-slate-100 dark:border-white/5">
+                        <x-mary-checkbox label="Disponible para uso activo" wire:model="is_active" class="checkbox-primary" />
+                    </div>
+                </div>
+            </div>
 
         <x-slot:actions>
-            <div class="flex gap-4 w-full mt-6">
-                <x-mary-button label="Cancelar" wire:click="$toggle('locationModal')" class="btn-ghost rounded-xl" />
-                <x-mary-button label="Guardar Ubicación" wire:click="save" class="btn-primary rounded-xl" spinner="save" />
+            <div class="flex gap-4 w-full justify-end pt-4">
+                <x-mary-button label="Cancelar" wire:click="$toggle('locationModal')" class="btn-ghost rounded-2xl h-14 px-8 font-bold" />
+                <x-mary-button label="Guardar Ubicación" wire:click="save" class="btn-primary rounded-2xl h-14 px-10 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20" spinner="save" />
             </div>
         </x-slot:actions>
     </x-mary-modal>

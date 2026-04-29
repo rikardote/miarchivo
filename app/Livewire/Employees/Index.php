@@ -28,7 +28,7 @@ class Index extends Component
     public function render()
     {
         $employees = Employee::query()
-            ->with(['department', 'branch', 'expedients'])
+            ->with(['branch', 'expedients'])
             ->when($this->search, fn (Builder $q) => $q->search($this->search))
             ->when($this->onlyWithExpedient, fn (Builder $q) => $q->whereHas('expedients'))
             ->orderBy($this->sortBy['column'], $this->sortBy['direction'])

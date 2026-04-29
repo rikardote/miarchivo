@@ -18,7 +18,7 @@ enum LoanStatus: string
             self::Pending => 'Pendiente',
             self::Approved => 'Aprobado',
             self::Reserved => 'Reservado',
-            self::Delivered => 'Entregado',
+            self::Delivered => 'En Préstamo',
             self::Returned => 'Devuelto',
             self::Rejected => 'Rechazado',
             self::Cancelled => 'Cancelado',

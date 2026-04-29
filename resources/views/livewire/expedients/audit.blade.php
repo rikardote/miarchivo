@@ -154,7 +154,9 @@
                     @if(count($results['missing']) > 0)
                         <x-mary-card shadow class="border-none shadow-xl shadow-error/10 bg-error/5">
                             <div class="p-4">
-                                <h3 class="text-sm font-black text-error uppercase tracking-widest mb-6">Faltantes ({{ count($results['missing']) }})</h3>
+                                <h3 class="text-sm font-black text-error uppercase tracking-widest mb-1">Faltantes ({{ count($results['missing']) }})</h3>
+                                <p class="text-[10px] text-error/70 font-bold mb-6 uppercase tracking-wider">Pendientes de escanear en esta ubicación</p>
+                                
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     @foreach($results['missing'] as $exp)
                                         <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-error/10">
@@ -169,7 +171,9 @@
 
                     <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50">
                         <div class="p-4">
-                            <h3 class="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest mb-6">Confirmados ({{ count($results['correct']) }})</h3>
+                            <h3 class="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest mb-1">Confirmados ({{ count($results['correct']) }})</h3>
+                            <p class="text-[10px] text-slate-400 font-bold mb-6 uppercase tracking-wider">Encontrados correctamente en su sitio</p>
+
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                                 @foreach($results['correct'] as $exp)
                                     <div class="p-3 bg-success/5 rounded-xl border border-success/10 text-center group hover:bg-success/10 transition-colors">

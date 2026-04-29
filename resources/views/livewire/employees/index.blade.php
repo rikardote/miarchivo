@@ -17,7 +17,6 @@
                 ['key' => 'employee_number', 'label' => 'No. Emp', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4 pl-6'],
                 ['key' => 'rfc', 'label' => 'RFC', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
                 ['key' => 'first_name', 'label' => 'Nombre', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
-                ['key' => 'department.name', 'label' => 'Departamento', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
                 ['key' => 'employment_status', 'label' => 'Estado', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
                 ['key' => 'actions', 'label' => '', 'class' => 'w-1 py-4 pr-6']
             ]" :rows="$employees" :sort-by="$sortBy" with-pagination class="table-premium">
