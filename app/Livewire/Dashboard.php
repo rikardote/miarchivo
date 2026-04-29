@@ -29,7 +29,7 @@ class Dashboard extends Component
         if ($isAdmin) {
             $data = [
                 'totalExpedients' => Expedient::count(),
-                'loanedExpedients' => Expedient::where('current_status', ExpedientStatus::Loaned)->count(),
+                'loanedExpedients' => Expedient::whereIn('current_status', [ExpedientStatus::Loaned, ExpedientStatus::Lost])->count(),
                 'pendingRequests' => LoanRequest::where('status', LoanStatus::Pending)->count(),
                 'overdueLoansCount' => LoanRequest::where('status', LoanStatus::Delivered)
                     ->where('due_date', '<', now())
@@ -43,9 +43,8 @@ class Dashboard extends Component
                 'pendingTransfersCount' => Expedient::whereHas('employee', function($q) {
                     $q->where('employment_status', 'inactive');
                 })->whereHas('currentLocation.branch', function($q) {
-                    $q->where('code', 'MEX');
+                    $q->where('code', '!=', 'CEN');
                 })->count(),
-                'branchStats' => \App\Models\Branch::withCount('employees')->get(),
                 'statusStats' => collect(ExpedientStatus::cases())->map(fn($status) => [
                     'label' => $status->label(),
                     'count' => Expedient::where('current_status', $status)->count(),

@@ -21,6 +21,7 @@ class Index extends Component
     public array $selected = [];
     public bool $bulkMoveModal = false;
     public ?int $targetLocationId = null;
+    public bool $showGlossary = false;
 
     #[Url]
     public string $status = '';

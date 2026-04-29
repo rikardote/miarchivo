@@ -38,7 +38,10 @@
     }
     
     .sidebar-glass {
-        @apply bg-white border-r border-slate-200 shadow-sm;
+        @apply bg-white border-r border-slate-200 shadow-sm !w-[320px] !min-w-[320px] !max-w-[320px] overflow-x-hidden transition-none;
+        @media (min-width: 1024px) {
+            @apply fixed top-20 left-0 h-[calc(100vh-5rem)] overflow-y-auto z-[40];
+        }
     }
 
     .premium-card {
@@ -73,10 +76,15 @@
     @apply rounded-2xl border border-slate-200 shadow-lg bg-white;
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Minimalist */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(203, 213, 225, 0.4) transparent;
+}
+
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 4px;
+    height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -84,7 +92,13 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300 rounded-full hover:bg-slate-400;
+    background: rgba(203, 213, 225, 0.4);
+    border-radius: 20px;
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.8);
 }
 
 /* Strictly Dark Theme Overrides */
@@ -116,8 +130,14 @@
     .mary-dropdown-content {
         @apply bg-slate-900 border-slate-800 shadow-xl;
     }
+    * {
+        scrollbar-color: rgba(51, 65, 85, 0.4) transparent;
+    }
     ::-webkit-scrollbar-thumb {
-        @apply bg-slate-700 hover:bg-slate-600;
+        background: rgba(51, 65, 85, 0.4);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(71, 85, 105, 0.8);
     }
 }
 

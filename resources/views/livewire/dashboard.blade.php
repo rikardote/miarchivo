@@ -64,37 +64,13 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
             <div class="lg:col-span-2 space-y-10">
-                <x-mary-card title="Expedientes por Sede" subtitle="Distribución física proporcional" class="premium-card p-6">
-                    <div class="space-y-6 mt-6">
-                        @foreach($branchStats as $branch)
-                            @php
-                                $percentage = $totalEmployees > 0 ? ($branch->employees_count / $totalEmployees) * 100 : 0;
-                            @endphp
-                            <div>
-                                <div class="flex justify-between mb-2 items-end">
-                                    <div class="flex flex-col">
-                                        <span class="text-sm font-bold text-slate-800 dark:text-slate-100">{{ $branch->name }}</span>
-                                    </div>
-                                    <div class="text-right">
-                                        <span class="text-lg font-bold text-slate-900 dark:text-white">{{ $branch->employees_count }}</span>
-                                        <span class="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-400 ml-1">Carpetas</span>
-                                    </div>
-                                </div>
-                                <div class="w-full bg-slate-100 rounded-full h-2">
-                                    <div class="bg-primary h-2 rounded-full" style="width: {{ $percentage }}%"></div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </x-mary-card>
-
                 <x-mary-card class="premium-card p-6">
                     <div class="flex justify-between items-center mb-6">
                         <div>
                             <h3 class="text-xl font-bold text-slate-900 dark:text-white">Estado de Carpetas</h3>
                             <p class="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-400 mt-1">Monitor en tiempo real</p>
                         </div>
-                        <x-mary-button icon="o-information-circle" class="btn-ghost btn-circle btn-sm text-primary" @click="$dispatch('open-glossary')" />
+                        <x-mary-button icon="o-information-circle" class="btn-ghost btn-circle btn-sm text-primary" wire:click="$set('showGlossary', true)" tooltip="Ver glosario de estados" />
                     </div>
                     
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -106,9 +82,47 @@
                         @endforeach
                     </div>
                 </x-mary-card>
+
+                <x-mary-card title="Historial Operativo" class="premium-card border-none shadow-2xl p-4">
+                    <div class="space-y-8 mt-6">
+                        @forelse($recentActivities as $activity)
+                            <div class="flex gap-5 group">
+                                <div class="relative flex flex-col items-center">
+                                    <div class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center z-10 border border-slate-100 dark:border-white/5 group-hover:bg-primary group-hover:text-white transition-premium shadow-sm">
+                                        <x-mary-icon name="o-bolt" class="w-4 h-4" />
+                                    </div>
+                                    <div class="absolute top-10 w-[2px] h-full bg-slate-100 dark:bg-slate-800/50 last:hidden"></div>
+                                </div>
+                                <div class="pb-8">
+                                    <p class="text-sm font-bold text-slate-800 dark:text-slate-100 dark:text-slate-200 leading-tight group-hover:text-primary transition-colors">{{ $activity->description }}</p>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                                        <span class="text-[9px] font-black text-slate-500 dark:text-slate-400 dark:text-slate-400 uppercase tracking-widest">{{ $activity->created_at->diffForHumans() }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="py-16 text-center">
+                                <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4 opacity-20">
+                                    <x-mary-icon name="o-inbox" class="w-10 h-10" />
+                                </div>
+                                <p class="text-xs font-black text-slate-300 uppercase tracking-widest">Sin actividad</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </x-mary-card>
             </div>
 
             <div class="space-y-10">
+                <x-mary-card class="bg-slate-900 rounded-3xl p-6 text-white">
+                    <h4 class="text-xl font-bold mb-6">Atajos de Sistema</h4>
+                    <div class="grid grid-cols-1 gap-3">
+                        <x-mary-button label="Nuevo Expediente" icon="o-plus" link="{{ route('expedients.create') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                        <x-mary-button label="Solicitud Masiva" icon="o-rectangle-stack" link="{{ route('loans.bulk') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                        <x-mary-button label="Mesa de Control" icon="o-clipboard-document-check" link="{{ route('loans.index') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                    </div>
+                </x-mary-card>
+
                 @if($overdueLoans->count() > 0)
                     <x-mary-card class="bg-rose-50 border border-rose-200 rounded-3xl p-6">
                         <div class="flex items-center gap-3 mb-6">
@@ -140,43 +154,6 @@
                     </x-mary-card>
                 @endif
 
-                <x-mary-card title="Historial Operativo" class="premium-card border-none shadow-2xl p-4">
-                    <div class="space-y-8 mt-6">
-                        @forelse($recentActivities as $activity)
-                            <div class="flex gap-5 group">
-                                <div class="relative flex flex-col items-center">
-                                    <div class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center z-10 border border-slate-100 dark:border-white/5 group-hover:bg-primary group-hover:text-white transition-premium shadow-sm">
-                                        <x-mary-icon name="o-bolt" class="w-4 h-4" />
-                                    </div>
-                                    <div class="absolute top-10 w-[2px] h-full bg-slate-100 dark:bg-slate-800/50 last:hidden"></div>
-                                </div>
-                                <div class="pb-8">
-                                    <p class="text-sm font-bold text-slate-800 dark:text-slate-100 dark:text-slate-200 leading-tight group-hover:text-primary transition-colors">{{ $activity->description }}</p>
-                                    <div class="flex items-center gap-2 mt-2">
-                                        <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                                        <span class="text-[9px] font-black text-slate-500 dark:text-slate-400 dark:text-slate-400 uppercase tracking-widest">{{ $activity->created_at->diffForHumans() }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="py-16 text-center">
-                                <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4 opacity-20">
-                                    <x-mary-icon name="o-inbox" class="w-10 h-10" />
-                                </div>
-                                <p class="text-xs font-black text-slate-300 uppercase tracking-widest">Sin actividad</p>
-                            </div>
-                        @endforelse
-                    </div>
-                </x-mary-card>
-
-                <x-mary-card class="bg-slate-900 rounded-3xl p-6 text-white">
-                    <h4 class="text-xl font-bold mb-6">Atajos de Sistema</h4>
-                    <div class="grid grid-cols-1 gap-3">
-                        <x-mary-button label="Nuevo Expediente" icon="o-plus" link="{{ route('expedients.create') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
-                        <x-mary-button label="Solicitud Masiva" icon="o-rectangle-stack" link="{{ route('loans.bulk') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
-                        <x-mary-button label="Mesa de Control" icon="o-clipboard-document-check" link="{{ route('loans.index') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
-                    </div>
-                </x-mary-card>
             </div>
         </div>
 
@@ -254,26 +231,24 @@
             <div class="flex items-center gap-3 mb-8">
                 <div class="w-10 h-1 h-1 bg-primary rounded-full"></div>
                 <span class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 dark:text-slate-400">Interpretación de Estatus</span>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @php
-                    $glossary = [
-                        ['label' => 'Disponible', 'color' => 'emerald', 'desc' => 'Ubicado físicamente en su estante asignado.'],
-                        ['label' => 'Solicitado', 'color' => 'amber', 'desc' => 'En proceso de validación administrativa.'],
-                        ['label' => 'Reservado', 'color' => 'blue', 'desc' => 'Validado y listo para ser recogido.'],
-                        ['label' => 'Prestado', 'color' => 'indigo', 'desc' => 'En posesión física del usuario solicitante.'],
-                        ['label' => 'Devuelto', 'color' => 'cyan', 'desc' => 'Pendiente de re-ubicación en estantería.'],
-                        ['label' => 'En almacén', 'color' => 'slate', 'desc' => 'En depósito temporal de baja frecuencia.'],
-                        ['label' => 'Archivado', 'color' => 'gray', 'desc' => 'Enviado a archivo de concentración final.'],
-                        ['label' => 'Extraviado', 'color' => 'rose', 'desc' => 'Sin localización física confirmada.'],
-                    ];
-                @endphp
-
-                @foreach($glossary as $item)
+            </div>            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach(\App\Enums\ExpedientStatus::cases() as $status)
                     <div class="flex flex-col gap-3 p-6 rounded-[1.5rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-premium group">
-                        <div class="px-4 py-1.5 bg-{{ $item['color'] }}-500 text-white text-[9px] font-black rounded-xl uppercase w-fit shadow-lg shadow-{{ $item['color'] }}-500/20 group-hover:scale-105 transition-premium">{{ $item['label'] }}</div>
-                        <p class="text-xs font-bold text-slate-600 dark:text-slate-300 dark:text-slate-500 leading-relaxed">{{ $item['desc'] }}</p>
+                        <div class="px-4 py-1.5 rounded-xl bg-{{ $status->color() }}/10 text-{{ $status->color() }} text-[9px] font-black uppercase text-center w-fit border border-{{ $status->color() }}/20 shadow-sm group-hover:scale-105 transition-premium">
+                            {{ $status->label() }}
+                        </div>
+                        <p class="text-xs font-bold text-slate-600 dark:text-slate-300 dark:text-slate-500 leading-relaxed">
+                            @switch($status)
+                                @case(\App\Enums\ExpedientStatus::Available) Ubicado físicamente en su estante asignado. @break
+                                @case(\App\Enums\ExpedientStatus::Requested) En proceso de validación administrativa. @break
+                                @case(\App\Enums\ExpedientStatus::Reserved) Validado y listo para ser recogido. @break
+                                @case(\App\Enums\ExpedientStatus::Loaned) En posesión física del usuario solicitante. @break
+                                @case(\App\Enums\ExpedientStatus::Returned) Pendiente de re-ubicación en estantería. @break
+                                @case(\App\Enums\ExpedientStatus::InStorage) En depósito temporal de baja frecuencia. @break
+                                @case(\App\Enums\ExpedientStatus::Archived) Enviado a archivo de concentración final. @break
+                                @case(\App\Enums\ExpedientStatus::Lost) Sin localización física confirmada. @break
+                            @endswitch
+                        </p>
                     </div>
                 @endforeach
             </div>

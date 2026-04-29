@@ -1,6 +1,7 @@
 <div>
     <x-mary-header title="Expedientes" subtitle="Gestión y búsqueda de expedientes físicos" class="mb-10">
         <x-slot:actions>
+            <x-mary-button icon="o-information-circle" class="btn-ghost btn-circle text-primary hover:bg-primary/5 mr-2" wire:click="$set('showGlossary', true)" tooltip="Ver glosario de estados" />
             @can('create', \App\Models\Expedient::class)
                 <x-mary-button icon="o-plus" class="btn-primary shadow-2xl shadow-primary/20 rounded-2xl h-14 px-8 font-black uppercase text-xs tracking-widest border-none hover:scale-105 transition-premium" link="{{ route('expedients.create') }}">Nuevo Expediente</x-mary-button>
             @endcan
@@ -47,27 +48,19 @@
 
         <div class="rounded-xl overflow-hidden border border-slate-200">
             <x-mary-table :headers="[
-                ['key' => 'expedient_code', 'label' => 'Código', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4 pl-6'],
-                ['key' => 'employee.full_name', 'label' => 'Empleado', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
+                ['key' => 'expedient', 'label' => 'Expediente', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4 pl-6'],
                 ['key' => 'employee.branch.name', 'label' => 'Sede', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
                 ['key' => 'volume_number', 'label' => 'Tomo', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
                 ['key' => 'current_status', 'label' => 'Estado', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
-                ['key' => 'currentLocation.full_label', 'label' => 'Ubicación', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
+                ['key' => 'currentLocation.short_label', 'label' => 'Ubicación', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
                 ['key' => 'actions', 'label' => '', 'class' => 'w-1 py-4 pr-6']
             ]" :rows="$expedients" :sort-by="$sortBy" with-pagination selectable wire:model="selected" class="table-premium">
                 
-                @scope('cell_expedient_code', $expedient)
-                    <div class="flex items-center gap-3 pl-4">
-                        <div class="w-1.5 h-6 bg-primary/20 rounded-full"></div>
-                        <span class="font-black text-slate-900 dark:text-white dark:text-slate-100 tracking-tighter text-base">{{ $expedient->expedient_code }}</span>
-                    </div>
-                @endscope
-
-                @scope('cell_employee.full_name', $expedient)
-                    <div class="flex flex-col py-2">
+                @scope('cell_expedient', $expedient)
+                    <div class="flex flex-col py-2 pl-4">
                         <span class="font-bold text-slate-800 dark:text-slate-100 dark:text-slate-200 leading-tight">{{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}</span>
-                        <div class="flex items-center gap-1.5 mt-1.5">
-                            <span class="text-[9px] font-black text-slate-500 dark:text-slate-400 dark:text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-white/5 px-2 py-0.5 rounded-md border border-slate-100 dark:border-white/5">{{ $expedient->employee->rfc }}</span>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="text-[10px] font-black text-primary uppercase tracking-widest">{{ $expedient->expedient_code }}</span>
                         </div>
                     </div>
                 @endscope
@@ -120,6 +113,42 @@
                 <x-mary-button label="Cancelar" wire:click="$toggle('bulkMoveModal')" class="btn-ghost rounded-xl" />
                 <x-mary-button label="Confirmar Traslado" wire:click="executeBulkMove" class="btn-primary rounded-xl" spinner="executeBulkMove" />
             </div>
+        </x-slot:actions>
+    </x-mary-modal>
+
+    <!-- Glosario de Estados -->
+    <x-mary-modal wire:model="showGlossary" title="Glosario Operativo" class="p-6">
+        <div class="space-y-6">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-1 h-1 bg-primary rounded-full"></div>
+                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 dark:text-slate-400">Interpretación de Estatus</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach(\App\Enums\ExpedientStatus::cases() as $status)
+                    <div class="flex flex-col gap-3 p-6 rounded-[1.5rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-premium group">
+                        <div class="px-4 py-1.5 rounded-xl bg-{{ $status->color() }}/10 text-{{ $status->color() }} text-[9px] font-black uppercase text-center w-fit border border-{{ $status->color() }}/20 shadow-sm group-hover:scale-105 transition-premium">
+                            {{ $status->label() }}
+                        </div>
+                        <p class="text-xs font-bold text-slate-600 dark:text-slate-300 dark:text-slate-500 leading-relaxed">
+                            @switch($status)
+                                @case(\App\Enums\ExpedientStatus::Available) Ubicado físicamente en su estante asignado. @break
+                                @case(\App\Enums\ExpedientStatus::Requested) En proceso de validación administrativa. @break
+                                @case(\App\Enums\ExpedientStatus::Reserved) Validado y listo para ser recogido. @break
+                                @case(\App\Enums\ExpedientStatus::Loaned) En posesión física del usuario solicitante. @break
+                                @case(\App\Enums\ExpedientStatus::Returned) Pendiente de re-ubicación en estantería. @break
+                                @case(\App\Enums\ExpedientStatus::InStorage) En depósito temporal de baja frecuencia. @break
+                                @case(\App\Enums\ExpedientStatus::Archived) Enviado a archivo de concentración final. @break
+                                @case(\App\Enums\ExpedientStatus::Lost) Sin localización física confirmada. @break
+                            @endswitch
+                        </p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <x-slot:actions>
+            <x-mary-button label="ENTENDIDO" wire:click="$set('showGlossary', false)" class="btn-primary w-full rounded-2xl h-14 font-black uppercase text-xs tracking-widest shadow-2xl shadow-primary/20 border-none" />
         </x-slot:actions>
     </x-mary-modal>
 </div>

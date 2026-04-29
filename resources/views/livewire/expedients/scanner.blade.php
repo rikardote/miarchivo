@@ -41,12 +41,11 @@
         </x-mary-card>
     </div>
 
-    @push('scripts')
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    @script
     <script>
-        let html5QrCode = null;
+        window.html5QrCode = window.html5QrCode || null;
 
-        function startScanner() {
+        window.startScanner = function() {
             const readerElement = document.getElementById('reader');
             if (!readerElement) return;
 
@@ -54,59 +53,51 @@
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('scan-overlay').classList.remove('hidden');
 
-            if (html5QrCode) {
-                html5QrCode.stop().catch(() => {});
+            if (window.html5QrCode) {
+                window.html5QrCode.stop().catch(() => {});
             }
 
-            html5QrCode = new Html5Qrcode("reader");
+            window.html5QrCode = new Html5Qrcode("reader");
             const config = { fps: 15, qrbox: { width: 250, height: 250 } };
 
             const onSuccess = (decodedText, decodedResult) => {
-                // 1. Actualizar texto y variable inmediatamente
                 document.getElementById('scanned-code').innerText = decodedText;
                 window.lastScannedCode = decodedText;
 
-                // 2. Mostrar contenedor de resultados
                 document.getElementById('result').classList.remove('hidden');
                 document.getElementById('reset-btn').classList.remove('hidden');
                 
-                // 3. Ocultar interfaz de escaneo
                 document.getElementById('reader').classList.add('hidden');
                 document.getElementById('scan-overlay').classList.add('hidden');
 
-                // 4. Detener cámara
-                if (html5QrCode) {
-                    html5QrCode.stop().catch(() => {});
+                if (window.html5QrCode) {
+                    window.html5QrCode.stop().catch(() => {});
                 }
             };
 
             const onGoToExpedient = () => {
                 if (window.lastScannedCode) {
-                    @this.dispatch('code-scanned', { code: window.lastScannedCode });
+                    $wire.dispatch('code-scanned', { code: window.lastScannedCode });
                 }
             };
 
             const btn = document.getElementById('redirect-btn');
-            btn.onclick = onGoToExpedient;
+            if (btn) btn.onclick = onGoToExpedient;
 
-            const onError = (err) => {};
-
-            html5QrCode.start({ facingMode: "environment" }, config, onSuccess, onError)
+            window.html5QrCode.start({ facingMode: "environment" }, config, onSuccess, (err) => {})
                 .catch((err) => {
                     console.error("Camera error:", err);
                     document.getElementById('scan-overlay').classList.add('hidden');
                     document.getElementById('start-screen').classList.remove('hidden');
-                    
-                    alert("Error al acceder a la cámara. Por favor, asegúrate de permitir los permisos en el navegador.");
+                    alert("Error al acceder a la cámara.");
                 });
         }
 
-        // Limpiar al salir de la página
         document.addEventListener('livewire:navigating', () => {
-            if (html5QrCode) {
-                html5QrCode.stop().catch(() => {});
+            if (window.html5QrCode) {
+                window.html5QrCode.stop().catch(() => {});
             }
         });
     </script>
-    @endpush
+    @endscript
 </div>

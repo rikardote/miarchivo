@@ -113,11 +113,11 @@
                         <div id="reader" class="hidden mb-6 rounded-2xl overflow-hidden bg-slate-50 border-4 border-slate-100 shadow-inner" wire:ignore></div>
                         
                         <div class="flex gap-2 mb-6">
-                            <x-mary-button label="Usar Cámara" icon="o-camera" id="start-camera" class="btn-primary btn-outline flex-1 rounded-xl h-12" />
-                            <x-mary-button label="Detener" icon="o-stop" id="stop-camera" class="btn-error btn-outline hidden flex-1 rounded-xl h-12" />
+                            <x-mary-button label="Usar Cámara" icon="o-camera" id="start-camera" onclick="startAuditCamera()" class="btn-primary btn-outline flex-1 rounded-xl h-12" />
+                            <x-mary-button label="Detener" icon="o-stop" id="stop-camera" onclick="stopAuditCamera()" class="btn-error btn-outline hidden flex-1 rounded-xl h-12" />
                         </div>
 
-                        <form wire:submit.prevent="scan" class="flex-1">
+                        <form wire:submit.prevent="addScan" class="flex-1">
                             <div class="relative group">
                                 <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
                                     <x-mary-icon name="o-qr-code" class="w-5 h-5" />
@@ -241,48 +241,68 @@
     </div>
 
     @push('scripts')
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
-        document.addEventListener('livewire:navigated', () => {
-            let html5QrCode = null;
+        window.html5QrCode = window.html5QrCode || null;
+
+        window.startAuditCamera = function() {
             const startBtn = document.getElementById('start-camera');
             const stopBtn = document.getElementById('stop-camera');
             const readerDiv = document.getElementById('reader');
             const scanInput = document.getElementById('scan-input');
 
-            if (!startBtn) return;
+            if (!readerDiv) return;
 
-            const startCamera = () => {
-                html5QrCode = new Html5Qrcode("reader");
-                readerDiv.classList.remove('hidden');
-                startBtn.classList.add('hidden');
-                stopBtn.classList.remove('hidden');
+            if (window.html5QrCode) {
+                window.html5QrCode.stop().catch(() => {});
+            }
 
-                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            window.html5QrCode = new Html5Qrcode("reader");
+            readerDiv.classList.remove('hidden');
+            if (startBtn) startBtn.classList.add('hidden');
+            if (stopBtn) stopBtn.classList.remove('hidden');
+
+            const config = { fps: 15, qrbox: { width: 250, height: 250 } };
+            
+            window.html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
+                @this.set('current_scan', decodedText);
+                @this.addScan();
                 
-                html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
-                    // Ponemos el texto en el input y disparamos el evento de Livewire
-                    @this.set('current_scan', decodedText);
-                    @this.addScan();
-                    
-                    // Feedback visual rápido
+                if (scanInput) {
                     scanInput.classList.add('ring-2', 'ring-success');
                     setTimeout(() => scanInput.classList.remove('ring-2', 'ring-success'), 500);
-                });
-            };
-
-            const stopCamera = () => {
-                if (html5QrCode) {
-                    html5QrCode.stop().then(() => {
-                        readerDiv.classList.add('hidden');
-                        startBtn.classList.remove('hidden');
-                        stopBtn.classList.add('hidden');
-                    });
                 }
-            };
+            }).catch(err => {
+                console.error("Camera error:", err);
+                window.stopAuditCamera();
+            });
+        }
 
-            startBtn.addEventListener('click', startCamera);
-            stopBtn.addEventListener('click', stopCamera);
+        window.stopAuditCamera = function() {
+            const startBtn = document.getElementById('start-camera');
+            const stopBtn = document.getElementById('stop-camera');
+            const readerDiv = document.getElementById('reader');
+
+            if (window.html5QrCode) {
+                window.html5QrCode.stop().then(() => {
+                    if (readerDiv) readerDiv.classList.add('hidden');
+                    if (startBtn) startBtn.classList.remove('hidden');
+                    if (stopBtn) stopBtn.classList.add('hidden');
+                }).catch(() => {
+                    if (readerDiv) readerDiv.classList.add('hidden');
+                    if (startBtn) startBtn.classList.remove('hidden');
+                    if (stopBtn) stopBtn.classList.add('hidden');
+                });
+            } else {
+                if (readerDiv) readerDiv.classList.add('hidden');
+                if (startBtn) startBtn.classList.remove('hidden');
+                if (stopBtn) stopBtn.classList.add('hidden');
+            }
+        }
+
+        document.addEventListener('livewire:navigating', () => {
+            if (window.html5QrCode) {
+                window.html5QrCode.stop().catch(() => {});
+            }
         });
     </script>
     @endpush
