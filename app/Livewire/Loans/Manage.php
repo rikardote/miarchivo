@@ -14,6 +14,7 @@ class Manage extends Component
 
     public LoanRequest $loan;
     public string $notes = '';
+    public string $deliveryNotes = '';
 
     public bool $sudoModalOpen = false;
     public string $pendingAction = '';
@@ -94,7 +95,7 @@ class Manage extends Component
                     $this->success('Préstamo aprobado.');
                     break;
                 case 'deliver':
-                    $service->deliverLoan($this->loan);
+                    $service->deliverLoan($this->loan, $this->deliveryNotes);
                     $this->success('Expediente marcado como En Préstamo.');
                     break;
                 case 'return':

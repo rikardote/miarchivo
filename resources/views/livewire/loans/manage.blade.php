@@ -69,10 +69,34 @@
                     </div>
 
                     @if($loan->observations)
-                        <div class="mt-8 pt-6 border-t border-slate-100">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Observaciones del solicitante</p>
+                        <div class="mt-8 pt-6 border-t border-slate-100 dark:border-white/5">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Motivo / Observaciones del solicitante</p>
                             <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-white/5">
                                 <p class="text-sm italic text-slate-600 dark:text-slate-300 leading-relaxed font-medium">"{{ $loan->observations }}"</p>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($loan->delivery_notes)
+                        <div class="mt-6 pt-6 border-t border-slate-100 dark:border-white/5">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-primary mb-2 flex items-center gap-1.5">
+                                <x-mary-icon name="o-clipboard-document-check" class="w-3.5 h-3.5" />
+                                <span>Estado Físico al Entregar</span>
+                            </p>
+                            <div class="bg-primary/5 p-4 rounded-2xl border border-primary/20">
+                                <p class="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-bold">{{ $loan->delivery_notes }}</p>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if($loan->return_notes)
+                        <div class="mt-6 pt-6 border-t border-slate-100 dark:border-white/5">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2 flex items-center gap-1.5">
+                                <x-mary-icon name="o-arrow-uturn-down" class="w-3.5 h-3.5" />
+                                <span>Estado Físico al Devolver</span>
+                            </p>
+                            <div class="bg-emerald-500/5 p-4 rounded-2xl border border-emerald-500/20">
+                                <p class="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-bold">{{ $loan->return_notes }}</p>
                             </div>
                         </div>
                     @endif
@@ -114,7 +138,18 @@
                                     La orden ya está activa en la pantalla del archivista en Planta Baja para su extracción física del cajón. En cuanto el operador lo marque como surtido, se habilitará el botón de entrega.
                                 </p>
                             </div>
-                            <div class="pt-2">
+
+                            <div class="space-y-2 pt-2">
+                                <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">Notas de entrega / Estado físico (Opcional)</label>
+                                <textarea 
+                                    wire:model="deliveryNotes" 
+                                    placeholder="Ej. Entregado con 140 fojas útiles, carpeta íntegra..." 
+                                    rows="2"
+                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl p-4 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none resize-none text-xs"
+                                ></textarea>
+                            </div>
+
+                            <div class="pt-1">
                                 <x-mary-button label="Forzar Entrega Inmediata (Si ya lo tienes en mano)" icon="o-hand-raised" class="btn-ghost btn-xs text-slate-400 hover:text-primary w-full text-center" wire:click="triggerAction('deliver')" spinner />
                             </div>
                         @else
@@ -135,6 +170,17 @@
                                     El operador de Planta Baja ya extrajo el expediente y lo envió a tu mesa. Requiere verificación con contraseña (SUDO) al entregarlo.
                                 </p>
                             </div>
+
+                            <div class="space-y-2">
+                                <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">Notas de entrega / Estado físico (Opcional)</label>
+                                <textarea 
+                                    wire:model="deliveryNotes" 
+                                    placeholder="Ej. Entregado con 145 fojas útiles, carpeta en buen estado, incluye talón original..." 
+                                    rows="2"
+                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl p-4 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none resize-none text-xs"
+                                ></textarea>
+                            </div>
+
                             <x-mary-button label="Entregar al Solicitante" icon="o-hand-raised" class="btn-primary w-full h-14 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-primary/20" wire:click="triggerAction('deliver')" spinner />
                         @else
                             <x-mary-alert icon="o-sparkles" title="¡Listo para Recoger!" class="alert-success">

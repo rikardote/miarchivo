@@ -25,6 +25,7 @@ class LoanRequest extends Model
         'returned_at',
         'due_date',
         'observations',
+        'delivery_notes',
         'return_notes',
     ];
 
@@ -41,7 +42,7 @@ class LoanRequest extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['status', 'approved_by', 'delivered_at', 'returned_at'])
+            ->logOnly(['status', 'approved_by', 'delivered_at', 'returned_at', 'delivery_notes', 'return_notes'])
             ->logOnlyDirty()
             ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
                 'created' => "Solicitud de préstamo creada para {$this->expedient->expedient_code}",

@@ -103,10 +103,11 @@ class LoanServiceTest extends TestCase
         $loan = LoanRequest::factory()->create(['status' => LoanStatus::Approved]);
         
         Auth::login($this->admin);
-        $this->loanService->deliverLoan($loan);
+        $this->loanService->deliverLoan($loan, '140 fojas útiles');
 
         $loan->refresh();
         $this->assertEquals(LoanStatus::Delivered, $loan->status);
+        $this->assertEquals('140 fojas útiles', $loan->delivery_notes);
         $this->assertNotNull($loan->delivered_at);
         $this->assertNotNull($loan->due_date);
 

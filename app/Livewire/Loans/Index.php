@@ -62,7 +62,9 @@ class Index extends Component
                 'Fecha Entrega',
                 'Fecha Vencimiento',
                 'Estado Operativo',
-                'Observaciones'
+                'Observaciones Solicitud',
+                'Estado Físico al Entregar',
+                'Estado Físico al Devolver'
             ]);
 
             foreach ($loans as $loan) {
@@ -76,7 +78,9 @@ class Index extends Component
                     $loan->delivered_at ? $loan->delivered_at->format('Y-m-d H:i:s') : 'N/A',
                     $loan->due_date ? \Carbon\Carbon::parse($loan->due_date)->format('Y-m-d') : 'N/A',
                     optional($loan->status)->label() ?? 'N/A',
-                    $loan->observations ?? ''
+                    $loan->observations ?? '',
+                    $loan->delivery_notes ?? '',
+                    $loan->return_notes ?? ''
                 ]);
             }
 

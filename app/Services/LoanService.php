@@ -108,7 +108,7 @@ class LoanService
     /**
      * Admin/Jefe RH delivers the expedient in person to the requester.
      */
-    public function deliverLoan(LoanRequest $loan): void
+    public function deliverLoan(LoanRequest $loan, ?string $deliveryNotes = null): void
     {
         if ($loan->status === LoanStatus::Pending) {
             $loan->update([
@@ -123,13 +123,14 @@ class LoanService
             throw new \Exception('La solicitud no se encuentra en un estado válido para entregarse.');
         }
 
-        DB::transaction(function () use ($loan) {
+        DB::transaction(function () use ($loan, $deliveryNotes) {
             $defaultDays = (int) config('services.loan.default_due_days', env('LOAN_DEFAULT_DUE_DAYS', 7));
 
             $loan->update([
                 'status' => LoanStatus::Delivered,
                 'delivered_at' => now(),
                 'due_date' => now()->addDays($defaultDays),
+                'delivery_notes' => $deliveryNotes,
             ]);
 
             $expedient = $loan->expedient;
@@ -140,12 +141,17 @@ class LoanService
                 'current_holder_id' => $loan->requester_id,
             ]);
 
+            $description = 'Iniciado préstamo a ' . ($loan->requester?->name ?? 'solicitante');
+            if (!empty($deliveryNotes)) {
+                $description .= " (Estado entrega: {$deliveryNotes})";
+            }
+
             $this->expedientService->recordMovement(
                 $expedient,
                 MovementType::Loaned,
                 $oldLocation,
-                $oldLocation, // Logical location doesn't change, just holder
-                'Iniciado préstamo a ' . $loan->requester->name
+                $oldLocation,
+                $description
             );
 
             \App\Events\LoanDelivered::dispatch($loan);
