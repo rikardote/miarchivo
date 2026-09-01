@@ -18,6 +18,8 @@ class Request extends Component
 
     public function mount(?int $expedient = null)
     {
+        abort_unless(auth()->user()->can('loans.create'), 403);
+
         $this->expedient_id = $expedient;
         
         if ($this->expedient_id) {

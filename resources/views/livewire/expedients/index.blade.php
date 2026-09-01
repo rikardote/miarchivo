@@ -90,11 +90,13 @@
                         <x-mary-button link="{{ route('expedients.show', $expedient) }}" class="btn-ghost btn-xs sm:btn-sm text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-premium group/btn" tooltip="Ver detalles">
                             <x-mary-icon name="o-eye" class="w-4 h-4 group-hover/btn:scale-110" />
                         </x-mary-button>
-                        @if($expedient->isAvailable())
-                            <x-mary-button link="{{ route('loans.request', ['expedient' => $expedient->id]) }}" class="btn-ghost btn-xs sm:btn-sm text-secondary hover:bg-secondary/5 rounded-xl transition-premium group/btn" tooltip="Solicitar Préstamo">
-                                <x-mary-icon name="o-document-text" class="w-4 h-4 group-hover/btn:scale-110" />
-                            </x-mary-button>
-                        @endif
+                        @can('loans.create')
+                            @if($expedient->isAvailable())
+                                <x-mary-button link="{{ route('loans.request', ['expedient' => $expedient->id]) }}" class="btn-ghost btn-xs sm:btn-sm text-secondary hover:bg-secondary/5 rounded-xl transition-premium group/btn" tooltip="Solicitar Préstamo">
+                                    <x-mary-icon name="o-document-text" class="w-4 h-4 group-hover/btn:scale-110" />
+                                </x-mary-button>
+                            @endif
+                        @endcan
                         @can('update', $expedient)
                             <x-mary-button link="{{ route('expedients.edit', $expedient) }}" class="btn-ghost btn-xs sm:btn-sm text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-premium group/btn" tooltip="Editar">
                                 <x-mary-icon name="o-pencil" class="w-4 h-4 group-hover/btn:scale-110" />

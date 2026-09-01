@@ -3,11 +3,13 @@
         <x-slot:actions>
             <div class="flex items-center gap-2 flex-wrap justify-end">
                 <x-mary-button icon="o-arrow-left" class="btn-ghost btn-sm sm:btn-md" link="{{ route('expedients.index') }}">Volver</x-mary-button>
-                @if($expedient->isAvailable())
-                    <x-mary-button icon="o-document-text" class="btn-secondary btn-sm sm:btn-md" link="{{ route('loans.request', ['expedient' => $expedient->id]) }}">Solicitar</x-mary-button>
-                @else
-                    <x-mary-button icon="o-document-text" class="btn-secondary btn-sm sm:btn-md" disabled label="No Disponible" />
-                @endif
+                @can('loans.create')
+                    @if($expedient->isAvailable())
+                        <x-mary-button icon="o-document-text" class="btn-secondary btn-sm sm:btn-md" link="{{ route('loans.request', ['expedient' => $expedient->id]) }}">Solicitar</x-mary-button>
+                    @else
+                        <x-mary-button icon="o-document-text" class="btn-secondary btn-sm sm:btn-md" disabled label="No Disponible" />
+                    @endif
+                @endcan
                 @can('update', $expedient)
                     @if($expedient->current_status->value !== 'lost')
                         <x-mary-button icon="o-exclamation-triangle" class="btn-error btn-outline btn-sm sm:btn-md" label="Extraviado" wire:click="markAsLost" />

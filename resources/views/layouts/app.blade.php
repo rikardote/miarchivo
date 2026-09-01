@@ -107,7 +107,9 @@
                 @endcan
 
                 <x-mary-menu-sub title="Préstamos" icon="o-document-text" open="{{ request()->routeIs('loans.*') }}" class="text-slate-600 dark:text-white/70 font-black text-sm">
-                    <x-mary-menu-item title="Bandeja Personal" icon="o-inbox" link="{{ route('loans.index', ['mine' => 1]) }}" active="{{ request()->fullUrlIs(route('loans.index', ['mine' => 1])) }}" class="text-xs font-bold py-3" />
+                    @can('loans.create')
+                        <x-mary-menu-item title="Bandeja Personal" icon="o-inbox" link="{{ route('loans.index', ['mine' => 1]) }}" active="{{ request()->fullUrlIs(route('loans.index', ['mine' => 1])) }}" class="text-xs font-bold py-3" />
+                    @endcan
                     @canany(['loans.deliver', 'loans.return'])
                         <x-mary-menu-item title="Despacho (Planta Baja)" icon="o-truck" link="{{ route('loans.dispatch') }}" active="{{ request()->routeIs('loans.dispatch') }}" class="text-xs font-bold py-3" />
                     @endcanany
