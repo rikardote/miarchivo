@@ -172,7 +172,9 @@ class Dispatch extends Component
         if ($count > 0) {
             $this->success("Se marcaron como surtidos {$count} expedientes y enviados a RH.");
         }
-        if ($pendingSkipped > 0) {
+        if ($pendingSkipped > 0 && $count === 0) {
+            $this->warning("No se pudo surtir: Los expedientes seleccionados aún requieren aprobación por el encargado de RH.");
+        } elseif ($pendingSkipped > 0) {
             $this->warning("Se omitieron {$pendingSkipped} expedientes por estar pendientes de aprobación en RH.");
         }
         $this->selectedLoans = [];

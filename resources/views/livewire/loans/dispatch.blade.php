@@ -121,10 +121,20 @@
             @foreach($items as $loan)
                 <div class="premium-card p-4 sm:p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-primary/40 transition-premium">
                     <div class="flex items-start gap-3 sm:gap-4 flex-1">
-                        <input type="checkbox" wire:model.live="selectedLoans" value="{{ $loan->id }}" class="checkbox checkbox-primary rounded-lg mt-1" />
+                        @php
+                            $canSelect = ($tab === 'to_return') || ($tab === 'to_extract' && $loan->status === \App\Enums\LoanStatus::Approved);
+                        @endphp
 
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 {{ $tab === 'to_extract' ? 'bg-amber-500/10 text-amber-600' : 'bg-emerald-500/10 text-emerald-600' }} rounded-2xl flex items-center justify-center shrink-0">
-                            <x-mary-icon name="{{ $tab === 'to_extract' ? 'o-arrow-up-tray' : 'o-archive-box-arrow-down' }}" class="w-5 h-5 sm:w-6 sm:h-6" />
+                        @if($canSelect)
+                            <input type="checkbox" wire:model.live="selectedLoans" value="{{ $loan->id }}" class="checkbox checkbox-primary rounded-lg mt-1" />
+                        @else
+                            <div class="tooltip mt-1" data-tip="Requiere aprobación previa de RH">
+                                <input type="checkbox" disabled class="checkbox checkbox-disabled opacity-20 cursor-not-allowed rounded-lg" />
+                            </div>
+                        @endif
+
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 {{ $tab === 'to_extract' ? ($loan->status === \App\Enums\LoanStatus::Approved ? 'bg-amber-500/10 text-amber-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400') : 'bg-emerald-500/10 text-emerald-600' }} rounded-2xl flex items-center justify-center shrink-0">
+                            <x-mary-icon name="{{ $tab === 'to_extract' ? ($loan->status === \App\Enums\LoanStatus::Approved ? 'o-arrow-up-tray' : 'o-clock') : 'o-archive-box-arrow-down' }}" class="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
 
                         <div class="space-y-1 flex-1">
