@@ -101,12 +101,15 @@ class Expedient extends Model
 
     public function scopeSearch($query, string $search)
     {
+        $search = trim($search);
         return $query->where(function ($q) use ($search) {
             $q->where('expedient_code', 'like', "%{$search}%")
               ->orWhereHas('employee', function ($eq) use ($search) {
                   $eq->where('rfc', 'like', "%{$search}%")
                     ->orWhere('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%");
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('employee_number', 'like', "%{$search}%")
+                    ->orWhereRaw("CONCAT(COALESCE(first_name, ''), ' ', COALESCE(last_name, '')) LIKE ?", ["%{$search}%"]);
               });
         });
     }

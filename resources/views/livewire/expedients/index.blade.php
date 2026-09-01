@@ -60,10 +60,12 @@
                 
                 @scope('cell_expedient', $expedient)
                     <div class="flex flex-col py-2 pl-2 sm:pl-4">
-                        <span class="font-bold text-slate-800 dark:text-slate-100 leading-tight text-sm sm:text-base">{{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}</span>
+                        <span class="font-bold text-slate-800 dark:text-slate-100 leading-tight text-sm sm:text-base">
+                            {{ $expedient->employee?->first_name ?? 'Sin empleado' }} {{ $expedient->employee?->last_name ?? '' }}
+                        </span>
                         <div class="flex items-center gap-2 mt-1 flex-wrap">
                             <span class="text-[10px] font-black text-primary uppercase tracking-widest">{{ $expedient->expedient_code }}</span>
-                            <span class="lg:hidden text-[9px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{{ $expedient->currentLocation->short_label ?? 'Sin ubicación' }}</span>
+                            <span class="lg:hidden text-[9px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{{ $expedient->currentLocation?->short_label ?? 'Sin ubicación' }}</span>
                         </div>
                     </div>
                 @endscope
@@ -79,6 +81,11 @@
                         <x-mary-button link="{{ route('expedients.show', $expedient) }}" class="btn-ghost btn-xs sm:btn-sm text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-premium group/btn" tooltip="Ver detalles">
                             <x-mary-icon name="o-eye" class="w-4 h-4 group-hover/btn:scale-110" />
                         </x-mary-button>
+                        @if($expedient->isAvailable())
+                            <x-mary-button link="{{ route('loans.request', ['expedient' => $expedient->id]) }}" class="btn-ghost btn-xs sm:btn-sm text-secondary hover:bg-secondary/5 rounded-xl transition-premium group/btn" tooltip="Solicitar Préstamo">
+                                <x-mary-icon name="o-document-text" class="w-4 h-4 group-hover/btn:scale-110" />
+                            </x-mary-button>
+                        @endif
                         @can('update', $expedient)
                             <x-mary-button link="{{ route('expedients.edit', $expedient) }}" class="btn-ghost btn-xs sm:btn-sm text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-premium group/btn" tooltip="Editar">
                                 <x-mary-icon name="o-pencil" class="w-4 h-4 group-hover/btn:scale-110" />

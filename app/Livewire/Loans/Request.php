@@ -14,6 +14,7 @@ class Request extends Component
     public ?int $expedient_id = null;
     public ?Expedient $preSelectedExpedient = null;
     public string $observations = '';
+    public string $searchExpedient = '';
 
     public function mount(?int $expedient = null)
     {
@@ -22,6 +23,11 @@ class Request extends Component
         if ($this->expedient_id) {
             $this->preSelectedExpedient = Expedient::with('employee')->find($this->expedient_id);
         }
+    }
+
+    public function search(string $value = '')
+    {
+        $this->searchExpedient = trim($value);
     }
 
     public function save(LoanService $loanService)
@@ -33,7 +39,7 @@ class Request extends Component
 
         $expedient = Expedient::find($this->expedient_id);
 
-        if (!$expedient->isAvailable()) {
+        if (!$expedient || !$expedient->isAvailable()) {
             $this->error('Este expediente no está disponible en este momento.');
             return;
         }
@@ -41,7 +47,7 @@ class Request extends Component
         try {
             $loan = $loanService->requestLoan($expedient, $this->observations);
             $this->success('Solicitud de préstamo enviada correctamente.');
-            return redirect()->route('loans.index');
+            return redirect()->route('loans.index', ['mine' => 1]);
         } catch (\Exception $e) {
             $this->error('Error al solicitar préstamo: ' . $e->getMessage());
         }
@@ -49,8 +55,23 @@ class Request extends Component
 
     public function render()
     {
+        $query = Expedient::available()->with('employee');
+
+        if (!empty($this->searchExpedient)) {
+            $query->search($this->searchExpedient);
+        }
+
+        $expedients = $query->take(50)->get();
+
+        if ($this->expedient_id && !$expedients->contains('id', $this->expedient_id)) {
+            $selected = Expedient::with('employee')->find($this->expedient_id);
+            if ($selected) {
+                $expedients->prepend($selected);
+            }
+        }
+
         return view('livewire.loans.request', [
-            'expedients' => Expedient::available()->with('employee')->take(100)->get(),
+            'expedients' => $expedients,
         ]);
     }
 }
