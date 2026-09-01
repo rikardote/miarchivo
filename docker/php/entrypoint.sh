@@ -5,6 +5,10 @@ set -e
 export TZ=America/Tijuana
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+# Asegurar directorios de almacenamiento y permisos
+mkdir -p /var/www/storage/framework/{sessions,views,cache} /var/www/storage/app/{public,tmp} /var/www/bootstrap/cache
+chmod -R 777 /var/www/storage /var/www/bootstrap/cache
+
 # Iniciar el proceso principal
 if [ "$#" -gt 0 ]; then
     echo "Ejecutando comando: $@"

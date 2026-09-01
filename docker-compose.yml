@@ -10,6 +10,7 @@ services:
       TZ: America/Tijuana
     volumes:
       - .:/var/www
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
     ports:
       - "5175:5173"
       - "8087:8080"
@@ -74,6 +75,7 @@ services:
     command: php artisan queue:work
     volumes:
       - .:/var/www
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
     depends_on:
       - db
     networks:
