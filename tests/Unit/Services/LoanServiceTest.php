@@ -121,7 +121,19 @@ class LoanServiceTest extends TestCase
         $this->assertEquals('All good', $loan->return_notes);
 
         $loan->expedient->refresh();
-        $this->assertEquals(ExpedientStatus::Available, $loan->expedient->current_status);
+        $this->assertEquals(ExpedientStatus::Returned, $loan->expedient->current_status);
         $this->assertNull($loan->expedient->current_holder_id);
+    }
+
+    public function test_it_can_rearchive_an_expedient()
+    {
+        $expedient = Expedient::factory()->create([
+            'current_status' => ExpedientStatus::Returned,
+        ]);
+
+        $this->loanService->rearchiveExpedient($expedient);
+
+        $expedient->refresh();
+        $this->assertEquals(ExpedientStatus::Available, $expedient->current_status);
     }
 }

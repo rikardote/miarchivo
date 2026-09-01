@@ -72,6 +72,11 @@ class Expedient extends Model
         return $this->hasMany(LoanRequest::class);
     }
 
+    public function loans(): HasMany
+    {
+        return $this->hasMany(LoanRequest::class);
+    }
+
     public function movements(): HasMany
     {
         return $this->hasMany(ExpedientMovement::class)->orderByDesc('created_at');

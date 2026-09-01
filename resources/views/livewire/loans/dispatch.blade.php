@@ -95,7 +95,11 @@
                 </div>
                 <span class="text-xs font-black uppercase text-primary tracking-widest">Expedientes seleccionados</span>
             </div>
-            <x-mary-button label="Marcar Surtidos y Enviar a RH" icon="o-check" wire:click="extractBulk" class="btn-primary btn-sm rounded-xl" />
+            @if($tab === 'to_extract')
+                <x-mary-button label="Marcar Surtidos y Enviar a RH" icon="o-check" wire:click="extractBulk" class="btn-primary btn-sm rounded-xl" />
+            @else
+                <x-mary-button label="Guardar Seleccionados en Gaveta" icon="o-archive-box-arrow-down" wire:click="rearchiveBulk" class="btn-success btn-sm rounded-xl text-white" />
+            @endif
         </div>
     @endif
 
@@ -106,10 +110,10 @@
                 <x-mary-icon name="o-check-badge" class="w-10 h-10" />
             </div>
             <h3 class="text-lg font-black text-slate-800 dark:text-slate-100 mb-1">
-                {{ $tab === 'to_extract' ? '¡Todo el archivo está al día!' : 'No hay préstamos activos pendientes de devolución' }}
+                {{ $tab === 'to_extract' ? '¡Todo el archivo está al día!' : '¡No hay expedientes pendientes por archivar!' }}
             </h3>
             <p class="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
-                {{ $tab === 'to_extract' ? 'No hay solicitudes pendientes por surtir en este momento.' : 'Todos los expedientes prestados se encuentran en orden.' }}
+                {{ $tab === 'to_extract' ? 'No hay solicitudes pendientes por surtir en este momento.' : 'Todos los expedientes devueltos ya se encuentran guardados en sus gavetas correspondientes.' }}
             </p>
         </div>
     @else
@@ -117,19 +121,17 @@
             @foreach($items as $loan)
                 <div class="premium-card p-4 sm:p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-primary/40 transition-premium">
                     <div class="flex items-start gap-3 sm:gap-4 flex-1">
-                        @if($tab === 'to_extract')
-                            <input type="checkbox" wire:model.live="selectedLoans" value="{{ $loan->id }}" class="checkbox checkbox-primary rounded-lg mt-1" />
-                        @endif
+                        <input type="checkbox" wire:model.live="selectedLoans" value="{{ $loan->id }}" class="checkbox checkbox-primary rounded-lg mt-1" />
 
-                        <div class="w-10 h-10 sm:w-12 sm:h-12 {{ $tab === 'to_extract' ? 'bg-amber-500/10 text-amber-600' : 'bg-blue-500/10 text-blue-600' }} rounded-2xl flex items-center justify-center shrink-0">
-                            <x-mary-icon name="{{ $tab === 'to_extract' ? 'o-arrow-up-tray' : 'o-arrow-down-tray' }}" class="w-5 h-5 sm:w-6 sm:h-6" />
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 {{ $tab === 'to_extract' ? 'bg-amber-500/10 text-amber-600' : 'bg-emerald-500/10 text-emerald-600' }} rounded-2xl flex items-center justify-center shrink-0">
+                            <x-mary-icon name="{{ $tab === 'to_extract' ? 'o-arrow-up-tray' : 'o-archive-box-arrow-down' }}" class="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
 
                         <div class="space-y-1 flex-1">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">{{ $loan->expedient?->expedient_code ?? 'ELIMINADO' }}</span>
-                                <span class="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase {{ $loan->status->color() === 'warning' ? 'bg-amber-500/10 text-amber-600' : 'bg-blue-500/10 text-blue-600' }}">
-                                    {{ $loan->status->label() }}
+                                <span class="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase {{ $tab === 'to_extract' ? 'bg-amber-500/10 text-amber-600' : 'bg-emerald-500/10 text-emerald-600' }}">
+                                    {{ $tab === 'to_extract' ? $loan->status->label() : ($loan->expedient?->current_status?->label() ?? 'Devuelto') }}
                                 </span>
                             </div>
 
@@ -141,10 +143,10 @@
                             <div class="flex items-center gap-2 text-[11px] text-slate-500 flex-wrap pt-1">
                                 <span class="flex items-center gap-1 font-bold">
                                     <x-mary-icon name="o-user" class="w-3.5 h-3.5 text-slate-400" />
-                                    <span>Solicitó: {{ $loan->requester?->name ?? 'Desconocido' }}</span>
+                                    <span>{{ $tab === 'to_extract' ? 'Solicitó: ' . ($loan->requester?->name ?? 'Desconocido') : 'Devuelto por: ' . ($loan->requester?->name ?? 'Desconocido') }}</span>
                                 </span>
                                 <span>•</span>
-                                <span class="text-slate-400">Fecha: {{ $loan->requested_at?->format('d/m/Y H:i') ?? 'N/A' }}</span>
+                                <span class="text-slate-400">{{ $tab === 'to_extract' ? 'Solicitud: ' . ($loan->requested_at?->format('d/m/Y H:i') ?? 'N/A') : 'Devolución: ' . ($loan->returned_at?->format('d/m/Y H:i') ?? 'N/A') }}</span>
                             </div>
                         </div>
                     </div>
@@ -154,7 +156,7 @@
                         <div class="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-white/5 text-center sm:text-left min-w-[200px]">
                             <div class="text-[9px] font-black uppercase tracking-widest text-primary flex items-center gap-1">
                                 <x-mary-icon name="o-map-pin" class="w-3 h-3" />
-                                <span>{{ $tab === 'to_extract' ? 'Ubicación en Gaveta' : 'Llevar a Gaveta' }}</span>
+                                <span>{{ $tab === 'to_extract' ? 'Ubicación en Gaveta' : 'Guardar en Gaveta' }}</span>
                             </div>
                             <div class="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-100 mt-0.5">
                                 {{ $loan->expedient?->currentLocation?->full_label ?? 'Sin ubicación' }}
@@ -164,7 +166,7 @@
                         @if($tab === 'to_extract')
                             <x-mary-button label="Marcar Surtido" icon="o-check" wire:click="extractSingle({{ $loan->id }})" class="btn-primary rounded-xl h-11 px-5 font-black uppercase text-xs tracking-wider" spinner="extractSingle({{ $loan->id }})" />
                         @else
-                            <x-mary-button label="Re-archivar" icon="o-archive-box-arrow-down" wire:click="returnSingle({{ $loan->id }})" class="btn-success btn-outline rounded-xl h-11 px-5 font-black uppercase text-xs tracking-wider" spinner="returnSingle({{ $loan->id }})" />
+                            <x-mary-button label="Guardar en Gaveta" icon="o-archive-box-arrow-down" wire:click="rearchiveSingle({{ $loan->id }})" class="btn-success rounded-xl h-11 px-5 font-black uppercase text-xs tracking-wider text-white" spinner="rearchiveSingle({{ $loan->id }})" />
                         @endif
                     </div>
                 </div>

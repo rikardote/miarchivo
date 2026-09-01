@@ -149,7 +149,7 @@ class LoanService
     }
 
     /**
-     * Admin receives the returned expedient.
+     * Admin receives the returned expedient in RH.
      */
     public function returnLoan(LoanRequest $loan, ?string $returnNotes = null): void
     {
@@ -168,7 +168,7 @@ class LoanService
             $location = $expedient->current_location_id;
 
             $expedient->update([
-                'current_status' => ExpedientStatus::Available,
+                'current_status' => ExpedientStatus::Returned,
                 'current_holder_id' => null,
             ]);
 
@@ -177,10 +177,42 @@ class LoanService
                 MovementType::Returned,
                 $location,
                 $location,
-                'Reingresado por ' . $loan->requester->name . ($returnNotes ? " - Notas: {$returnNotes}" : '')
+                'Devuelto por ' . $loan->requester->name . ' en Jefatura de RH' . ($returnNotes ? " - Notas: {$returnNotes}" : '')
             );
 
             \App\Events\LoanReturned::dispatch($loan);
+        });
+    }
+
+    /**
+     * Operator in Planta Baja physically places the folder back into its drawer.
+     */
+    public function rearchiveExpedient(Expedient $expedient): void
+    {
+        DB::transaction(function () use ($expedient) {
+            $activeLoan = $expedient->loans()->where('status', LoanStatus::Delivered)->latest()->first();
+            if ($activeLoan) {
+                $activeLoan->update([
+                    'status' => LoanStatus::Returned,
+                    'returned_at' => now(),
+                ]);
+            }
+
+            $expedient->update([
+                'current_status' => ExpedientStatus::Available,
+                'current_holder_id' => null,
+            ]);
+
+            $operatorName = Auth::user()?->name ?? 'Operador de Archivo';
+            $location = $expedient->current_location_id;
+
+            $this->expedientService->recordMovement(
+                $expedient,
+                MovementType::StatusChanged,
+                $location,
+                $location,
+                "Reingresado y guardado físicamente en gaveta por {$operatorName}."
+            );
         });
     }
 

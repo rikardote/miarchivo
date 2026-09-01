@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Loans;
 
+use App\Enums\ExpedientStatus;
 use App\Enums\LoanStatus;
 use App\Models\ArchiveLocation;
 use App\Models\Expedient;
@@ -83,24 +84,34 @@ class Dispatch extends Component
                 $this->error("Error al surtir: " . $e->getMessage());
             }
         } else {
-            // Tab to_return
-            $loan = LoanRequest::where('expedient_id', $expedient->id)
-                ->where('status', LoanStatus::Delivered)
-                ->latest()
-                ->first();
+            // Tab to_return: Rearchive to drawer
+            if ($expedient->current_status === ExpedientStatus::Returned) {
+                try {
+                    $loanService->rearchiveExpedient($expedient);
+                    $locationName = $expedient->currentLocation ? $expedient->currentLocation->full_label : 'su gaveta';
+                    $this->success("¡Expediente {$expedient->expedient_code} guardado correctamente en: {$locationName}!");
+                } catch (\Exception $e) {
+                    $this->error("Error al re-archivar: " . $e->getMessage());
+                }
+            } elseif ($expedient->current_status === ExpedientStatus::Loaned) {
+                // If user returned directly to Planta Baja
+                $loan = LoanRequest::where('expedient_id', $expedient->id)
+                    ->where('status', LoanStatus::Delivered)
+                    ->latest()
+                    ->first();
 
-            if (!$loan) {
-                $this->warning("El expediente {$expedient->expedient_code} no tiene un préstamo activo por devolver.");
-                $this->scannedCode = '';
-                return;
-            }
-
-            try {
-                $loanService->returnLoan($loan);
-                $locationName = $expedient->currentLocation ? $expedient->currentLocation->full_label : 'Sin ubicación asignada';
-                $this->success("¡Devolución registrada! Reubicar en: {$locationName}");
-            } catch (\Exception $e) {
-                $this->error("Error al procesar devolución: " . $e->getMessage());
+                try {
+                    if ($loan) {
+                        $loanService->returnLoan($loan);
+                    }
+                    $loanService->rearchiveExpedient($expedient);
+                    $locationName = $expedient->currentLocation ? $expedient->currentLocation->full_label : 'su gaveta';
+                    $this->success("¡Devolución recibida y guardado en gaveta: {$locationName}!");
+                } catch (\Exception $e) {
+                    $this->error("Error al procesar: " . $e->getMessage());
+                }
+            } else {
+                $this->info("El expediente {$expedient->expedient_code} ya está disponible en su gaveta.");
             }
         }
 
@@ -146,18 +157,44 @@ class Dispatch extends Component
         $this->selectedLoans = [];
     }
 
-    public function returnSingle(int $loanId)
+    public function rearchiveSingle(int $loanId)
     {
         $loan = LoanRequest::find($loanId);
-        if (!$loan) return;
+        if (!$loan || !$loan->expedient) return;
 
         try {
-            app(LoanService::class)->returnLoan($loan);
-            $locationName = $loan->expedient->currentLocation ? $loan->expedient->currentLocation->full_label : 'Sin ubicación';
-            $this->success("Expediente devuelto. Guardar en: {$locationName}");
+            app(LoanService::class)->rearchiveExpedient($loan->expedient);
+            $locationName = $loan->expedient->currentLocation ? $loan->expedient->currentLocation->full_label : 'su gaveta';
+            $this->success("Expediente {$loan->expedient->expedient_code} guardado en gaveta ({$locationName}).");
         } catch (\Exception $e) {
             $this->error("Error: " . $e->getMessage());
         }
+    }
+
+    public function rearchiveBulk()
+    {
+        if (empty($this->selectedLoans)) {
+            $this->error("Selecciona al menos un expediente.");
+            return;
+        }
+
+        $loanService = app(LoanService::class);
+        $count = 0;
+
+        foreach ($this->selectedLoans as $loanId) {
+            $loan = LoanRequest::find($loanId);
+            if ($loan && $loan->expedient && $loan->expedient->current_status === ExpedientStatus::Returned) {
+                try {
+                    $loanService->rearchiveExpedient($loan->expedient);
+                    $count++;
+                } catch (\Exception $e) {
+                    // Continue with next
+                }
+            }
+        }
+
+        $this->success("Se guardaron {$count} expedientes en su gaveta correspondiente.");
+        $this->selectedLoans = [];
     }
 
     public function render()
@@ -177,12 +214,11 @@ class Dispatch extends Component
                 $query->whereHas('expedient', fn($q) => $q->where('current_location_id', $this->selectedLocationId));
             }
 
-            // Group by location for picking
             $items = $query->orderBy('created_at', 'asc')->paginate(15);
-            $totalPending = LoanRequest::whereIn('status', [LoanStatus::Pending, LoanStatus::Approved])->count();
-            $totalReturns = LoanRequest::where('status', LoanStatus::Delivered)->count();
         } else {
-            $query = LoanRequest::where('status', LoanStatus::Delivered)
+            // Tab to_return: Expedients returned to RH that need to be rearchived to drawers in PB
+            $query = LoanRequest::where('status', LoanStatus::Returned)
+                ->whereHas('expedient', fn($q) => $q->where('current_status', ExpedientStatus::Returned))
                 ->with(['expedient.employee', 'expedient.currentLocation.branch', 'requester']);
 
             if (!empty($searchTerm)) {
@@ -190,10 +226,15 @@ class Dispatch extends Component
                     ->orWhereHas('requester', fn($q) => $q->where('name', 'like', "%{$searchTerm}%"));
             }
 
-            $items = $query->orderBy('due_date', 'asc')->paginate(15);
-            $totalPending = LoanRequest::whereIn('status', [LoanStatus::Pending, LoanStatus::Approved, LoanStatus::Reserved])->count();
-            $totalReturns = LoanRequest::where('status', LoanStatus::Delivered)->count();
+            if ($this->selectedLocationId) {
+                $query->whereHas('expedient', fn($q) => $q->where('current_location_id', $this->selectedLocationId));
+            }
+
+            $items = $query->orderBy('returned_at', 'asc')->paginate(15);
         }
+
+        $totalPending = LoanRequest::whereIn('status', [LoanStatus::Pending, LoanStatus::Approved])->count();
+        $totalReturns = Expedient::where('current_status', ExpedientStatus::Returned)->count();
 
         return view('livewire.loans.dispatch', [
             'items' => $items,

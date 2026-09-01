@@ -121,14 +121,14 @@ class DispatchTest extends TestCase
             'employee_id' => $employee->id,
             'expedient_code' => 'MARA800505-V1',
             'current_location_id' => $this->location->id,
-            'current_status' => ExpedientStatus::Loaned,
-            'current_holder_id' => $this->requester->id,
+            'current_status' => ExpedientStatus::Returned,
+            'current_holder_id' => null,
         ]);
 
         $loan = LoanRequest::factory()->create([
             'expedient_id' => $expedient->id,
             'requester_id' => $this->requester->id,
-            'status' => LoanStatus::Delivered,
+            'status' => LoanStatus::Returned,
         ]);
 
         Livewire::actingAs($this->operator)
@@ -138,8 +138,33 @@ class DispatchTest extends TestCase
             ->call('processScan')
             ->assertHasNoErrors();
 
-        $this->assertEquals(LoanStatus::Returned, $loan->fresh()->status);
         $this->assertEquals(ExpedientStatus::Available, $expedient->fresh()->current_status);
         $this->assertNull($expedient->fresh()->current_holder_id);
+    }
+
+    public function test_operator_can_rearchive_returned_loan_single()
+    {
+        $employee = Employee::factory()->create(['rfc' => 'MARA800506']);
+        $expedient = Expedient::factory()->create([
+            'employee_id' => $employee->id,
+            'expedient_code' => 'MARA800506-V1',
+            'current_location_id' => $this->location->id,
+            'current_status' => ExpedientStatus::Returned,
+            'current_holder_id' => null,
+        ]);
+
+        $loan = LoanRequest::factory()->create([
+            'expedient_id' => $expedient->id,
+            'requester_id' => $this->requester->id,
+            'status' => LoanStatus::Returned,
+        ]);
+
+        Livewire::actingAs($this->operator)
+            ->test(Dispatch::class)
+            ->set('tab', 'to_return')
+            ->call('rearchiveSingle', $loan->id)
+            ->assertHasNoErrors();
+
+        $this->assertEquals(ExpedientStatus::Available, $expedient->fresh()->current_status);
     }
 }
