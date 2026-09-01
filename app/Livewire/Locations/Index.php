@@ -29,6 +29,11 @@ class Index extends Component
     public $notes;
     public $is_active = true;
 
+    public function mount()
+    {
+        abort_unless(auth()->user()->can('locations.view'), 403);
+    }
+
     protected $rules = [
         'branch_id' => 'required|exists:branches,id',
         'location_type' => 'required|string',

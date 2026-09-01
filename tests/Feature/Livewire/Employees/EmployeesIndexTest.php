@@ -20,6 +20,7 @@ class EmployeesIndexTest extends TestCase
         parent::setUp();
         $this->seed(\Database\Seeders\RolePermissionSeeder::class);
         $this->user = User::factory()->create();
+        $this->user->assignRole('admin');
     }
 
     public function test_it_can_render_employees_directory_with_pagination()
@@ -46,5 +47,15 @@ class EmployeesIndexTest extends TestCase
             ->assertStatus(200)
             ->assertSee('GOMA850215')
             ->assertSee('ALEJANDRO');
+    }
+
+    public function test_regular_user_cannot_access_employees_directory()
+    {
+        $regularUser = User::factory()->create();
+        $regularUser->assignRole('user');
+
+        Livewire::actingAs($regularUser)
+            ->test(Index::class)
+            ->assertStatus(403);
     }
 }

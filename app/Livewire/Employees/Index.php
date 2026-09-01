@@ -29,6 +29,11 @@ class Index extends Component
     public string $last_name = '';
     public ?string $employee_number = null;
 
+    public function mount()
+    {
+        abort_unless(auth()->user()->can('employees.view'), 403);
+    }
+
     public function updatingSearch()
     {
         $this->resetPage();

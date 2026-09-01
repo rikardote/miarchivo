@@ -78,13 +78,12 @@ class RolePermissionSeeder extends Seeder
         ]);
 
         $user = Role::firstOrCreate(['name' => 'user']);
-        $user->givePermissionTo([
-            'expedients.view',
-            'loans.view', 'loans.create', 'loans.cancel-own',
-            'employees.view',
-            'locations.view',
-            'movements.view',
+        $user->syncPermissions([
             'dashboard.view',
+            'expedients.view',
+            'loans.view',
+            'loans.create',
+            'loans.cancel-own',
         ]);
     }
 }

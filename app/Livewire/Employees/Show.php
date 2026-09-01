@@ -11,6 +11,7 @@ class Show extends Component
 
     public function mount(Employee $employee)
     {
+        abort_unless(auth()->user()->can('employees.view'), 403);
         $this->employee = $employee->load(['department', 'branch', 'expedients.currentLocation']);
     }
 
