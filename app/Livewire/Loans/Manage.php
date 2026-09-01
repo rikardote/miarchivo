@@ -115,6 +115,9 @@ class Manage extends Component
 
     public function render()
     {
+        $this->loan->refresh();
+        $this->loan->loadMissing(['expedient.employee', 'requester', 'approver']);
+
         return view('livewire.loans.manage');
     }
 }

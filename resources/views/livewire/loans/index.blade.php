@@ -1,4 +1,4 @@
-<div>
+<div wire:poll.3s>
     <x-mary-header title="Préstamos" subtitle="Listado de solicitudes de expedientes" class="mb-6 sm:mb-10">
         <x-slot:actions>
             <x-mary-button icon="o-document-arrow-down" wire:click="exportActiveLoans" class="btn-ghost rounded-xl sm:rounded-2xl h-11 sm:h-14 px-3 sm:px-6 font-black uppercase text-[10px] tracking-widest border border-slate-100 dark:border-white/5 hover:bg-slate-50 transition-premium" spinner>

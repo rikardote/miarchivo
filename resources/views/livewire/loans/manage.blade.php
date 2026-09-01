@@ -1,4 +1,4 @@
-<div>
+<div wire:poll.2s>
     <x-mary-header title="Gestionar Préstamo" subtitle="Solicitud de {{ $loan->requester->name ?? 'Usuario desconocido' }}" separator>
         <x-slot:actions>
             <x-mary-button icon="o-arrow-left" class="btn-ghost" link="{{ route('loans.index') }}">Volver</x-mary-button>
