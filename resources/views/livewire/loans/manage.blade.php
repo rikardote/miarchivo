@@ -134,15 +134,80 @@
                         @endcan
                     </div>
                 @else
-                    <div class="text-center py-6 text-gray-500 flex flex-col items-center">
-                        <x-mary-icon name="o-lock-closed" class="w-12 h-12 mb-2 text-base-300" />
-                        <p>No hay acciones disponibles para este estado.</p>
+                    <div class="space-y-6 py-2">
+                        @can('loans.create')
+                            @if($loan->expedient && $loan->expedient->current_status === \App\Enums\ExpedientStatus::Available)
+                                <div class="p-5 bg-primary/5 border border-primary/20 rounded-2xl space-y-4">
+                                    <div class="flex items-center gap-3 text-primary">
+                                        <div class="p-2.5 bg-primary/10 rounded-xl">
+                                            <x-mary-icon name="o-arrow-path" class="w-5 h-5 text-primary" />
+                                        </div>
+                                        <div>
+                                            <h4 class="font-black text-sm text-slate-800 dark:text-slate-100">¿Necesitas este expediente de nuevo?</h4>
+                                            <p class="text-xs text-slate-500">Disponible para solicitar de inmediato.</p>
+                                        </div>
+                                    </div>
+                                    <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                        El expediente <strong>{{ $loan->expedient->expedient_code }}</strong> se encuentra guardado en su gaveta. Puedes generar una nueva solicitud con un solo clic.
+                                    </p>
+                                    <x-mary-button 
+                                        label="Solicitar Este Expediente Otra Vez" 
+                                        icon="o-arrow-path" 
+                                        wire:click="openRequestAgainModal" 
+                                        class="btn-primary w-full h-12 rounded-xl font-black uppercase text-xs tracking-wider shadow-lg shadow-primary/20" 
+                                        spinner="openRequestAgainModal"
+                                    />
+                                </div>
+                            @elseif($loan->expedient)
+                                <div class="p-5 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2">
+                                    <p class="text-xs font-bold text-slate-700 dark:text-slate-300">Estado del expediente físico:</p>
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-{{ $loan->expedient->current_status->color() }}-500/10 text-{{ $loan->expedient->current_status->color() }}-600">
+                                            {{ $loan->expedient->current_status->label() }}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs text-slate-400">Actualmente no está disponible en gaveta para un nuevo préstamo.</p>
+                                </div>
+                            @endif
+                        @else
+                            <div class="text-center py-6 text-gray-500 flex flex-col items-center">
+                                <x-mary-icon name="o-lock-closed" class="w-12 h-12 mb-2 text-base-300" />
+                                <p>No hay acciones disponibles para este estado.</p>
+                            </div>
+                        @endcan
                     </div>
                 @endif
 
             </x-mary-card>
         </div>
     </div>
+
+    <!-- Modal para Solicitar Nuevamente -->
+    <x-mary-modal wire:model="requestAgainModalOpen" title="Solicitar Nuevamente este Expediente" separator>
+        <div class="py-4 space-y-4">
+            <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-white/5 flex items-center gap-3">
+                <x-mary-icon name="o-folder" class="w-8 h-8 text-primary" />
+                <div>
+                    <p class="text-sm font-black text-slate-900 dark:text-white">{{ $loan->expedient->expedient_code ?? 'N/A' }}</p>
+                    <p class="text-xs text-slate-500 font-bold">{{ $loan->expedient->employee->first_name ?? '' }} {{ $loan->expedient->employee->last_name ?? '' }}</p>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">Motivo / Observaciones (Opcional)</label>
+                <textarea 
+                    wire:model="requestObservations" 
+                    placeholder="Ej. Revisión de documentos para trámite de pensión..." 
+                    rows="3"
+                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl p-4 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none resize-none text-sm"
+                ></textarea>
+            </div>
+        </div>
+        <x-slot:actions>
+            <x-mary-button label="Cancelar" wire:click="$set('requestAgainModalOpen', false)" class="btn-ghost" />
+            <x-mary-button label="Enviar Solicitud" icon="o-paper-airplane" wire:click="submitRequestAgain" class="btn-primary" spinner="submitRequestAgain" />
+        </x-slot:actions>
+    </x-mary-modal>
 
     <!-- Sudo Modal -->
     <x-mary-modal wire:model="sudoModalOpen" title="Verificación de Identidad Requerida" separator>

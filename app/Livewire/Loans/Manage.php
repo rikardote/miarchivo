@@ -18,9 +18,48 @@ class Manage extends Component
     public bool $sudoModalOpen = false;
     public string $pendingAction = '';
 
+    public bool $requestAgainModalOpen = false;
+    public string $requestObservations = '';
+
     public function mount(LoanRequest $loan)
     {
         $this->loan = $loan->load(['expedient.employee', 'requester', 'approver']);
+    }
+
+    public function openRequestAgainModal()
+    {
+        abort_unless(auth()->user()->can('loans.create'), 403);
+        $this->requestObservations = '';
+        $this->requestAgainModalOpen = true;
+    }
+
+    public function submitRequestAgain()
+    {
+        abort_unless(auth()->user()->can('loans.create'), 403);
+
+        if (!$this->loan->expedient) {
+            $this->error('El expediente ya no existe.');
+            return;
+        }
+
+        if ($this->loan->expedient->current_status !== \App\Enums\ExpedientStatus::Available) {
+            $this->warning("El expediente actualmente está en estado '{$this->loan->expedient->current_status->label()}'. No está disponible para préstamo.");
+            $this->requestAgainModalOpen = false;
+            return;
+        }
+
+        try {
+            $newLoan = app(LoanService::class)->requestLoan(
+                $this->loan->expedient,
+                $this->requestObservations ?: 'Solicitud generada nuevamente desde el historial.'
+            );
+
+            $this->success("¡Solicitud enviada exitosamente!");
+            $this->requestAgainModalOpen = false;
+            return redirect()->route('loans.manage', $newLoan);
+        } catch (\Exception $e) {
+            $this->error("Error al solicitar: " . $e->getMessage());
+        }
     }
 
     public function triggerAction(string $action)
