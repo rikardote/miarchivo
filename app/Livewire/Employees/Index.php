@@ -2,8 +2,6 @@
 
 namespace App\Livewire\Employees;
 
-use App\Models\Branch;
-use App\Models\Department;
 use App\Models\Employee;
 use App\Rules\ValidRfc;
 use App\Services\EmployeeApiService;
@@ -27,9 +25,6 @@ class Index extends Component
     public string $first_name = '';
     public string $last_name = '';
     public ?string $employee_number = null;
-    public ?string $position = null;
-    public ?int $branch_id = null;
-    public ?int $department_id = null;
 
     public function updatingSearch()
     {
@@ -48,9 +43,6 @@ class Index extends Component
             'first_name',
             'last_name',
             'employee_number',
-            'position',
-            'branch_id',
-            'department_id',
         ]);
         $this->createEmployeeModal = true;
     }
@@ -62,9 +54,6 @@ class Index extends Component
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
             'employee_number' => 'nullable|string|max:50|unique:employees,employee_number',
-            'position' => 'nullable|string|max:100',
-            'branch_id' => 'nullable|exists:branches,id',
-            'department_id' => 'nullable|exists:departments,id',
         ], [
             'rfc.required' => 'El RFC es obligatorio.',
             'rfc.unique' => 'Este RFC ya se encuentra registrado.',
@@ -78,9 +67,6 @@ class Index extends Component
             'first_name' => trim($this->first_name),
             'last_name' => trim($this->last_name),
             'employee_number' => $this->employee_number ? trim($this->employee_number) : null,
-            'position' => $this->position ? trim($this->position) : null,
-            'branch_id' => $this->branch_id,
-            'department_id' => $this->department_id,
             'employment_status' => 'active',
         ]);
 
@@ -100,9 +86,8 @@ class Index extends Component
 
         return view('livewire.employees.index', [
             'employees' => $employees,
-            'branches' => Branch::where('is_active', true)->orderBy('name')->get(),
-            'departments' => Department::where('is_active', true)->orderBy('name')->get(),
         ]);
     }
 }
+
 
