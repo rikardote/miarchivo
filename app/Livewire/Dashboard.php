@@ -25,8 +25,10 @@ class Dashboard extends Component
     {
         $user = Auth::user();
         $isAdmin = $user->can('loans.approve');
+        $isOperator = $user->hasRole('operator') || (!$isAdmin && $user->can('loans.deliver'));
+        $isStaff = $isAdmin || $isOperator;
 
-        if ($isAdmin) {
+        if ($isStaff) {
             $statusCounts = Expedient::selectRaw('current_status, count(*) as total')
                 ->groupBy('current_status')
                 ->pluck('total', 'current_status');

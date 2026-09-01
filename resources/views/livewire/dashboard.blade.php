@@ -117,9 +117,20 @@
                 <x-mary-card class="bg-slate-900 rounded-3xl p-6 text-white">
                     <h4 class="text-xl font-bold mb-6">Atajos de Sistema</h4>
                     <div class="grid grid-cols-1 gap-3">
-                        <x-mary-button label="Nuevo Expediente" icon="o-plus" link="{{ route('expedients.create') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
-                        <x-mary-button label="Solicitud Masiva" icon="o-rectangle-stack" link="{{ route('loans.bulk') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
-                        <x-mary-button label="Mesa de Control" icon="o-clipboard-document-check" link="{{ route('loans.index') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                        @canany(['loans.deliver', 'loans.return'])
+                            <x-mary-button label="Despacho (Planta Baja)" icon="o-truck" link="{{ route('loans.dispatch') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                            <x-mary-button label="Hoja de Surtido" icon="o-printer" link="{{ route('loans.picking-list') }}" external class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                        @endcanany
+                        @can('expedients.create')
+                            <x-mary-button label="Nuevo Expediente" icon="o-plus" link="{{ route('expedients.create') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                        @endcan
+                        @can('loans.approve')
+                            <x-mary-button label="Solicitud Masiva" icon="o-rectangle-stack" link="{{ route('loans.bulk') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                            <x-mary-button label="Mesa de Control" icon="o-clipboard-document-check" link="{{ route('loans.index') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                        @endcan
+                        @can('expedients.change-location')
+                            <x-mary-button label="Escáner Inteligente" icon="o-qr-code" link="{{ route('expedients.scanner') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                        @endcan
                     </div>
                 </x-mary-card>
 
