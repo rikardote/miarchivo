@@ -12,8 +12,8 @@ services:
       - .:/var/www
       - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
     ports:
-      - "5175:5173"
-      - "8087:8080"
+      - "5177:5173"
+      - "8089:8080"
     depends_on:
       - db
     networks:
