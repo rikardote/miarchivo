@@ -55,13 +55,15 @@ class Request extends Component
 
     public function render()
     {
-        $query = Expedient::available()->with('employee');
+        $expedients = collect();
 
-        if (!empty($this->searchExpedient)) {
-            $query->search($this->searchExpedient);
+        if (mb_strlen($this->searchExpedient) >= 2) {
+            $expedients = Expedient::available()
+                ->with('employee')
+                ->search($this->searchExpedient)
+                ->take(30)
+                ->get();
         }
-
-        $expedients = $query->take(50)->get();
 
         if ($this->expedient_id && !$expedients->contains('id', $this->expedient_id)) {
             $selected = Expedient::with('employee')->find($this->expedient_id);

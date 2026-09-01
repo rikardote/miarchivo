@@ -92,20 +92,28 @@ class Index extends Component
 
     public function render()
     {
-        $expedients = Expedient::query()
-            ->with(['employee.branch', 'currentLocation'])
-            ->when($this->search, fn (Builder $q) => $q->search($this->search))
-            ->when($this->status, fn (Builder $q) => $q->where('current_status', $this->status))
-            ->when($this->filter === 'pending_transfer', function($q) {
-                $q->whereHas('employee', fn($e) => $e->where('employment_status', 'inactive'))
-                  ->whereHas('currentLocation.branch', fn($b) => $b->where('code', 'MEX'));
-            })
-            ->when($this->branch_id, fn (Builder $q) => $q->whereHas('employee', fn($e) => $e->where('branch_id', $this->branch_id)))
-            ->orderBy($this->sortBy['column'], $this->sortBy['direction'])
-            ->paginate(10);
+        $isAdmin = auth()->user()->can('expedients.create');
+        $searchTerm = trim($this->search);
+
+        if (!$isAdmin && mb_strlen($searchTerm) < 2) {
+            $expedients = Expedient::query()->whereRaw('1 = 0')->paginate(10);
+        } else {
+            $expedients = Expedient::query()
+                ->with(['employee.branch', 'currentLocation'])
+                ->when($this->search, fn (Builder $q) => $q->search($this->search))
+                ->when($this->status, fn (Builder $q) => $q->where('current_status', $this->status))
+                ->when($this->filter === 'pending_transfer', function($q) {
+                    $q->whereHas('employee', fn($e) => $e->where('employment_status', 'inactive'))
+                      ->whereHas('currentLocation.branch', fn($b) => $b->where('code', 'MEX'));
+                })
+                ->when($this->branch_id, fn (Builder $q) => $q->whereHas('employee', fn($e) => $e->where('branch_id', $this->branch_id)))
+                ->orderBy($this->sortBy['column'], $this->sortBy['direction'])
+                ->paginate(10);
+        }
 
         return view('livewire.expedients.index', [
             'expedients' => $expedients,
+            'isAdmin' => $isAdmin,
             'statuses' => collect(ExpedientStatus::cases())->map(fn($status) => [
                 'name' => $status->label(),
                 'value' => $status->value,

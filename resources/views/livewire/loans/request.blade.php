@@ -32,8 +32,11 @@
                     icon="o-folder" 
                     single 
                     searchable
-                    placeholder="Busca un expediente disponible..." 
-                    hint="Sólo se muestran los expedientes actualmente disponibles en el archivo." />
+                    search-function="search"
+                    no-result-text="No se encontraron expedientes disponibles"
+                    min-chars="2"
+                    placeholder="Escribe al menos 2 caracteres (código, RFC o nombre)..." 
+                    hint="Escribe en el buscador para localizar y seleccionar el expediente que requieres." />
             @endif
 
             <x-mary-textarea 

@@ -48,6 +48,15 @@
             </div>
         </div>
 
+        @if(!$isAdmin && strlen(trim($search)) < 2)
+            <div class="py-12 sm:py-20 text-center">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-4 text-primary">
+                    <x-mary-icon name="o-magnifying-glass" class="w-8 h-8 sm:w-10 sm:h-10" />
+                </div>
+                <h3 class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 mb-1">Búsqueda de Expedientes</h3>
+                <p class="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto px-4">Ingresa el código, RFC o nombre del trabajador en el buscador superior para consultar su disponibilidad y solicitarlo.</p>
+            </div>
+        @else
         <div class="rounded-xl overflow-hidden border border-slate-200">
             <x-mary-table :headers="[
                 ['key' => 'expedient', 'label' => 'Expediente', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4 pl-4 sm:pl-6'],
@@ -96,6 +105,7 @@
 
             </x-mary-table>
         </div>
+        @endif
     </x-mary-card>
     
     <!-- Bulk Move Modal -->
