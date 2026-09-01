@@ -44,7 +44,7 @@ class Index extends Component
             $query->where('status', $this->status);
         }
 
-        $query->orderBy($this->sortBy['column'], $this->sortBy['direction']);
+        $this->applySorting($query);
 
         $loans = $query->get();
 
@@ -86,6 +86,26 @@ class Index extends Component
         ]);
     }
 
+    protected function applySorting(Builder $query): void
+    {
+        $column = $this->sortBy['column'] ?? 'created_at';
+        $direction = strtolower($this->sortBy['direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+
+        if ($column === 'requester.name') {
+            $query->join('users as requesters', 'loan_requests.requester_id', '=', 'requesters.id')
+                ->orderBy('requesters.name', $direction)
+                ->select('loan_requests.*');
+        } elseif ($column === 'expedient.expedient_code') {
+            $query->join('expedients', 'loan_requests.expedient_id', '=', 'expedients.id')
+                ->orderBy('expedients.expedient_code', $direction)
+                ->select('loan_requests.*');
+        } elseif (in_array($column, ['requested_at', 'due_date', 'delivered_at', 'status', 'created_at', 'id'])) {
+            $query->orderBy("loan_requests.{$column}", $direction);
+        } else {
+            $query->orderBy('loan_requests.created_at', 'desc');
+        }
+    }
+
     public function render()
     {
         $query = LoanRequest::query()->with(['expedient.employee', 'requester', 'approver']);
@@ -101,7 +121,7 @@ class Index extends Component
             $query->where('status', $this->status);
         }
 
-        $query->orderBy($this->sortBy['column'], $this->sortBy['direction']);
+        $this->applySorting($query);
 
         return view('livewire.loans.index', [
             'loans' => $query->paginate(10),

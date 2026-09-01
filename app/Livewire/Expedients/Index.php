@@ -90,6 +90,30 @@ class Index extends Component
         $this->reset(['selected', 'bulkMoveModal', 'targetLocationId']);
     }
 
+    protected function applySorting(Builder $query): void
+    {
+        $column = $this->sortBy['column'] ?? 'created_at';
+        $direction = strtolower($this->sortBy['direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
+
+        if ($column === 'expedient' || $column === 'expedient_code') {
+            $query->orderBy('expedients.expedient_code', $direction);
+        } elseif ($column === 'employee.branch.name') {
+            $query->join('employees as branch_emp', 'expedients.employee_id', '=', 'branch_emp.id')
+                ->leftJoin('branches as emp_branches', 'branch_emp.branch_id', '=', 'emp_branches.id')
+                ->orderBy('emp_branches.name', $direction)
+                ->select('expedients.*');
+        } elseif ($column === 'currentLocation.short_label') {
+            $query->leftJoin('archive_locations', 'expedients.current_location_id', '=', 'archive_locations.id')
+                ->orderBy('archive_locations.cabinet', $direction)
+                ->orderBy('archive_locations.drawer', $direction)
+                ->select('expedients.*');
+        } elseif (in_array($column, ['volume_number', 'current_status', 'created_at', 'id'])) {
+            $query->orderBy("expedients.{$column}", $direction);
+        } else {
+            $query->orderBy('expedients.created_at', 'desc');
+        }
+    }
+
     public function render()
     {
         $isAdmin = auth()->user()->can('expedients.create');
@@ -98,7 +122,7 @@ class Index extends Component
         if (!$isAdmin && mb_strlen($searchTerm) < 2) {
             $expedients = Expedient::query()->whereRaw('1 = 0')->paginate(10);
         } else {
-            $expedients = Expedient::query()
+            $query = Expedient::query()
                 ->with(['employee.branch', 'currentLocation'])
                 ->when($this->search, fn (Builder $q) => $q->search($this->search))
                 ->when($this->status, fn (Builder $q) => $q->where('current_status', $this->status))
@@ -106,9 +130,10 @@ class Index extends Component
                     $q->whereHas('employee', fn($e) => $e->where('employment_status', 'inactive'))
                       ->whereHas('currentLocation.branch', fn($b) => $b->where('code', 'MEX'));
                 })
-                ->when($this->branch_id, fn (Builder $q) => $q->whereHas('employee', fn($e) => $e->where('branch_id', $this->branch_id)))
-                ->orderBy($this->sortBy['column'], $this->sortBy['direction'])
-                ->paginate(10);
+                ->when($this->branch_id, fn (Builder $q) => $q->whereHas('employee', fn($e) => $e->where('branch_id', $this->branch_id)));
+
+            $this->applySorting($query);
+            $expedients = $query->paginate(10);
         }
 
         return view('livewire.expedients.index', [
