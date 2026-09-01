@@ -7,13 +7,15 @@
 
     <title>{{ config('app.name', 'Archivo') }} - Iniciar Sesión</title>
 
-    <!-- Immediate Theme Initialization -->
+    <!-- Immediate Theme Initialization (Strict Light Default) -->
     <script>
         (function() {
             try {
-                const storedTheme = localStorage.getItem('mary-theme')?.replaceAll('"', '');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+                if (!localStorage.getItem('mary-theme')) {
+                    localStorage.setItem('mary-theme', '"light"');
+                    localStorage.setItem('mary-class', '"light"');
+                }
+                const theme = localStorage.getItem('mary-theme')?.replaceAll('"', '') || 'light';
                 const themeClass = localStorage.getItem('mary-class')?.replaceAll('"', '') || theme;
                 
                 document.documentElement.setAttribute('data-theme', theme);
