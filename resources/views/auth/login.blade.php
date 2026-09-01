@@ -81,22 +81,6 @@
                 <p class="text-base sm:text-lg text-emerald-100/90 leading-relaxed font-medium">
                     Control centralizado, trazabilidad física y digital de expedientes de personal para la Representación Estatal Baja California.
                 </p>
-
-                <!-- Características clave en pastillas -->
-                <div class="mt-8 flex flex-wrap gap-2.5">
-                    <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 text-white backdrop-blur-sm border border-white/10">
-                        <x-mary-icon name="o-archive-box" class="w-3.5 h-3.5 text-[#C4A462]" />
-                        Control de Gavetas
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 text-white backdrop-blur-sm border border-white/10">
-                        <x-mary-icon name="o-arrow-path-rounded-square" class="w-3.5 h-3.5 text-[#C4A462]" />
-                        Préstamos en 2 Etapas
-                    </span>
-                    <span class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white/10 text-white backdrop-blur-sm border border-white/10">
-                        <x-mary-icon name="o-qr-code" class="w-3.5 h-3.5 text-[#C4A462]" />
-                        Escaneo de Códigos
-                    </span>
-                </div>
             </div>
 
             <!-- Footer Institucional Izquierdo -->
