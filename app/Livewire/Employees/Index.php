@@ -7,6 +7,7 @@ use App\Rules\ValidRfc;
 use App\Services\EmployeeApiService;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
+use Livewire\WithPagination;
 use Mary\Traits\Toast;
 
 class Index extends Component
