@@ -49,7 +49,6 @@ class CreateExpedientTest extends TestCase
             ->set('manual_first_name', 'Alejandro')
             ->set('manual_last_name', 'Gomez Martinez')
             ->set('manual_employee_number', '99001')
-            ->set('manual_position', 'Analista de Operaciones')
             ->call('saveManualEmployee')
             ->assertHasNoErrors()
             ->assertSet('searchEmployee', 'Alejandro Gomez Martinez')

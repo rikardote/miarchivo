@@ -165,18 +165,6 @@
                     <x-mary-input label="Apellidos *" wire:model="manual_last_name" placeholder="Apellidos..." icon="o-user" />
                 </div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                    <x-mary-input label="Puesto" wire:model="manual_position" placeholder="Ej: Analista de Operaciones" icon="o-briefcase" />
-                </div>
-                <div>
-                    <x-mary-select label="Sucursal / Sede" wire:model="manual_branch_id" :options="$branches" placeholder="Seleccione..." icon="o-building-office" />
-                </div>
-                <div>
-                    <x-mary-select label="Departamento" wire:model="manual_department_id" :options="$departments" placeholder="Seleccione..." icon="o-rectangle-group" />
-                </div>
-            </div>
         </div>
 
         <x-slot:actions>

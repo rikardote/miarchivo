@@ -27,9 +27,6 @@ class Create extends Component
     public string $manual_first_name = '';
     public string $manual_last_name = '';
     public ?string $manual_employee_number = null;
-    public ?string $manual_position = null;
-    public ?int $manual_branch_id = null;
-    public ?int $manual_department_id = null;
 
     public function mount($employee = null)
     {
@@ -146,9 +143,6 @@ class Create extends Component
             'manual_first_name' => 'required|string|max:100',
             'manual_last_name' => 'required|string|max:100',
             'manual_employee_number' => 'nullable|string|max:50|unique:employees,employee_number',
-            'manual_position' => 'nullable|string|max:100',
-            'manual_branch_id' => 'nullable|exists:branches,id',
-            'manual_department_id' => 'nullable|exists:departments,id',
         ], [
             'manual_rfc.required' => 'El RFC es obligatorio.',
             'manual_rfc.unique' => 'Ya existe un empleado con este RFC en el sistema.',
@@ -162,9 +156,6 @@ class Create extends Component
             'first_name' => trim($this->manual_first_name),
             'last_name' => trim($this->manual_last_name),
             'employee_number' => $this->manual_employee_number ? trim($this->manual_employee_number) : null,
-            'position' => $this->manual_position ? trim($this->manual_position) : null,
-            'branch_id' => $this->manual_branch_id,
-            'department_id' => $this->manual_department_id,
             'employment_status' => 'active',
         ]);
 
@@ -179,9 +170,6 @@ class Create extends Component
             'manual_first_name',
             'manual_last_name',
             'manual_employee_number',
-            'manual_position',
-            'manual_branch_id',
-            'manual_department_id',
         ]);
 
         $this->success("Empleado {$employee->full_name} registrado y seleccionado exitosamente.");
