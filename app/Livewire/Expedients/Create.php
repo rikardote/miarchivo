@@ -105,18 +105,19 @@ class Create extends Component
             $results = $apiService->search($value);
             $apiResults = collect($results)
                 ->sortByDesc('id')
-                ->unique('id_legal')
                 ->map(function ($item) {
+                    $rfc10 = !empty($item['id_legal']) ? mb_strtoupper(mb_substr(trim($item['id_legal']), 0, 10), 'UTF-8') : 'S/RFC';
                     return [
-                        'id' => $item['id_legal'],
+                        'id' => $rfc10,
                         'name' => trim(($item['nombre'] ?? '') . ' ' . ($item['apellido_1'] ?? '') . ' ' . ($item['apellido_2'] ?? '')),
-                        'rfc' => $item['id_legal'] ?? 'S/RFC',
+                        'rfc' => $rfc10,
                         'employee_number' => $item['id_empleado'] ?? 'S/N',
                         'source' => 'api',
                         'local_id' => null,
                         'raw' => $item,
                     ];
-                });
+                })
+                ->unique('rfc');
         } catch (\Throwable $e) {
             // Silently fallback to local results if API is temporarily unavailable
         }
@@ -132,6 +133,7 @@ class Create extends Component
 
     public function selectEmployee($rfc, $source = 'api', $localId = null)
     {
+        $rfc = mb_strtoupper(mb_substr(trim($rfc), 0, 10), 'UTF-8');
         if ($source === 'local' && $localId) {
             $employee = Employee::find($localId);
         } else {

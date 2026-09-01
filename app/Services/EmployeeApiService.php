@@ -50,11 +50,16 @@ class EmployeeApiService
             return null;
         }
 
+        $cleanRfc = mb_strtoupper(mb_substr(trim($apiData['id_legal']), 0, 10), 'UTF-8');
+        if (empty($cleanRfc)) {
+            return null;
+        }
+
         // Determine status from API (map 'ACTIVO' to 'active', otherwise 'inactive')
         $apiStatus = strtoupper($apiData['estado_empleado'] ?? $apiData['estatus'] ?? 'ACTIVO');
         $status = (str_contains($apiStatus, 'ACTIVO')) ? 'active' : 'inactive';
 
-        $employee = Employee::where('rfc', $apiData['id_legal'])->first();
+        $employee = Employee::where('rfc', $cleanRfc)->first();
 
         $data = [
             'external_api_id' => $apiData['id'] ?? null,
@@ -71,7 +76,7 @@ class EmployeeApiService
         // Only assign branch if it's a new employee
         if (!$employee) {
             $data['branch_id'] = $this->determineBranch($apiData, $status);
-            return Employee::create(array_merge(['rfc' => $apiData['id_legal']], $data));
+            return Employee::create(array_merge(['rfc' => $cleanRfc], $data));
         }
 
         $employee->update($data);
