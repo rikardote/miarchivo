@@ -57,7 +57,7 @@ class Index extends Component
     public function saveEmployee()
     {
         $this->validate([
-            'rfc' => 'required|string|min:10|max:13|unique:employees,rfc',
+            'rfc' => 'required|string|size:10|unique:employees,rfc',
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
             'employee_number' => 'nullable|string|max:50|unique:employees,employee_number',
@@ -66,6 +66,7 @@ class Index extends Component
             'department_id' => 'nullable|exists:departments,id',
         ], [
             'rfc.required' => 'El RFC es obligatorio.',
+            'rfc.size' => 'El RFC debe tener exactamente 10 caracteres (ej: GOMA850215).',
             'rfc.unique' => 'Este RFC ya se encuentra registrado.',
             'first_name.required' => 'El nombre es obligatorio.',
             'last_name.required' => 'Los apellidos son obligatorios.',

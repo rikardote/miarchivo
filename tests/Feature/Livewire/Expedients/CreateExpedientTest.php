@@ -45,7 +45,7 @@ class CreateExpedientTest extends TestCase
     {
         Livewire::actingAs($this->admin)
             ->test(Create::class)
-            ->set('manual_rfc', 'GOMA850215ABC')
+            ->set('manual_rfc', 'GOMA850215')
             ->set('manual_first_name', 'Alejandro')
             ->set('manual_last_name', 'Gomez Martinez')
             ->set('manual_employee_number', '99001')
@@ -56,7 +56,7 @@ class CreateExpedientTest extends TestCase
             ->call('save')
             ->assertHasNoErrors();
 
-        $employee = Employee::where('rfc', 'GOMA850215ABC')->first();
+        $employee = Employee::where('rfc', 'GOMA850215')->first();
         $this->assertNotNull($employee);
         $this->assertEquals('Alejandro', $employee->first_name);
         $this->assertEquals(1, $employee->expedients()->count());

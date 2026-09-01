@@ -139,12 +139,13 @@ class Create extends Component
     public function saveManualEmployee()
     {
         $this->validate([
-            'manual_rfc' => 'required|string|min:10|max:13|unique:employees,rfc',
+            'manual_rfc' => 'required|string|size:10|unique:employees,rfc',
             'manual_first_name' => 'required|string|max:100',
             'manual_last_name' => 'required|string|max:100',
             'manual_employee_number' => 'nullable|string|max:50|unique:employees,employee_number',
         ], [
             'manual_rfc.required' => 'El RFC es obligatorio.',
+            'manual_rfc.size' => 'El RFC debe tener exactamente 10 caracteres (ej: GOMA850215).',
             'manual_rfc.unique' => 'Ya existe un empleado con este RFC en el sistema.',
             'manual_first_name.required' => 'El nombre es obligatorio.',
             'manual_last_name.required' => 'Los apellidos son obligatorios.',

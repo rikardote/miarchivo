@@ -150,7 +150,7 @@
         <div class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <x-mary-input label="RFC *" wire:model="manual_rfc" placeholder="Ej: GOMA850215ABC" icon="o-identification" class="uppercase" />
+                    <x-mary-input label="RFC (10 caracteres) *" wire:model="manual_rfc" placeholder="Ej: GOMA850215" icon="o-identification" class="uppercase" maxlength="10" />
                 </div>
                 <div>
                     <x-mary-input label="No. de Empleado (Opcional)" wire:model="manual_employee_number" placeholder="Ej: 10452" icon="o-hashtag" />
