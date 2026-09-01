@@ -2,35 +2,18 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Impresión de Etiqueta - {{ config('app.name') }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ config('app.name', 'Archivo') }} - Impresión</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        @page {
-            margin: 0;
-            size: 80mm 50mm;
-        }
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background: white;
-            color: black;
-            width: 80mm;
-            height: 50mm;
-        }
         @media print {
-            .no-print {
-                display: none;
-            }
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; font-size: 12px; }
+            .page-break { page-break-after: always; }
         }
     </style>
-    @vite(['resources/css/app.css'])
 </head>
-<body>
+<body class="bg-slate-100 text-slate-900 min-h-screen p-4 sm:p-8">
     {{ $slot }}
-    
-    <div class="no-print fixed bottom-2 right-2 flex gap-2">
-        <button onclick="window.print()" class="btn btn-primary btn-sm">Imprimir</button>
-        <button onclick="window.close()" class="btn btn-ghost btn-sm">Cerrar</button>
-    </div>
 </body>
 </html>

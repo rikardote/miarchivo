@@ -32,6 +32,8 @@ Route::middleware('auth')->group(function () {
     
     // Loans
     Route::get('/loans', \App\Livewire\Loans\Index::class)->name('loans.index');
+    Route::get('/loans/dispatch', \App\Livewire\Loans\Dispatch::class)->name('loans.dispatch');
+    Route::get('/loans/picking-list', \App\Livewire\Loans\PickingList::class)->name('loans.picking-list');
     Route::get('/loans/bulk', \App\Livewire\Loans\BulkRequest::class)->name('loans.bulk');
     Route::get('/loans/request/{expedient?}', \App\Livewire\Loans\Request::class)->name('loans.request');
     Route::get('/loans/{loan}/manage', \App\Livewire\Loans\Manage::class)->name('loans.manage');

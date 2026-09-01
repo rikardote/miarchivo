@@ -77,6 +77,17 @@ class RolePermissionSeeder extends Seeder
             'dashboard.view',
         ]);
 
+        $operator = Role::firstOrCreate(['name' => 'operator']);
+        $operator->syncPermissions([
+            'dashboard.view',
+            'expedients.view',
+            'expedients.change-location',
+            'loans.view',
+            'loans.deliver',
+            'loans.return',
+            'movements.view',
+        ]);
+
         $user = Role::firstOrCreate(['name' => 'user']);
         $user->syncPermissions([
             'dashboard.view',

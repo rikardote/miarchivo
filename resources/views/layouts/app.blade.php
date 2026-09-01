@@ -108,6 +108,9 @@
 
                 <x-mary-menu-sub title="Préstamos" icon="o-document-text" open="{{ request()->routeIs('loans.*') }}" class="text-slate-600 dark:text-white/70 font-black text-sm">
                     <x-mary-menu-item title="Bandeja Personal" icon="o-inbox" link="{{ route('loans.index', ['mine' => 1]) }}" active="{{ request()->fullUrlIs(route('loans.index', ['mine' => 1])) }}" class="text-xs font-bold py-3" />
+                    @canany(['loans.deliver', 'loans.return'])
+                        <x-mary-menu-item title="Despacho (Planta Baja)" icon="o-truck" link="{{ route('loans.dispatch') }}" active="{{ request()->routeIs('loans.dispatch') }}" class="text-xs font-bold py-3" />
+                    @endcanany
                     @can('loans.approve')
                         <x-mary-menu-item title="Carga Masiva" icon="o-rectangle-stack" link="{{ route('loans.bulk') }}" active="{{ request()->routeIs('loans.bulk') }}" class="text-xs font-bold py-3" />
                         <x-mary-menu-item title="Mesa de Control" icon="o-clipboard-document-check" link="{{ route('loans.index') }}" active="{{ request()->routeIs('loans.index') && !request()->has('mine') }}" class="text-xs font-bold py-3" />

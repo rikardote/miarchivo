@@ -76,8 +76,17 @@ class LoanService
      */
     public function deliverLoan(LoanRequest $loan): void
     {
+        if ($loan->status === LoanStatus::Pending) {
+            $loan->update([
+                'status' => LoanStatus::Approved,
+                'approved_by' => Auth::id(),
+                'approved_at' => now(),
+            ]);
+            $loan->expedient->update(['current_status' => ExpedientStatus::Reserved]);
+        }
+
         if ($loan->status !== LoanStatus::Approved && $loan->status !== LoanStatus::Reserved) {
-            throw new \Exception('La solicitud debe estar aprobada o reservada para entregarse.');
+            throw new \Exception('La solicitud no se encuentra en un estado válido para entregarse.');
         }
 
         DB::transaction(function () use ($loan) {
