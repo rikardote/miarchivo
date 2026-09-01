@@ -1,19 +1,16 @@
 <div>
-    <x-mary-header title="Directorio de Empleados" subtitle="Personal sincronizado desde el sistema principal" class="mb-10">
+    <x-mary-header title="Directorio de Personal" subtitle="Personal con expedientes físicos registrados en el archivo" class="mb-10">
         <x-slot:actions>
-            <x-mary-button label="Sincronizar Catálogo" icon="o-arrow-path" wire:click="syncFromApi" spinner class="btn-primary" />
+            @can('create', \App\Models\Expedient::class)
+                <x-mary-button label="Nuevo Expediente" icon="o-plus" link="{{ route('expedients.create') }}" class="btn-primary shadow-2xl shadow-primary/20 rounded-2xl h-14 px-8 font-black uppercase text-xs tracking-widest border-none hover:scale-105 transition-premium" />
+            @endcan
         </x-slot:actions>
     </x-mary-header>
 
     <x-mary-card class="premium-card p-6 overflow-hidden">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 p-2 items-center">
-            <div class="md:col-span-3 flex gap-2">
-                <div class="flex-1">
-                    <x-mary-input wire:model.live.debounce.300ms="search" icon="o-magnifying-glass" placeholder="Buscar por RFC, número o nombre..." />
-                </div>
-                @if(strlen($search) >= 3)
-                    <x-mary-button label="Buscar en API" icon="o-cloud-arrow-down" wire:click="searchApi" spinner class="btn-outline btn-primary shrink-0" />
-                @endif
+            <div class="md:col-span-3">
+                <x-mary-input wire:model.live.debounce.300ms="search" icon="o-magnifying-glass" placeholder="Buscar por RFC, número o nombre..." />
             </div>
             <div class="flex items-center justify-center p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 h-14">
                 <x-mary-toggle label="Solo con Expediente" wire:model.live="onlyWithExpedient" class="checkbox-primary" tight />

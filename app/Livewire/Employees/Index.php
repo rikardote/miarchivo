@@ -16,9 +16,8 @@ class Index extends Component
     use Toast;
 
     public string $search = '';
-    public bool $onlyWithExpedient = false;
+    public bool $onlyWithExpedient = true;
     public array $sortBy = ['column' => 'first_name', 'direction' => 'asc'];
-    public bool $isSyncing = false;
 
     public function updatingSearch()
     {
