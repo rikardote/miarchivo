@@ -32,7 +32,7 @@
                 ['key' => 'first_name', 'label' => 'Nombre', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
                 ['key' => 'employment_status', 'label' => 'Estado', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
                 ['key' => 'actions', 'label' => '', 'class' => 'w-1 py-4 pr-6']
-            ]" :rows="$employees" :sort-by="$sortBy" with-pagination class="table-premium">
+            ]" :rows="$employees" :sort-by="$sortBy" :with-pagination="$employees instanceof \Illuminate\Contracts\Pagination\Paginator" class="table-premium">
 
                 @scope('cell_employee_number', $employee)
                     <div class="flex items-center gap-3 pl-4">
