@@ -30,38 +30,38 @@
     </style>
 </head>
 <body class="font-sans antialiased min-h-screen">
-    <x-mary-nav sticky class="glass border-b border-slate-200 dark:border-white/10 z-[60] px-6 !h-20">
+    <x-mary-nav sticky class="glass border-b border-slate-200 dark:border-white/10 z-[60] px-3 sm:px-6 !h-16 sm:!h-20">
         <x-slot:brand>
-            <div class="flex items-center gap-3 group cursor-pointer">
-                <img src="{{ asset('60issste.png') }}" alt="Logo" class="h-12 w-auto object-contain" />
+            <div class="flex items-center gap-2 sm:gap-3 group cursor-pointer">
+                <img src="{{ asset('60issste.png') }}" alt="Logo" class="h-9 sm:h-12 w-auto object-contain" />
                 <div class="flex flex-col">
-                    <div class="font-black text-2xl tracking-tighter text-slate-900 dark:text-white dark:text-white leading-none">
+                    <div class="font-black text-xl sm:text-2xl tracking-tighter text-slate-900 dark:text-white leading-none">
                         Archivo<span class="text-primary">.</span>
                     </div>
-                    <div class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 mt-1">ISSSTE BAJA CALIFORNIA</div>
+                    <div class="hidden sm:block text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 mt-1">ISSSTE BAJA CALIFORNIA</div>
                 </div>
             </div>
         </x-slot:brand>
         <x-slot:actions>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5 sm:gap-3">
                 <div class="p-1 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center transition-premium border border-transparent dark:border-white/5">
                     <livewire:notifications-bell />
                 </div>
                 
-                <div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2"></div>
+                <div class="h-6 sm:h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1 sm:mx-2"></div>
 
-                <x-mary-dropdown right class="btn-ghost !h-14 px-3 rounded-2xl hover:bg-white dark:hover:bg-white/5 transition-premium border border-transparent hover:border-slate-100 dark:hover:border-white/5">
+                <x-mary-dropdown right class="btn-ghost !h-12 sm:!h-14 px-2 sm:px-3 rounded-2xl hover:bg-white dark:hover:bg-white/5 transition-premium border border-transparent hover:border-slate-100 dark:hover:border-white/5">
                     <x-slot:label>
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2 sm:gap-4">
                             <div class="hidden md:flex flex-col items-end">
                                 <span class="text-sm font-black text-slate-900 dark:text-white dark:text-slate-100 leading-none">{{ Auth::user()->name }}</span>
                                 <span class="text-[10px] text-primary font-bold uppercase tracking-widest mt-1.5 opacity-80">{{ Auth::user()->getRoleNames()->first() }}</span>
                             </div>
                             <div class="relative group-hover:scale-110 transition-premium">
-                                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center overflow-hidden border border-slate-200 dark:border-white/10 shadow-sm">
-                                    <x-mary-icon name="o-user" class="w-6 h-6 text-slate-500 dark:text-slate-400 dark:text-slate-400" />
+                                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center overflow-hidden border border-slate-200 dark:border-white/10 shadow-sm">
+                                    <x-mary-icon name="o-user" class="w-5 h-5 sm:w-6 sm:h-6 text-slate-500 dark:text-slate-400" />
                                 </div>
-                                <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-4 border-white dark:border-slate-950 rounded-full shadow-sm"></div>
+                                <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 border-2 sm:border-4 border-white dark:border-slate-950 rounded-full shadow-sm"></div>
                             </div>
                         </div>
                     </x-slot:label>
@@ -78,8 +78,8 @@
                     </div>
                 </x-mary-dropdown>
 
-                <label for="main-drawer" class="lg:hidden btn btn-ghost btn-circle text-slate-600 dark:text-slate-300 dark:text-white">
-                    <x-mary-icon name="o-bars-3" />
+                <label for="main-drawer" class="lg:hidden btn btn-ghost btn-circle btn-sm sm:btn-md text-slate-600 dark:text-slate-300 dark:text-white">
+                    <x-mary-icon name="o-bars-3" class="w-5 h-5 sm:w-6 sm:h-6" />
                 </label>
             </div>
         </x-slot:actions>
@@ -134,14 +134,14 @@
         </x-slot:sidebar>
 
         <!-- Main Content -->
-        <x-slot:content class="p-4 md:p-8 lg:pl-[352px]">
+        <x-slot:content class="p-3 sm:p-6 md:p-8 lg:pl-[352px] max-w-full overflow-x-hidden">
             @isset($header)
-                <header class="mb-8">
+                <header class="mb-6 sm:mb-8">
                     <div class="flex items-center gap-3 mb-1">
                         <div class="h-1 w-6 bg-primary rounded-full"></div>
-                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 dark:text-slate-400">Vista Actual</span>
+                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Vista Actual</span>
                     </div>
-                    <h1 class="text-4xl font-black text-slate-800 dark:text-slate-100 dark:text-white tracking-tight">{{ $header }}</h1>
+                    <h1 class="text-2xl sm:text-4xl font-black text-slate-800 dark:text-slate-100 dark:text-white tracking-tight">{{ $header }}</h1>
                 </header>
             @endisset
 

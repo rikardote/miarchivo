@@ -20,64 +20,64 @@
             </div>
         @endif
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
-            <div class="premium-card p-6 flex flex-col justify-between">
-                <div class="p-3 bg-primary/10 rounded-xl text-primary w-fit mb-4">
-                    <x-mary-icon name="o-folder" class="w-6 h-6" />
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-16">
+            <div class="premium-card p-4 sm:p-6 flex flex-col justify-between">
+                <div class="p-2.5 sm:p-3 bg-primary/10 rounded-xl text-primary w-fit mb-3 sm:mb-4">
+                    <x-mary-icon name="o-folder" class="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 mb-1">Total Archivo</div>
-                    <div class="text-3xl font-bold text-slate-900 dark:text-white">{{ number_format($totalExpedients) }}</div>
+                    <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Total Archivo</div>
+                    <div class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">{{ number_format($totalExpedients) }}</div>
                 </div>
             </div>
 
-            <div class="premium-card p-6 flex flex-col justify-between">
-                <div class="p-3 bg-blue-500/10 rounded-xl text-blue-600 w-fit mb-4">
-                    <x-mary-icon name="o-arrow-path" class="w-6 h-6" />
+            <div class="premium-card p-4 sm:p-6 flex flex-col justify-between">
+                <div class="p-2.5 sm:p-3 bg-blue-500/10 rounded-xl text-blue-600 w-fit mb-3 sm:mb-4">
+                    <x-mary-icon name="o-arrow-path" class="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 mb-1">Fuera de Estante</div>
-                    <div class="text-3xl font-bold text-blue-600">{{ $loanedExpedients }}</div>
+                    <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Fuera de Estante</div>
+                    <div class="text-2xl sm:text-3xl font-bold text-blue-600">{{ $loanedExpedients }}</div>
                 </div>
             </div>
 
-            <div class="premium-card p-6 flex flex-col justify-between">
-                <div class="p-3 bg-amber-500/10 rounded-xl text-amber-600 w-fit mb-4">
-                    <x-mary-icon name="o-clock" class="w-6 h-6" />
+            <div class="premium-card p-4 sm:p-6 flex flex-col justify-between">
+                <div class="p-2.5 sm:p-3 bg-amber-500/10 rounded-xl text-amber-600 w-fit mb-3 sm:mb-4">
+                    <x-mary-icon name="o-clock" class="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 mb-1">Por Aprobar</div>
-                    <div class="text-3xl font-bold text-amber-600">{{ $pendingRequests }}</div>
+                    <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Por Aprobar</div>
+                    <div class="text-2xl sm:text-3xl font-bold text-amber-600">{{ $pendingRequests }}</div>
                 </div>
             </div>
 
-            <div class="premium-card p-6 flex flex-col justify-between">
-                <div class="p-3 bg-rose-500/10 rounded-xl text-rose-600 w-fit mb-4">
-                    <x-mary-icon name="o-exclamation-triangle" class="w-6 h-6" />
+            <div class="premium-card p-4 sm:p-6 flex flex-col justify-between">
+                <div class="p-2.5 sm:p-3 bg-rose-500/10 rounded-xl text-rose-600 w-fit mb-3 sm:mb-4">
+                    <x-mary-icon name="o-exclamation-triangle" class="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 mb-1">Vencimientos</div>
-                    <div class="text-3xl font-bold text-rose-600">{{ $overdueLoansCount }}</div>
+                    <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">Vencimientos</div>
+                    <div class="text-2xl sm:text-3xl font-bold text-rose-600">{{ $overdueLoansCount }}</div>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
-            <div class="lg:col-span-2 space-y-10">
-                <x-mary-card class="premium-card p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10">
+            <div class="lg:col-span-2 space-y-6 sm:space-y-10">
+                <x-mary-card class="premium-card p-4 sm:p-6">
                     <div class="flex justify-between items-center mb-6">
                         <div>
-                            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Estado de Carpetas</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-400 mt-1">Monitor en tiempo real</p>
+                            <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">Estado de Carpetas</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Monitor en tiempo real</p>
                         </div>
                         <x-mary-button icon="o-information-circle" class="btn-ghost btn-circle btn-sm text-primary" wire:click="$set('showGlossary', true)" tooltip="Ver glosario de estados" />
                     </div>
                     
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
                         @foreach($statusStats as $stat)
-                            <div class="p-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-white/5 transition-premium hover:scale-[1.02]">
-                                <div class="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-2">{{ $stat['label'] }}</div>
-                                <div class="text-2xl font-bold text-slate-800 dark:text-white">{{ $stat['count'] }}</div>
+                            <div class="p-3 sm:p-4 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-white/5 transition-premium hover:scale-[1.02]">
+                                <div class="text-[9px] sm:text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1.5">{{ $stat['label'] }}</div>
+                                <div class="text-xl sm:text-2xl font-bold text-slate-800 dark:text-white">{{ $stat['count'] }}</div>
                             </div>
                         @endforeach
                     </div>
@@ -113,7 +113,7 @@
                 </x-mary-card>
             </div>
 
-            <div class="space-y-10">
+            <div class="space-y-6 sm:space-y-10">
                 <x-mary-card class="bg-slate-900 rounded-3xl p-6 text-white">
                     <h4 class="text-xl font-bold mb-6">Atajos de Sistema</h4>
                     <div class="grid grid-cols-1 gap-3">
@@ -147,7 +147,7 @@
                                             <span>{{ $loan->requester->name }}</span>
                                         </div>
                                     </div>
-                                    <x-mary-button label="GESTIONAR" icon="o-pencil-square" link="{{ route('loans.manage', $loan) }}" class="btn-outline btn-sm border-rose-200 text-rose-600 hover:bg-rose-50" />
+                                    <x-mary-button label="GESTIONAR" icon="o-pencil-square" link="{{ route('loans.manage', $loan) }}" class="btn-outline btn-sm border-rose-200 text-rose-600 hover:bg-rose-50 w-full sm:w-auto" />
                                 </div>
                             @endforeach
                         </div>
@@ -159,31 +159,31 @@
 
     @else
         <!-- Dashboard USUARIO ESTÁNDAR -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-            <div class="premium-card p-8 bg-primary text-white border-primary">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="text-[10px] font-bold uppercase tracking-wider text-white/80">Posesión Activa</div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 mb-8 sm:mb-16">
+            <div class="premium-card p-5 sm:p-8 bg-primary text-white border-primary">
+                <div class="flex items-center gap-3 mb-2 sm:mb-4">
+                    <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-white/80">Posesión Activa</div>
                 </div>
-                <div class="text-5xl font-bold">{{ $myActiveLoans }}</div>
-                <div class="mt-6 flex items-center gap-2 text-[10px] font-bold uppercase text-white/90">
+                <div class="text-3xl sm:text-5xl font-bold">{{ $myActiveLoans }}</div>
+                <div class="mt-4 sm:mt-6 flex items-center gap-2 text-[10px] font-bold uppercase text-white/90">
                     <x-mary-icon name="o-check-circle" class="w-4 h-4" />
                     <span>Expedientes en tu posesión</span>
                 </div>
             </div>
 
-            <div class="premium-card p-8 flex flex-col justify-center">
-                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 mb-2">Trámites Pendientes</div>
-                <div class="text-5xl font-bold text-slate-900 dark:text-white">{{ $myPendingRequests }}</div>
-                <div class="mt-6 text-[10px] font-bold text-primary uppercase tracking-wider flex items-center gap-2 cursor-pointer hover:underline">
+            <div class="premium-card p-5 sm:p-8 flex flex-col justify-center">
+                <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 sm:mb-2">Trámites Pendientes</div>
+                <div class="text-3xl sm:text-5xl font-bold text-slate-900 dark:text-white">{{ $myPendingRequests }}</div>
+                <div class="mt-4 sm:mt-6 text-[10px] font-bold text-primary uppercase tracking-wider flex items-center gap-2 cursor-pointer hover:underline" onclick="window.location='{{ route('loans.index', ['mine' => 1]) }}'">
                     <span>Ver mis solicitudes</span>
                     <x-mary-icon name="o-arrow-right" class="w-4 h-4" />
                 </div>
             </div>
 
-            <div class="premium-card p-8 flex flex-col justify-center">
-                <div class="text-[10px] font-bold uppercase tracking-wider text-rose-500 mb-2">Retrasos Detectados</div>
-                <div class="text-5xl font-bold text-rose-600">{{ $myOverdueLoans }}</div>
-                <div class="mt-6 text-[10px] font-bold text-rose-600 uppercase tracking-wider flex items-center gap-2 cursor-pointer hover:underline">
+            <div class="premium-card p-5 sm:p-8 flex flex-col justify-center">
+                <div class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-rose-500 mb-1 sm:mb-2">Retrasos Detectados</div>
+                <div class="text-3xl sm:text-5xl font-bold text-rose-600">{{ $myOverdueLoans }}</div>
+                <div class="mt-4 sm:mt-6 text-[10px] font-bold text-rose-600 uppercase tracking-wider flex items-center gap-2 cursor-pointer hover:underline" onclick="window.location='{{ route('loans.index', ['mine' => 1]) }}'">
                     <span>Atención urgente</span>
                     <x-mary-icon name="o-exclamation-circle" class="w-4 h-4" />
                 </div>
@@ -192,14 +192,14 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2">
-                <x-mary-card class="premium-card p-8">
-                    <div class="py-12 text-center">
-                        <div class="w-24 h-24 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-8">
-                            <x-mary-icon name="o-magnifying-glass-circle" class="w-12 h-12 text-primary" />
+                <x-mary-card class="premium-card p-4 sm:p-8">
+                    <div class="py-6 sm:py-12 text-center">
+                        <div class="w-16 h-16 sm:w-24 sm:h-24 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6 sm:mb-8">
+                            <x-mary-icon name="o-magnifying-glass-circle" class="w-8 h-8 sm:w-12 sm:h-12 text-primary" />
                         </div>
-                        <h3 class="text-4xl font-bold text-slate-900 dark:text-white mb-6">Gestión Ágil de Expedientes</h3>
-                        <p class="text-slate-600 dark:text-slate-300 mb-10 max-w-sm mx-auto">Localiza expedientes de personal y genera solicitudes de préstamo de forma instantánea y segura.</p>
-                        <x-mary-button label="Iniciar Nueva Solicitud" icon="o-rocket-launch" link="{{ route('loans.index') }}" class="btn-primary rounded-xl px-12" />
+                        <h3 class="text-2xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-3 sm:mb-6">Gestión Ágil de Expedientes</h3>
+                        <p class="text-slate-600 dark:text-slate-300 mb-6 sm:mb-10 max-w-sm mx-auto text-sm sm:text-base">Localiza expedientes de personal y genera solicitudes de préstamo de forma instantánea y segura.</p>
+                        <x-mary-button label="Buscar y Solicitar" icon="o-rocket-launch" link="{{ route('expedients.index') }}" class="btn-primary rounded-xl px-8 sm:px-12 w-full sm:w-auto" />
                     </div>
                 </x-mary-card>
             </div>

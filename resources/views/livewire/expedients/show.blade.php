@@ -1,62 +1,64 @@
 <div>
-    <x-mary-header title="Expediente: {{ $expedient->expedient_code }}" subtitle="Detalles y movimientos físicos" separator>
+    <x-mary-header title="{{ $expedient->expedient_code }}" subtitle="Detalles y movimientos físicos" separator class="mb-4 sm:mb-6">
         <x-slot:actions>
-            <x-mary-button icon="o-arrow-left" class="btn-ghost" link="{{ route('expedients.index') }}">Volver</x-mary-button>
-            @if($expedient->isAvailable())
-                <x-mary-button icon="o-document-text" class="btn-secondary" link="{{ route('loans.request', ['expedient' => $expedient->id]) }}">Solicitar</x-mary-button>
-            @else
-                <x-mary-button icon="o-document-text" class="btn-secondary" disabled label="No Disponible" />
-            @endif
-            @can('update', $expedient)
-                @if($expedient->current_status->value !== 'lost')
-                    <x-mary-button icon="o-exclamation-triangle" class="btn-error btn-outline" label="Extraviado" wire:click="markAsLost" />
+            <div class="flex items-center gap-2 flex-wrap justify-end">
+                <x-mary-button icon="o-arrow-left" class="btn-ghost btn-sm sm:btn-md" link="{{ route('expedients.index') }}">Volver</x-mary-button>
+                @if($expedient->isAvailable())
+                    <x-mary-button icon="o-document-text" class="btn-secondary btn-sm sm:btn-md" link="{{ route('loans.request', ['expedient' => $expedient->id]) }}">Solicitar</x-mary-button>
                 @else
-                    <x-mary-button icon="o-check-circle" class="btn-success btn-outline" label="Recuperado" wire:click="markAsFound" />
+                    <x-mary-button icon="o-document-text" class="btn-secondary btn-sm sm:btn-md" disabled label="No Disponible" />
                 @endif
-                <x-mary-button icon="o-pencil" class="btn-primary" link="{{ route('expedients.edit', $expedient) }}">Editar</x-mary-button>
-            @endcan
+                @can('update', $expedient)
+                    @if($expedient->current_status->value !== 'lost')
+                        <x-mary-button icon="o-exclamation-triangle" class="btn-error btn-outline btn-sm sm:btn-md" label="Extraviado" wire:click="markAsLost" />
+                    @else
+                        <x-mary-button icon="o-check-circle" class="btn-success btn-outline btn-sm sm:btn-md" label="Recuperado" wire:click="markAsFound" />
+                    @endif
+                    <x-mary-button icon="o-pencil" class="btn-primary btn-sm sm:btn-md" link="{{ route('expedients.edit', $expedient) }}">Editar</x-mary-button>
+                @endcan
+            </div>
         </x-slot:actions>
     </x-mary-header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         
         <!-- Info Principal -->
-        <div class="lg:col-span-2 space-y-8">
+        <div class="lg:col-span-2 space-y-6 sm:space-y-8">
             <!-- Información del Empleado -->
             <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 overflow-hidden">
-                <div class="p-4 space-y-6">
-                    <h3 class="text-xl font-black text-slate-800 dark:text-slate-100 mb-6">Información del Empleado</h3>
+                <div class="p-2 sm:p-4 space-y-4 sm:space-y-6">
+                    <h3 class="text-lg sm:text-xl font-black text-slate-800 dark:text-slate-100 mb-4 sm:mb-6">Información del Empleado</h3>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="flex items-center gap-5 group">
-                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
-                                <x-mary-icon name="o-user" class="w-7 h-7 text-slate-500 group-hover:text-primary" />
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
+                        <div class="flex items-center gap-4 sm:gap-5 group">
+                            <div class="p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-user" class="w-6 h-6 sm:w-7 sm:h-7 text-slate-500 group-hover:text-primary" />
                             </div>
                             <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Nombre Completo</p>
-                                <p class="text-lg font-black text-slate-800 dark:text-slate-100 leading-tight">
+                                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Nombre Completo</p>
+                                <p class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 leading-tight">
                                     {{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}
                                 </p>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-5 group">
-                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
-                                <x-mary-icon name="o-identification" class="w-7 h-7 text-slate-500 group-hover:text-primary" />
+                        <div class="flex items-center gap-4 sm:gap-5 group">
+                            <div class="p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-identification" class="w-6 h-6 sm:w-7 sm:h-7 text-slate-500 group-hover:text-primary" />
                             </div>
                             <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">RFC</p>
-                                <p class="text-lg font-black text-slate-800 dark:text-slate-100">{{ $expedient->employee->rfc }}</p>
+                                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">RFC</p>
+                                <p class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100">{{ $expedient->employee->rfc }}</p>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-5 group">
-                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
-                                <x-mary-icon name="o-building-storefront" class="w-7 h-7 text-slate-500 group-hover:text-primary" />
+                        <div class="flex items-center gap-4 sm:gap-5 group">
+                            <div class="p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-building-storefront" class="w-6 h-6 sm:w-7 sm:h-7 text-slate-500 group-hover:text-primary" />
                             </div>
                             <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Sucursal</p>
-                                <p class="text-lg font-black text-slate-800 dark:text-slate-100 leading-tight">
+                                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Sucursal</p>
+                                <p class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100 leading-tight">
                                     {{ $expedient->employee->branch->name ?? 'N/A' }}
                                 </p>
                             </div>
@@ -67,49 +69,49 @@
 
             <!-- Detalles del Archivo -->
             <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 overflow-hidden">
-                <div class="p-4 space-y-6">
-                    <h3 class="text-xl font-black text-slate-800 dark:text-slate-100 mb-6">Detalles del Archivo</h3>
+                <div class="p-2 sm:p-4 space-y-4 sm:space-y-6">
+                    <h3 class="text-lg sm:text-xl font-black text-slate-800 dark:text-slate-100 mb-4 sm:mb-6">Detalles del Archivo</h3>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="flex items-center gap-5 group">
-                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
-                                <x-mary-icon name="o-qr-code" class="w-7 h-7 text-slate-500 group-hover:text-primary" />
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
+                        <div class="flex items-center gap-4 sm:gap-5 group">
+                            <div class="p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-qr-code" class="w-6 h-6 sm:w-7 sm:h-7 text-slate-500 group-hover:text-primary" />
                             </div>
                             <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Código</p>
-                                <p class="text-lg font-black text-slate-800 dark:text-slate-100">{{ $expedient->expedient_code }}</p>
+                                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Código</p>
+                                <p class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100">{{ $expedient->expedient_code }}</p>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-5 group">
-                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
-                                <x-mary-icon name="o-book-open" class="w-7 h-7 text-slate-500 group-hover:text-primary" />
+                        <div class="flex items-center gap-4 sm:gap-5 group">
+                            <div class="p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-book-open" class="w-6 h-6 sm:w-7 sm:h-7 text-slate-500 group-hover:text-primary" />
                             </div>
                             <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Tomo</p>
-                                <p class="text-lg font-black text-slate-800 dark:text-slate-100">{{ $expedient->volume_number }}</p>
+                                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Tomo</p>
+                                <p class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100">{{ $expedient->volume_number }}</p>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-5 group md:col-span-2">
-                            <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
-                                <x-mary-icon name="o-map-pin" class="w-7 h-7 text-slate-500 group-hover:text-primary" />
+                        <div class="flex items-center gap-4 sm:gap-5 group sm:col-span-2">
+                            <div class="p-2.5 sm:p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl group-hover:bg-primary/10 transition-colors">
+                                <x-mary-icon name="o-map-pin" class="w-6 h-6 sm:w-7 sm:h-7 text-slate-500 group-hover:text-primary" />
                             </div>
                             <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Ubicación Física</p>
-                                <p class="text-lg font-black text-slate-800 dark:text-slate-100">
+                                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Ubicación Física</p>
+                                <p class="text-base sm:text-lg font-black text-slate-800 dark:text-slate-100">
                                     {{ $expedient->currentLocation->full_label ?? 'Sin asignar' }}
                                 </p>
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-5 group pt-4 border-t border-slate-100 md:col-span-2">
-                            <div class="p-3 bg-{{ $expedient->current_status->color() }}/10 rounded-2xl">
-                                <x-mary-icon name="o-tag" class="w-7 h-7 text-{{ $expedient->current_status->color() }}" />
+                        <div class="flex items-center gap-4 sm:gap-5 group pt-4 border-t border-slate-100 sm:col-span-2">
+                            <div class="p-2.5 sm:p-3 bg-{{ $expedient->current_status->color() }}/10 rounded-2xl">
+                                <x-mary-icon name="o-tag" class="w-6 h-6 sm:w-7 sm:h-7 text-{{ $expedient->current_status->color() }}" />
                             </div>
                             <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Estado</p>
-                                <p class="text-xl font-black text-{{ $expedient->current_status->color() }}">
+                                <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Estado</p>
+                                <p class="text-lg sm:text-xl font-black text-{{ $expedient->current_status->color() }}">
                                     {{ $expedient->current_status->label() }}
                                 </p>
                             </div>

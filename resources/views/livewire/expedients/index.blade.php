@@ -1,38 +1,40 @@
 <div>
-    <x-mary-header title="Expedientes" subtitle="Gestión y búsqueda de expedientes físicos" class="mb-10">
+    <x-mary-header title="Expedientes" subtitle="Gestión y búsqueda de expedientes físicos" class="mb-6 sm:mb-10">
         <x-slot:actions>
-            <x-mary-button icon="o-information-circle" class="btn-ghost btn-circle text-primary hover:bg-primary/5 mr-2" wire:click="$set('showGlossary', true)" tooltip="Ver glosario de estados" />
+            <x-mary-button icon="o-information-circle" class="btn-ghost btn-circle btn-sm sm:btn-md text-primary hover:bg-primary/5 mr-1" wire:click="$set('showGlossary', true)" tooltip="Ver glosario de estados" />
             @can('create', \App\Models\Expedient::class)
-                <x-mary-button icon="o-plus" class="btn-primary shadow-2xl shadow-primary/20 rounded-2xl h-14 px-8 font-black uppercase text-xs tracking-widest border-none hover:scale-105 transition-premium" link="{{ route('expedients.create') }}">Nuevo Expediente</x-mary-button>
+                <x-mary-button icon="o-plus" class="btn-primary shadow-xl shadow-primary/20 rounded-xl sm:rounded-2xl h-11 sm:h-14 px-4 sm:px-8 font-black uppercase text-[10px] sm:text-xs tracking-widest border-none hover:scale-105 transition-premium" link="{{ route('expedients.create') }}">
+                    <span class="hidden sm:inline">Nuevo Expediente</span>
+                    <span class="sm:hidden">Nuevo</span>
+                </x-mary-button>
             @endcan
         </x-slot:actions>
     </x-mary-header>
 
     @if(count($selected) > 0)
-        <div class="bg-primary/5 border border-primary/20 rounded-2xl p-6 mb-10 flex flex-col md:flex-row justify-between items-center animate-in zoom-in-95 duration-500 gap-6">
-            <div class="flex items-center gap-6">
-                <div class="w-14 h-14 bg-primary text-white rounded-xl flex items-center justify-center font-bold text-xl shadow-sm">
+        <div class="bg-primary/5 border border-primary/20 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-10 flex flex-col md:flex-row justify-between items-center animate-in zoom-in-95 duration-500 gap-4 sm:gap-6">
+            <div class="flex items-center gap-4 sm:gap-6 flex-wrap">
+                <div class="w-10 h-10 sm:w-14 sm:h-14 bg-primary text-white rounded-xl flex items-center justify-center font-bold text-lg sm:text-xl shadow-sm">
                     {{ count($selected) }}
                 </div>
                 <div class="flex flex-col">
                     <span class="font-black text-primary uppercase text-[10px] tracking-[0.3em]">Gestión Grupal</span>
-                    <span class="text-slate-600 dark:text-slate-300 dark:text-slate-500 text-xs font-bold mt-1">Expedientes seleccionados para acción</span>
+                    <span class="text-slate-600 dark:text-slate-300 text-xs font-bold mt-0.5">Expedientes seleccionados</span>
                 </div>
-                <div class="h-10 w-[1px] bg-primary/20 hidden md:block"></div>
+                <div class="h-8 w-[1px] bg-primary/20 hidden md:block"></div>
                 <div class="flex items-center gap-2">
                     @can('changeLocation', \App\Models\Expedient::class)
-                        <x-mary-button label="Mover Ubicación" icon="o-map-pin" wire:click="showBulkMove" class="btn-sm btn-primary rounded-lg px-4" />
+                        <x-mary-button label="Mover" icon="o-map-pin" wire:click="showBulkMove" class="btn-sm btn-primary rounded-lg px-3 sm:px-4" />
                     @endcan
-                    <x-mary-button label="Etiquetas" icon="o-printer" class="btn-sm btn-ghost rounded-lg px-4 border border-slate-200" />
                 </div>
             </div>
-            <x-mary-button icon="o-x-mark" wire:click="$set('selected', [])" class="btn-ghost btn-circle hover:bg-rose-500/10 hover:text-rose-500 transition-premium" />
+            <x-mary-button icon="o-x-mark" wire:click="$set('selected', [])" class="btn-ghost btn-circle btn-sm hover:bg-rose-500/10 hover:text-rose-500 transition-premium" />
         </div>
     @endif
 
-    <x-mary-card class="premium-card p-6 overflow-hidden">
-        <div class="grid grid-cols-1 md:grid-cols-6 gap-6 mb-10 p-2">
-            <div class="md:col-span-2">
+    <x-mary-card class="premium-card p-3 sm:p-6 overflow-hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-3 sm:gap-6 mb-6 sm:mb-10 p-1 sm:p-2">
+            <div class="sm:col-span-2">
                 <x-mary-input wire:model.live.debounce.300ms="search" icon="o-magnifying-glass" placeholder="Buscar por código, RFC o nombre..." />
             </div>
             <div>
@@ -42,42 +44,43 @@
                 <x-mary-select wire:model.live="branch_id" :options="$branches" option-label="name" option-value="id" placeholder="Sede" />
             </div>
             <div>
-                <x-mary-button wire:click="clearFilters" icon="o-x-mark" class="btn-ghost w-full rounded-2xl h-14 font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-premium border border-transparent hover:border-slate-100">Limpiar</x-mary-button>
+                <x-mary-button wire:click="clearFilters" icon="o-x-mark" class="btn-ghost w-full rounded-2xl h-12 sm:h-14 font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-premium border border-transparent hover:border-slate-100">Limpiar</x-mary-button>
             </div>
         </div>
 
         <div class="rounded-xl overflow-hidden border border-slate-200">
             <x-mary-table :headers="[
-                ['key' => 'expedient', 'label' => 'Expediente', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4 pl-6'],
-                ['key' => 'employee.branch.name', 'label' => 'Sede', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
-                ['key' => 'volume_number', 'label' => 'Tomo', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
-                ['key' => 'current_status', 'label' => 'Estado', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
-                ['key' => 'currentLocation.short_label', 'label' => 'Ubicación', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
-                ['key' => 'actions', 'label' => '', 'class' => 'w-1 py-4 pr-6']
+                ['key' => 'expedient', 'label' => 'Expediente', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4 pl-4 sm:pl-6'],
+                ['key' => 'employee.branch.name', 'label' => 'Sede', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4 hidden md:table-cell'],
+                ['key' => 'volume_number', 'label' => 'Tomo', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4 hidden sm:table-cell'],
+                ['key' => 'current_status', 'label' => 'Estado', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4'],
+                ['key' => 'currentLocation.short_label', 'label' => 'Ubicación', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4 hidden lg:table-cell'],
+                ['key' => 'actions', 'label' => '', 'class' => 'w-1 py-4 pr-3 sm:pr-6']
             ]" :rows="$expedients" :sort-by="$sortBy" with-pagination selectable wire:model="selected" class="table-premium">
                 
                 @scope('cell_expedient', $expedient)
-                    <div class="flex flex-col py-2 pl-4">
-                        <span class="font-bold text-slate-800 dark:text-slate-100 dark:text-slate-200 leading-tight">{{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}</span>
-                        <div class="flex items-center gap-1.5 mt-1">
+                    <div class="flex flex-col py-2 pl-2 sm:pl-4">
+                        <span class="font-bold text-slate-800 dark:text-slate-100 leading-tight text-sm sm:text-base">{{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}</span>
+                        <div class="flex items-center gap-2 mt-1 flex-wrap">
                             <span class="text-[10px] font-black text-primary uppercase tracking-widest">{{ $expedient->expedient_code }}</span>
+                            <span class="lg:hidden text-[9px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">{{ $expedient->currentLocation->short_label ?? 'Sin ubicación' }}</span>
                         </div>
                     </div>
                 @endscope
 
                 @scope('cell_current_status', $expedient)
-                    <div class="px-4 py-1.5 rounded-xl bg-{{ $expedient->current_status->color() }}/10 text-{{ $expedient->current_status->color() }} text-[9px] font-black uppercase text-center w-fit border border-{{ $expedient->current_status->color() }}/20 shadow-sm">
+                    <div class="px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-xl bg-{{ $expedient->current_status->color() }}/10 text-{{ $expedient->current_status->color() }} text-[8px] sm:text-[9px] font-black uppercase text-center w-fit border border-{{ $expedient->current_status->color() }}/20 shadow-sm whitespace-nowrap">
                         {{ $expedient->current_status->label() }}
                     </div>
                 @endscope
 
                 @scope('cell_actions', $expedient)
-                    <div class="flex items-center gap-2 pr-4">
-                        <x-mary-button link="{{ route('expedients.show', $expedient) }}" class="btn-ghost btn-sm text-slate-500 dark:text-slate-400 dark:text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-premium group/btn" tooltip="Ver detalles">
+                    <div class="flex items-center gap-1 sm:gap-2 pr-2 sm:pr-4">
+                        <x-mary-button link="{{ route('expedients.show', $expedient) }}" class="btn-ghost btn-xs sm:btn-sm text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-premium group/btn" tooltip="Ver detalles">
                             <x-mary-icon name="o-eye" class="w-4 h-4 group-hover/btn:scale-110" />
                         </x-mary-button>
                         @can('update', $expedient)
-                            <x-mary-button link="{{ route('expedients.edit', $expedient) }}" class="btn-ghost btn-sm text-slate-500 dark:text-slate-400 dark:text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-premium group/btn" tooltip="Editar">
+                            <x-mary-button link="{{ route('expedients.edit', $expedient) }}" class="btn-ghost btn-xs sm:btn-sm text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-premium group/btn" tooltip="Editar">
                                 <x-mary-icon name="o-pencil" class="w-4 h-4 group-hover/btn:scale-110" />
                             </x-mary-button>
                         @endcan
