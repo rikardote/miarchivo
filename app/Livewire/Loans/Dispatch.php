@@ -229,8 +229,10 @@ class Dispatch extends Component
                 ->with(['expedient.employee', 'expedient.currentLocation.branch', 'requester']);
 
             if (!empty($searchTerm)) {
-                $query->whereHas('expedient', fn($q) => $q->search($searchTerm))
-                    ->orWhereHas('requester', fn($q) => $q->where('name', 'like', "%{$searchTerm}%"));
+                $query->where(function ($sub) use ($searchTerm) {
+                    $sub->whereHas('expedient', fn($q) => $q->search($searchTerm))
+                        ->orWhereHas('requester', fn($q) => $q->where('name', 'like', "%{$searchTerm}%"));
+                });
             }
 
             if ($this->selectedLocationId) {
@@ -245,8 +247,10 @@ class Dispatch extends Component
                 ->with(['expedient.employee', 'expedient.currentLocation.branch', 'requester']);
 
             if (!empty($searchTerm)) {
-                $query->whereHas('expedient', fn($q) => $q->search($searchTerm))
-                    ->orWhereHas('requester', fn($q) => $q->where('name', 'like', "%{$searchTerm}%"));
+                $query->where(function ($sub) use ($searchTerm) {
+                    $sub->whereHas('expedient', fn($q) => $q->search($searchTerm))
+                        ->orWhereHas('requester', fn($q) => $q->where('name', 'like', "%{$searchTerm}%"));
+                });
             }
 
             if ($this->selectedLocationId) {

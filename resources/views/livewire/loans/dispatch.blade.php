@@ -1,4 +1,4 @@
-<div>
+<div wire:poll.2s>
     <x-mary-header title="Despacho y Extracción" subtitle="Centro operativo de surtido y recepción de expedientes en planta baja" class="mb-6 sm:mb-10">
         <x-slot:actions>
             <x-mary-button label="Hoja de Surtido" icon="o-printer" link="{{ route('loans.picking-list') }}" external class="btn-primary shadow-xl shadow-primary/20 rounded-xl sm:rounded-2xl h-11 sm:h-14 px-4 sm:px-6 font-black uppercase text-[10px] sm:text-xs tracking-widest" />

@@ -102,14 +102,43 @@
                             </x-mary-alert>
                         @endcan
                     </div>
-                @elseif($loan->status === \App\Enums\LoanStatus::Approved || $loan->status === \App\Enums\LoanStatus::Reserved)
+                @elseif($loan->status === \App\Enums\LoanStatus::Approved)
                     <div class="space-y-4">
                         @can('loans.deliver')
-                            <p class="text-sm text-gray-600">El expediente está reservado. Requiere verificación con contraseña (SUDO) al momento de entregarlo físicamente.</p>
-                            <x-mary-button label="Entregar Expediente" icon="o-hand-raised" class="btn-primary w-full" wire:click="triggerAction('deliver')" spinner />
+                            <div class="p-4 bg-info/10 border border-info/20 rounded-2xl space-y-2">
+                                <div class="flex items-center gap-2 text-info font-black text-xs uppercase tracking-wider">
+                                    <x-mary-icon name="o-clock" class="w-4 h-4" />
+                                    <span>Aprobado • Esperando extracción en Planta Baja</span>
+                                </div>
+                                <p class="text-xs text-slate-600 dark:text-slate-300">
+                                    La orden ya está activa en la pantalla del archivista en Planta Baja para su extracción física del cajón. En cuanto el operador lo marque como surtido, se habilitará el botón de entrega.
+                                </p>
+                            </div>
+                            <div class="pt-2">
+                                <x-mary-button label="Forzar Entrega Inmediata (Si ya lo tienes en mano)" icon="o-hand-raised" class="btn-ghost btn-xs text-slate-400 hover:text-primary w-full text-center" wire:click="triggerAction('deliver')" spinner />
+                            </div>
                         @else
                             <x-mary-alert icon="o-check-circle" title="¡Aprobado!" class="alert-success">
-                                Tu solicitud ha sido aprobada. Por favor, acude al archivo físico para recoger tu expediente.
+                                Tu solicitud fue aprobada por la Jefatura. El personal de archivo en Planta Baja está preparando tu expediente.
+                            </x-mary-alert>
+                        @endcan
+                    </div>
+                @elseif($loan->status === \App\Enums\LoanStatus::Reserved)
+                    <div class="space-y-4">
+                        @can('loans.deliver')
+                            <div class="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl space-y-1 mb-2">
+                                <div class="flex items-center gap-2 text-emerald-600 font-black text-xs uppercase tracking-wider">
+                                    <x-mary-icon name="o-check-circle" class="w-4 h-4" />
+                                    <span>Surtido • Fólder Físico en Mesa de Control</span>
+                                </div>
+                                <p class="text-xs text-slate-600 dark:text-slate-300">
+                                    El operador de Planta Baja ya extrajo el expediente y lo envió a tu mesa. Requiere verificación con contraseña (SUDO) al entregarlo.
+                                </p>
+                            </div>
+                            <x-mary-button label="Entregar al Solicitante" icon="o-hand-raised" class="btn-primary w-full h-14 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-primary/20" wire:click="triggerAction('deliver')" spinner />
+                        @else
+                            <x-mary-alert icon="o-sparkles" title="¡Listo para Recoger!" class="alert-success">
+                                Tu expediente ya fue surtido y está disponible en la mesa de control de Recursos Humanos. Puedes pasar a recogerlo.
                             </x-mary-alert>
                         @endcan
                     </div>
