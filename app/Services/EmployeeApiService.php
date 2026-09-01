@@ -59,29 +59,52 @@ class EmployeeApiService
      */
     public function syncEmployee(array $apiData): ?Employee
     {
-        if (empty($apiData['id_legal'])) {
+        $rawRfc = $apiData['id_legal'] ?? $apiData['rfc'] ?? null;
+        if (empty($rawRfc)) {
             return null;
         }
 
-        $cleanRfc = mb_strtoupper(mb_substr(trim($apiData['id_legal']), 0, 10), 'UTF-8');
+        $cleanRfc = mb_strtoupper(mb_substr(trim($rawRfc), 0, 10), 'UTF-8');
         if (empty($cleanRfc)) {
             return null;
         }
 
+        $employeeNumber = !empty($apiData['id_empleado']) ? mb_strtoupper(trim((string)$apiData['id_empleado']), 'UTF-8') : (!empty($apiData['employee_number']) ? mb_strtoupper(trim((string)$apiData['employee_number']), 'UTF-8') : null);
+        $externalApiId = !empty($apiData['id']) ? (int)$apiData['id'] : (!empty($apiData['external_api_id']) ? (int)$apiData['external_api_id'] : null);
+
         // Determine status from API (map 'ACTIVO' to 'active', otherwise 'inactive')
-        $apiStatus = strtoupper($apiData['estado_empleado'] ?? $apiData['estatus'] ?? 'ACTIVO');
+        $apiStatus = strtoupper($apiData['estado_empleado'] ?? $apiData['estatus'] ?? $apiData['employment_status'] ?? 'ACTIVO');
         $status = (str_contains($apiStatus, 'ACTIVO')) ? 'active' : 'inactive';
 
-        $employee = Employee::where('rfc', $cleanRfc)->first();
+        // Find existing employee by RFC (exact or prefix), employee_number, or external_api_id, including trashed
+        $employee = Employee::withTrashed()
+            ->where(function ($q) use ($cleanRfc, $employeeNumber, $externalApiId) {
+                $q->where('rfc', $cleanRfc)
+                  ->orWhere('rfc', 'like', "{$cleanRfc}%");
+
+                if ($employeeNumber) {
+                    $q->orWhere('employee_number', $employeeNumber);
+                }
+
+                if ($externalApiId) {
+                    $q->orWhere('external_api_id', $externalApiId);
+                }
+            })
+            ->first();
+
+        if ($employee && $employee->trashed()) {
+            $employee->restore();
+        }
 
         $data = [
-            'external_api_id' => $apiData['id'] ?? null,
-            'employee_number' => $apiData['id_empleado'] ?? null,
-            'first_name' => $apiData['nombre'] ?? '',
-            'last_name' => trim(($apiData['apellido_1'] ?? '') . ' ' . ($apiData['apellido_2'] ?? '')),
-            'position' => $apiData['n_puesto_plaza'] ?? null,
-            'work_center' => $apiData['n_centro_trabajo'] ?? null,
-            'city' => $apiData['poblacion'] ?? null,
+            'rfc' => $cleanRfc,
+            'external_api_id' => $externalApiId,
+            'employee_number' => $employeeNumber,
+            'first_name' => $apiData['nombre'] ?? $apiData['first_name'] ?? '',
+            'last_name' => trim(($apiData['apellido_1'] ?? $apiData['last_name'] ?? '') . ' ' . ($apiData['apellido_2'] ?? '')),
+            'position' => $apiData['n_puesto_plaza'] ?? $apiData['position'] ?? null,
+            'work_center' => $apiData['n_centro_trabajo'] ?? $apiData['work_center'] ?? null,
+            'city' => $apiData['poblacion'] ?? $apiData['city'] ?? null,
             'employment_status' => $status,
             'last_synced_at' => now(),
         ];
@@ -89,7 +112,7 @@ class EmployeeApiService
         // Only assign branch if it's a new employee
         if (!$employee) {
             $data['branch_id'] = $this->determineBranch($apiData, $status);
-            return Employee::create(array_merge(['rfc' => $cleanRfc], $data));
+            return Employee::create($data);
         }
 
         $employee->update($data);
