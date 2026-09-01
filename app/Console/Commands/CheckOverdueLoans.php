@@ -18,7 +18,8 @@ class CheckOverdueLoans extends Command
     {
         $this->info('Checking for overdue loans...');
 
-        $overdueLoans = LoanRequest::where('status', LoanStatus::Delivered)
+        $overdueLoans = LoanRequest::with(['expedient.employee', 'requester'])
+            ->where('status', LoanStatus::Delivered)
             ->where('due_date', '<', now())
             ->get();
 
@@ -27,7 +28,11 @@ class CheckOverdueLoans extends Command
             return;
         }
 
-        $admins = User::role(['admin', 'superuser'])->get();
+        try {
+            $admins = User::role(['admin', 'superuser'])->get();
+        } catch (\Throwable) {
+            $admins = collect();
+        }
 
         foreach ($overdueLoans as $loan) {
             /** @var \App\Models\LoanRequest $loan */

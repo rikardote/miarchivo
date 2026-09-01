@@ -141,7 +141,7 @@ class BulkRequest extends Component
             \Illuminate\Support\Facades\Cache::forget('bulk_obs_' . auth()->id());
 
             $this->success("Se han generado {$count} solicitudes de préstamo exitosamente.");
-            return redirect()->route('loans.index');
+            $this->redirect(route('loans.index'));
 
         } catch (\Exception $e) {
             $this->error("Error al procesar: " . $e->getMessage());

@@ -73,7 +73,8 @@ class Audit extends Component
     private function getResults()
     {
         $expectedExpedients = $this->location_id 
-            ? Expedient::where('current_location_id', $this->location_id)
+            ? Expedient::with(['employee', 'currentLocation'])
+                ->where('current_location_id', $this->location_id)
                 ->whereIn('current_status', ['available', 'returned', 'archived', 'in_storage', 'reserved'])
                 ->get()
             : collect();
@@ -84,10 +85,15 @@ class Audit extends Component
             'missing' => [],
         ];
 
-        if ($this->is_auditing) {
+        if ($this->is_auditing && !empty($this->scanned_codes)) {
+            $scannedExpedients = Expedient::with(['employee', 'currentLocation'])
+                ->whereIn('expedient_code', $this->scanned_codes)
+                ->get()
+                ->keyBy('expedient_code');
+
             foreach ($this->scanned_codes as $code) {
-                $expedient = Expedient::where('expedient_code', $code)->first();
-                if ($expedient) {
+                if ($scannedExpedients->has($code)) {
+                    $expedient = $scannedExpedients->get($code);
                     if ($expedient->current_location_id == $this->location_id) {
                         $results['correct'][] = $expedient;
                     } else {

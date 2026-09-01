@@ -21,7 +21,11 @@ class LoanActivityListener
                 ->log("Solicitud de préstamo creada para el expediente {$expedient->expedient_code} ({$employee->full_name})");
 
             // Notify Admins and Superusers
-            $admins = \App\Models\User::role(['admin', 'superuser'])->get();
+            try {
+                $admins = \App\Models\User::role(['admin', 'superuser'])->get();
+            } catch (\Throwable) {
+                $admins = collect();
+            }
             $message = "Nueva solicitud: {$expedient->expedient_code} por {$loanRequest->requester->name}";
             foreach ($admins as $admin) {
                 $admin->notify(new \App\Notifications\LoanStatusNotification($loanRequest, $message, 'info'));

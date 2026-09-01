@@ -27,6 +27,10 @@ class Dashboard extends Component
         $isAdmin = $user->can('loans.approve');
 
         if ($isAdmin) {
+            $statusCounts = Expedient::selectRaw('current_status, count(*) as total')
+                ->groupBy('current_status')
+                ->pluck('total', 'current_status');
+
             $data = [
                 'totalExpedients' => Expedient::count(),
                 'loanedExpedients' => Expedient::whereIn('current_status', [ExpedientStatus::Loaned, ExpedientStatus::Lost])->count(),
@@ -34,7 +38,7 @@ class Dashboard extends Component
                 'overdueLoansCount' => LoanRequest::where('status', LoanStatus::Delivered)
                     ->where('due_date', '<', now())
                     ->count(),
-                'overdueLoans' => LoanRequest::with(['expedient', 'requester'])
+                'overdueLoans' => LoanRequest::with(['expedient.employee', 'requester'])
                     ->where('status', LoanStatus::Delivered)
                     ->where('due_date', '<', now())
                     ->limit(5)
@@ -47,10 +51,10 @@ class Dashboard extends Component
                 })->count(),
                 'statusStats' => collect(ExpedientStatus::cases())->map(fn($status) => [
                     'label' => $status->label(),
-                    'count' => Expedient::where('current_status', $status)->count(),
+                    'count' => $statusCounts->get($status->value, 0),
                     'color' => $status->color()
                 ]),
-                'recentActivities' => \Spatie\Activitylog\Models\Activity::latest()->limit(8)->get()->map(function($activity) {
+                'recentActivities' => \Spatie\Activitylog\Models\Activity::with(['subject', 'causer'])->latest()->limit(8)->get()->map(function($activity) {
                     if (in_array($activity->description, ['created', 'updated', 'deleted'])) {
                         $rawType = str_replace('App\\Models\\', '', $activity->subject_type);
                         $subjectType = match($rawType) {
@@ -89,7 +93,7 @@ class Dashboard extends Component
                     ->where('status', LoanStatus::Delivered)
                     ->where('due_date', '<', now())
                     ->count(),
-                'recentActivities' => \Spatie\Activitylog\Models\Activity::where('causer_id', $user->id)->latest()->limit(5)->get()->map(function($activity) {
+                'recentActivities' => \Spatie\Activitylog\Models\Activity::with(['subject', 'causer'])->where('causer_id', $user->id)->latest()->limit(5)->get()->map(function($activity) {
                     if (in_array($activity->description, ['created', 'updated', 'deleted'])) {
                         $rawType = str_replace('App\\Models\\', '', $activity->subject_type);
                         $subjectType = match($rawType) {

@@ -16,7 +16,7 @@ class Show extends Component
 
     public function mount(Expedient $expedient)
     {
-        $this->expedient = $expedient->load(['employee', 'currentLocation', 'currentHolder', 'movements.user', 'loanRequests.user']);
+        $this->expedient = $expedient->load(['employee.branch', 'currentLocation.branch', 'currentHolder', 'movements.user', 'loanRequests.requester']);
     }
 
     public function markAsLost()

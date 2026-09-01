@@ -1,11 +1,19 @@
 <div>
     <x-mary-header title="Directorio de Empleados" subtitle="Personal sincronizado desde el sistema principal" class="mb-10">
+        <x-slot:actions>
+            <x-mary-button label="Sincronizar Catálogo" icon="o-arrow-path" wire:click="syncFromApi" spinner class="btn-primary" />
+        </x-slot:actions>
     </x-mary-header>
 
     <x-mary-card class="premium-card p-6 overflow-hidden">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 p-2">
-            <div class="md:col-span-3">
-                <x-mary-input wire:model.live.debounce.300ms="search" icon="o-magnifying-glass" placeholder="Buscar por RFC, número o nombre..." />
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 p-2 items-center">
+            <div class="md:col-span-3 flex gap-2">
+                <div class="flex-1">
+                    <x-mary-input wire:model.live.debounce.300ms="search" icon="o-magnifying-glass" placeholder="Buscar por RFC, número o nombre..." />
+                </div>
+                @if(strlen($search) >= 3)
+                    <x-mary-button label="Buscar en API" icon="o-cloud-arrow-down" wire:click="searchApi" spinner class="btn-outline btn-primary shrink-0" />
+                @endif
             </div>
             <div class="flex items-center justify-center p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 h-14">
                 <x-mary-toggle label="Solo con Expediente" wire:model.live="onlyWithExpedient" class="checkbox-primary" tight />

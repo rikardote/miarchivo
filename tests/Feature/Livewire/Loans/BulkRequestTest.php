@@ -21,6 +21,7 @@ class BulkRequestTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        \Illuminate\Support\Facades\Cache::flush();
         $this->admin = User::factory()->create();
         $this->recipient = User::factory()->create();
     }
