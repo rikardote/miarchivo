@@ -1,6 +1,7 @@
 <div>
     <x-mary-header title="Directorio de Personal" subtitle="Personal con expedientes físicos registrados en el archivo" class="mb-10">
         <x-slot:actions>
+            <x-mary-button label="Nuevo Empleado" icon="o-user-plus" wire:click="openCreateModal" class="btn-outline rounded-2xl h-14 px-6 font-bold uppercase text-xs tracking-widest border-slate-200 hover:bg-slate-50 transition-premium" />
             @can('create', \App\Models\Expedient::class)
                 <x-mary-button label="Nuevo Expediente" icon="o-plus" link="{{ route('expedients.create') }}" class="btn-primary shadow-2xl shadow-primary/20 rounded-2xl h-14 px-8 font-black uppercase text-xs tracking-widest border-none hover:scale-105 transition-premium" />
             @endcan
@@ -29,7 +30,7 @@
                 @scope('cell_employee_number', $employee)
                     <div class="flex items-center gap-3 pl-4">
                         <div class="w-1.5 h-6 bg-primary/20 rounded-full"></div>
-                        <span class="font-black text-slate-900 dark:text-white dark:text-slate-100 tracking-tight">{{ $employee->employee_number }}</span>
+                        <span class="font-black text-slate-900 dark:text-white dark:text-slate-100 tracking-tight">{{ $employee->employee_number ?? 'S/N' }}</span>
                     </div>
                 @endscope
 
@@ -60,4 +61,57 @@
             </x-mary-table>
         </div>
     </x-mary-card>
+
+    <!-- Modal de Creación Manual de Empleado -->
+    <x-mary-modal wire:model="createEmployeeModal" class="p-8 modal-wide">
+        <div class="flex items-center justify-between gap-4 mb-8 border-b border-slate-100 pb-6">
+            <div>
+                <h3 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Registrar Nuevo Empleado</h3>
+                <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Captura manual para personal de nuevo ingreso</p>
+            </div>
+            <div class="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center font-black">
+                <x-mary-icon name="o-user-plus" class="w-6 h-6" />
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <x-mary-input label="RFC *" wire:model="rfc" placeholder="Ej: GOMA850215ABC" icon="o-identification" class="uppercase" />
+                </div>
+                <div>
+                    <x-mary-input label="No. de Empleado (Opcional)" wire:model="employee_number" placeholder="Ej: 10452" icon="o-hashtag" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <x-mary-input label="Nombre(s) *" wire:model="first_name" placeholder="Nombre(s)..." icon="o-user" />
+                </div>
+                <div>
+                    <x-mary-input label="Apellidos *" wire:model="last_name" placeholder="Apellidos..." icon="o-user" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <x-mary-input label="Puesto" wire:model="position" placeholder="Ej: Analista de RH" icon="o-briefcase" />
+                </div>
+                <div>
+                    <x-mary-select label="Sucursal / Sede" wire:model="branch_id" :options="$branches" placeholder="Seleccione..." icon="o-building-office" />
+                </div>
+                <div>
+                    <x-mary-select label="Departamento" wire:model="department_id" :options="$departments" placeholder="Seleccione..." icon="o-rectangle-group" />
+                </div>
+            </div>
+        </div>
+
+        <x-slot:actions>
+            <div class="flex gap-4 w-full justify-end pt-6">
+                <x-mary-button label="Cancelar" wire:click="$set('createEmployeeModal', false)" class="btn-ghost rounded-xl font-bold" />
+                <x-mary-button label="Guardar Empleado" wire:click="saveEmployee" class="btn-primary rounded-xl px-8 font-black uppercase text-xs tracking-wider shadow-lg shadow-primary/20" spinner="saveEmployee" />
+            </div>
+        </x-slot:actions>
+    </x-mary-modal>
 </div>
+

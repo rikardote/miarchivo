@@ -2,10 +2,11 @@
 
 namespace App\Livewire\Employees;
 
+use App\Models\Branch;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Services\EmployeeApiService;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Artisan;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Mary\Traits\Toast;
@@ -19,6 +20,16 @@ class Index extends Component
     public bool $onlyWithExpedient = true;
     public array $sortBy = ['column' => 'first_name', 'direction' => 'asc'];
 
+    // Modal de Creación Manual
+    public bool $createEmployeeModal = false;
+    public string $rfc = '';
+    public string $first_name = '';
+    public string $last_name = '';
+    public ?string $employee_number = null;
+    public ?string $position = null;
+    public ?int $branch_id = null;
+    public ?int $department_id = null;
+
     public function updatingSearch()
     {
         $this->resetPage();
@@ -29,40 +40,52 @@ class Index extends Component
         $this->resetPage();
     }
 
-    public function syncFromApi()
+    public function openCreateModal()
     {
-        $this->isSyncing = true;
-        try {
-            Artisan::call('employees:sync', ['--max-pages' => 5]);
-            $this->success('Sincronización de empleados completada exitosamente.');
-        } catch (\Exception $e) {
-            $this->error('Error al sincronizar: ' . $e->getMessage());
-        } finally {
-            $this->isSyncing = false;
-        }
+        $this->reset([
+            'rfc',
+            'first_name',
+            'last_name',
+            'employee_number',
+            'position',
+            'branch_id',
+            'department_id',
+        ]);
+        $this->createEmployeeModal = true;
     }
 
-    public function searchApi(EmployeeApiService $apiService)
+    public function saveEmployee()
     {
-        $term = trim($this->search);
-        if (empty($term)) {
-            $this->warning('Ingresa un RFC, número de empleado o nombre para buscar en el API.');
-            return;
-        }
+        $this->validate([
+            'rfc' => 'required|string|min:10|max:13|unique:employees,rfc',
+            'first_name' => 'required|string|max:100',
+            'last_name' => 'required|string|max:100',
+            'employee_number' => 'nullable|string|max:50|unique:employees,employee_number',
+            'position' => 'nullable|string|max:100',
+            'branch_id' => 'nullable|exists:branches,id',
+            'department_id' => 'nullable|exists:departments,id',
+        ], [
+            'rfc.required' => 'El RFC es obligatorio.',
+            'rfc.unique' => 'Este RFC ya se encuentra registrado.',
+            'first_name.required' => 'El nombre es obligatorio.',
+            'last_name.required' => 'Los apellidos son obligatorios.',
+            'employee_number.unique' => 'Este número de empleado ya está en uso.',
+        ]);
 
-        $results = $apiService->search($term);
-        $count = 0;
-        foreach ($results as $item) {
-            if ($apiService->syncEmployee($item)) {
-                $count++;
-            }
-        }
+        $employee = Employee::create([
+            'rfc' => strtoupper(trim($this->rfc)),
+            'first_name' => trim($this->first_name),
+            'last_name' => trim($this->last_name),
+            'employee_number' => $this->employee_number ? trim($this->employee_number) : null,
+            'position' => $this->position ? trim($this->position) : null,
+            'branch_id' => $this->branch_id,
+            'department_id' => $this->department_id,
+            'employment_status' => 'active',
+        ]);
 
-        if ($count > 0) {
-            $this->success("Se encontraron y sincronizaron {$count} empleados desde el API.");
-        } else {
-            $this->warning("No se encontraron resultados en el API para '{$term}'.");
-        }
+        $this->createEmployeeModal = false;
+        $this->onlyWithExpedient = false; // Mostrar al nuevo empleado
+        $this->success("Empleado {$employee->full_name} registrado exitosamente.");
     }
 
     public function render()
@@ -76,6 +99,9 @@ class Index extends Component
 
         return view('livewire.employees.index', [
             'employees' => $employees,
+            'branches' => Branch::where('is_active', true)->orderBy('name')->get(),
+            'departments' => Department::where('is_active', true)->orderBy('name')->get(),
         ]);
     }
 }
+
