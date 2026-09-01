@@ -33,13 +33,14 @@ class SyncEmployees extends Command
         $this->info('Starting full sync...');
         
         $baseUrl = config('services.empleados.url', env('EMPLOYEES_API_URL', 'http://host.docker.internal:9290/api'));
+        $apiKey = config('services.empleados.api_key');
         
         $page = 1;
         $syncedCount = 0;
         
         do {
             $this->info("Fetching page {$page}...");
-            $response = Http::get("{$baseUrl}/employees", [
+            $response = Http::withHeaders($apiKey ? ['X-API-KEY' => $apiKey] : [])->get("{$baseUrl}/employees", [
                 'page' => $page,
                 'per_page' => 100,
             ]);

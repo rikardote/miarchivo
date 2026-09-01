@@ -11,9 +11,22 @@ class EmployeeApiService
 {
     protected string $baseUrl;
 
+    protected ?string $apiKey;
+
     public function __construct()
     {
         $this->baseUrl = config('services.empleados.url', env('EMPLOYEES_API_URL', 'http://host.docker.internal:9290/api'));
+        $this->apiKey = config('services.empleados.api_key');
+    }
+
+    /**
+     * Headers de autenticación para la API de empleados.
+     */
+    protected function headers(): array
+    {
+        return $this->apiKey
+            ? ['X-API-KEY' => $this->apiKey]
+            : [];
     }
 
     /**
@@ -22,7 +35,7 @@ class EmployeeApiService
     public function search(string $query): array
     {
         try {
-            $response = Http::timeout(5)->get("{$this->baseUrl}/employees/search", [
+            $response = Http::timeout(5)->withHeaders($this->headers())->get("{$this->baseUrl}/employees/search", [
                 'q' => $query,
                 'per_page' => 15,
             ]);

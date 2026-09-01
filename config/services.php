@@ -37,6 +37,7 @@ return [
 
     'empleados' => [
         'url' => env('EMPLOYEES_API_URL', 'http://host.docker.internal:9290/api'),
+        'api_key' => env('EMPLOYEES_API_KEY'),
     ],
 
 ];
