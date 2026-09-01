@@ -134,23 +134,9 @@
                                     <x-mary-icon name="o-clock" class="w-4 h-4" />
                                     <span>Aprobado • Esperando extracción en Planta Baja</span>
                                 </div>
-                                <p class="text-xs text-slate-600 dark:text-slate-300">
-                                    La orden ya está activa en la pantalla del archivista en Planta Baja para su extracción física del cajón. En cuanto el operador lo marque como surtido, se habilitará el botón de entrega.
+                                <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                                    La orden ya está activa en la pantalla del archivista en Planta Baja para su extracción física del cajón. En cuanto el operador extraiga la carpeta y la envíe a tu mesa, podrás registrar las notas de inspección y entregarlo.
                                 </p>
-                            </div>
-
-                            <div class="space-y-2 pt-2">
-                                <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">Notas de entrega / Estado físico (Opcional)</label>
-                                <textarea 
-                                    wire:model="deliveryNotes" 
-                                    placeholder="Ej. Entregado con 140 fojas útiles, carpeta íntegra..." 
-                                    rows="2"
-                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl p-4 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none resize-none text-xs"
-                                ></textarea>
-                            </div>
-
-                            <div class="pt-1">
-                                <x-mary-button label="Forzar Entrega Inmediata (Si ya lo tienes en mano)" icon="o-hand-raised" class="btn-ghost btn-xs text-slate-400 hover:text-primary w-full text-center" wire:click="triggerAction('deliver')" spinner />
                             </div>
                         @else
                             <x-mary-alert icon="o-check-circle" title="¡Aprobado!" class="alert-success">
