@@ -7,6 +7,26 @@
 
     <title>{{ config('app.name', 'Archivo') }}</title>
 
+    <!-- Immediate Theme Initialization (Prevents Theme Flashing Across All Pages) -->
+    <script>
+        (function() {
+            try {
+                const storedTheme = localStorage.getItem('mary-theme')?.replaceAll('"', '');
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+                const themeClass = localStorage.getItem('mary-class')?.replaceAll('"', '') || theme;
+                
+                document.documentElement.setAttribute('data-theme', theme);
+                document.documentElement.setAttribute('class', themeClass);
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,7 +49,7 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased min-h-screen">
+<body class="font-sans antialiased min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
     <x-mary-nav sticky class="glass border-b border-slate-200 dark:border-white/10 z-[60] px-3 sm:px-6 !h-16 sm:!h-20">
         <x-slot:brand>
             <div class="flex items-center gap-2 sm:gap-3 group cursor-pointer">
@@ -44,7 +64,11 @@
         </x-slot:brand>
         <x-slot:actions>
             <div class="flex items-center gap-1.5 sm:gap-3">
-                <div class="p-1 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center transition-premium border border-transparent dark:border-white/5">
+                <div class="p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl flex items-center transition-premium border border-transparent dark:border-white/5">
+                    <x-mary-theme-toggle darkTheme="dark" lightTheme="light" class="btn btn-ghost btn-sm btn-circle text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700" />
+                </div>
+
+                <div class="p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl flex items-center transition-premium border border-transparent dark:border-white/5">
                     <livewire:notifications-bell />
                 </div>
                 

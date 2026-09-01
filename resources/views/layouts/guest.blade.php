@@ -7,6 +7,26 @@
 
         <title>{{ config('app.name', 'Archivo') }}</title>
 
+        <!-- Immediate Theme Initialization -->
+        <script>
+            (function() {
+                try {
+                    const storedTheme = localStorage.getItem('mary-theme')?.replaceAll('"', '');
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+                    const themeClass = localStorage.getItem('mary-class')?.replaceAll('"', '') || theme;
+                    
+                    document.documentElement.setAttribute('data-theme', theme);
+                    document.documentElement.setAttribute('class', themeClass);
+                    if (theme === 'dark') {
+                        document.documentElement.classList.add('dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                    }
+                } catch (e) {}
+            })();
+        </script>
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +35,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-slate-50 text-slate-900">
+    <body class="font-sans antialiased bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
         <div class="min-h-screen flex flex-col md:flex-row">
             <!-- Left Side: Visual/Branding -->
             <div class="hidden md:flex md:w-1/2 bg-primary items-center justify-center p-12 relative overflow-hidden">
