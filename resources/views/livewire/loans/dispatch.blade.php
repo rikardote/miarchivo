@@ -130,9 +130,21 @@
                         <div class="space-y-1 flex-1">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight">{{ $loan->expedient?->expedient_code ?? 'ELIMINADO' }}</span>
-                                <span class="px-2 py-0.5 rounded-lg text-[9px] font-black uppercase {{ $tab === 'to_extract' ? 'bg-amber-500/10 text-amber-600' : 'bg-emerald-500/10 text-emerald-600' }}">
-                                    {{ $tab === 'to_extract' ? $loan->status->label() : ($loan->expedient?->current_status?->label() ?? 'Devuelto') }}
-                                </span>
+                                @if($tab === 'to_extract')
+                                    @if($loan->status === \App\Enums\LoanStatus::Approved)
+                                        <span class="px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                                            Aprobado (Listo para Extraer)
+                                        </span>
+                                    @else
+                                        <span class="px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase bg-amber-500/10 text-amber-600 border border-amber-500/20">
+                                            En Espera de Aprobación (RH)
+                                        </span>
+                                    @endif
+                                @else
+                                    <span class="px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                                        {{ $loan->expedient?->current_status?->label() ?? 'Devuelto' }}
+                                    </span>
+                                @endif
                             </div>
 
                             <p class="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200">
@@ -164,9 +176,18 @@
                         </div>
 
                         @if($tab === 'to_extract')
-                            <x-mary-button label="Marcar Surtido" icon="o-check" wire:click="extractSingle({{ $loan->id }})" class="btn-primary rounded-xl h-11 px-5 font-black uppercase text-xs tracking-wider" spinner="extractSingle({{ $loan->id }})" />
+                            @if($loan->status === \App\Enums\LoanStatus::Approved)
+                                <x-mary-button label="Marcar Surtido" icon="o-check" wire:click="extractSingle({{ $loan->id }})" class="btn-primary rounded-xl h-11 px-5 font-black uppercase text-xs tracking-wider shadow-lg shadow-primary/20" spinner="extractSingle({{ $loan->id }})" />
+                            @else
+                                <div class="tooltip" data-tip="Requiere aprobación previa del encargado de RH">
+                                    <button class="btn btn-disabled bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-white/5 rounded-xl h-11 px-4 font-black uppercase text-[10px] tracking-wider flex items-center gap-2 cursor-not-allowed">
+                                        <x-mary-icon name="o-lock-closed" class="w-4 h-4 text-slate-400" />
+                                        <span>En Espera de RH</span>
+                                    </button>
+                                </div>
+                            @endif
                         @else
-                            <x-mary-button label="Guardar en Gaveta" icon="o-archive-box-arrow-down" wire:click="rearchiveSingle({{ $loan->id }})" class="btn-success rounded-xl h-11 px-5 font-black uppercase text-xs tracking-wider text-white" spinner="rearchiveSingle({{ $loan->id }})" />
+                            <x-mary-button label="Guardar en Gaveta" icon="o-archive-box-arrow-down" wire:click="rearchiveSingle({{ $loan->id }})" class="btn-success rounded-xl h-11 px-5 font-black uppercase text-xs tracking-wider text-white shadow-lg shadow-emerald-500/20" spinner="rearchiveSingle({{ $loan->id }})" />
                         @endif
                     </div>
                 </div>

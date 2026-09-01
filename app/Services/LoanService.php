@@ -76,8 +76,12 @@ class LoanService
      */
     public function extractLoan(LoanRequest $loan): void
     {
-        if (!in_array($loan->status, [LoanStatus::Pending, LoanStatus::Approved])) {
-            throw new \Exception('La solicitud no se encuentra en estado pendiente por extraer.');
+        if ($loan->status === LoanStatus::Pending) {
+            throw new \Exception('La solicitud requiere la aprobación previa de la Jefatura de Recursos Humanos antes de poder extraerse.');
+        }
+
+        if ($loan->status !== LoanStatus::Approved) {
+            throw new \Exception('La solicitud no se encuentra en un estado válido para extracción.');
         }
 
         DB::transaction(function () use ($loan) {

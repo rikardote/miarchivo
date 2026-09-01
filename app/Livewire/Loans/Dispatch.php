@@ -77,6 +77,12 @@ class Dispatch extends Component
                 return;
             }
 
+            if ($loan->status === LoanStatus::Pending) {
+                $this->warning("El expediente {$expedient->expedient_code} aún requiere aprobación por el encargado de RH antes de poder extraerse.");
+                $this->scannedCode = '';
+                return;
+            }
+
             try {
                 $loanService->extractLoan($loan);
                 $this->success("¡Expediente {$expedient->expedient_code} extraído y enviado a Recursos Humanos para entrega!");
@@ -123,6 +129,11 @@ class Dispatch extends Component
         $loan = LoanRequest::find($loanId);
         if (!$loan) return;
 
+        if ($loan->status === LoanStatus::Pending) {
+            $this->warning("Esta solicitud aún no ha sido aprobada por el encargado de Recursos Humanos.");
+            return;
+        }
+
         try {
             app(LoanService::class)->extractLoan($loan);
             $this->success("Expediente {$loan->expedient->expedient_code} extraído y enviado a RH.");
@@ -140,20 +151,30 @@ class Dispatch extends Component
 
         $loanService = app(LoanService::class);
         $count = 0;
+        $pendingSkipped = 0;
 
         foreach ($this->selectedLoans as $loanId) {
             $loan = LoanRequest::find($loanId);
-            if ($loan && in_array($loan->status, [LoanStatus::Pending, LoanStatus::Approved])) {
-                try {
-                    $loanService->extractLoan($loan);
-                    $count++;
-                } catch (\Exception $e) {
-                    // Continue with next
+            if ($loan) {
+                if ($loan->status === LoanStatus::Approved) {
+                    try {
+                        $loanService->extractLoan($loan);
+                        $count++;
+                    } catch (\Exception $e) {
+                        // Continue with next
+                    }
+                } elseif ($loan->status === LoanStatus::Pending) {
+                    $pendingSkipped++;
                 }
             }
         }
 
-        $this->success("Se marcaron como surtidos {$count} expedientes y enviados a RH.");
+        if ($count > 0) {
+            $this->success("Se marcaron como surtidos {$count} expedientes y enviados a RH.");
+        }
+        if ($pendingSkipped > 0) {
+            $this->warning("Se omitieron {$pendingSkipped} expedientes por estar pendientes de aprobación en RH.");
+        }
         $this->selectedLoans = [];
     }
 

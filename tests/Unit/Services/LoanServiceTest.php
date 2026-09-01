@@ -76,9 +76,19 @@ class LoanServiceTest extends TestCase
         $this->assertEquals(ExpedientStatus::Reserved, $loan->expedient->current_status);
     }
 
-    public function test_an_operator_can_extract_a_loan()
+    public function test_an_operator_cannot_extract_a_pending_loan()
     {
         $loan = LoanRequest::factory()->create(['status' => LoanStatus::Pending]);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('La solicitud requiere la aprobación previa de la Jefatura de Recursos Humanos antes de poder extraerse.');
+
+        $this->loanService->extractLoan($loan);
+    }
+
+    public function test_an_operator_can_extract_an_approved_loan()
+    {
+        $loan = LoanRequest::factory()->create(['status' => LoanStatus::Approved]);
         
         $this->loanService->extractLoan($loan);
 
