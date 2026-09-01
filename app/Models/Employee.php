@@ -33,6 +33,33 @@ class Employee extends Model
         'last_synced_at' => 'datetime',
     ];
 
+    protected static function booted()
+    {
+        static::saving(function (Employee $employee) {
+            if ($employee->rfc) {
+                $employee->rfc = mb_strtoupper(trim($employee->rfc), 'UTF-8');
+            }
+            if ($employee->first_name) {
+                $employee->first_name = mb_strtoupper(trim($employee->first_name), 'UTF-8');
+            }
+            if ($employee->last_name) {
+                $employee->last_name = mb_strtoupper(trim($employee->last_name), 'UTF-8');
+            }
+            if ($employee->position) {
+                $employee->position = mb_strtoupper(trim($employee->position), 'UTF-8');
+            }
+            if ($employee->work_center) {
+                $employee->work_center = mb_strtoupper(trim($employee->work_center), 'UTF-8');
+            }
+            if ($employee->city) {
+                $employee->city = mb_strtoupper(trim($employee->city), 'UTF-8');
+            }
+            if ($employee->employee_number) {
+                $employee->employee_number = mb_strtoupper(trim($employee->employee_number), 'UTF-8');
+            }
+        });
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
