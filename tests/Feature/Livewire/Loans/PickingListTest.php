@@ -61,10 +61,22 @@ class PickingListTest extends TestCase
             'status' => LoanStatus::Approved,
         ]);
 
+        $pendingExpedient = Expedient::factory()->create([
+            'expedient_code' => 'PENDING99-V1',
+            'current_location_id' => $location->id,
+        ]);
+
+        LoanRequest::factory()->create([
+            'expedient_id' => $pendingExpedient->id,
+            'requester_id' => $this->requester->id,
+            'status' => LoanStatus::Pending,
+        ]);
+
         Livewire::actingAs($this->operator)
             ->test(PickingList::class)
             ->assertStatus(200)
             ->assertSee('TEST800101-V1')
-            ->assertSee('Archivero A');
+            ->assertSee('Archivero A')
+            ->assertDontSee('PENDING99-V1');
     }
 }

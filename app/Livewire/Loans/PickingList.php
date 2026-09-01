@@ -15,7 +15,7 @@ class PickingList extends Component
 
     public function render()
     {
-        $loans = LoanRequest::whereIn('status', [LoanStatus::Pending, LoanStatus::Approved, LoanStatus::Reserved])
+        $loans = LoanRequest::where('status', LoanStatus::Approved)
             ->with(['expedient.employee', 'expedient.currentLocation.branch', 'requester'])
             ->get()
             ->sortBy(function ($loan) {
