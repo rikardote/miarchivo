@@ -33,38 +33,57 @@ class Index extends Component
 
     public function exportActiveLoans()
     {
-        $loans = LoanRequest::whereIn('status', ['delivered', 'approved'])
-            ->with(['expedient.employee', 'requester'])
-            ->get();
+        $query = LoanRequest::query()->with(['expedient.employee', 'requester', 'approver']);
+        $user = Auth::user();
 
-        $headers = [
-            'Content-type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename=prestamos_activos_' . now()->format('Y-m-d') . '.csv',
-            'Pragma' => 'no-cache',
-            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-            'Expires' => '0'
-        ];
+        if (!$user->can('loans.approve') || $this->myLoansOnly) {
+            $query->where('requester_id', Auth::id());
+        }
 
-        $callback = function() use ($loans) {
+        if ($this->status) {
+            $query->where('status', $this->status);
+        }
+
+        $query->orderBy($this->sortBy['column'], $this->sortBy['direction']);
+
+        $loans = $query->get();
+
+        return response()->streamDownload(function () use ($loans) {
             $file = fopen('php://output', 'w');
-            fputcsv($file, ['ID Solicitud', 'Expediente', 'Empleado', 'Solicitante', 'Fecha Entrega', 'Fecha Vencimiento', 'Estado']);
+            // UTF-8 BOM para compatibilidad con Microsoft Excel
+            fputs($file, "\xEF\xBB\xBF");
+            fputcsv($file, [
+                'ID Solicitud',
+                'Código Expediente',
+                'Empleado',
+                'RFC Empleado',
+                'Solicitante',
+                'Fecha Solicitud',
+                'Fecha Entrega',
+                'Fecha Vencimiento',
+                'Estado Operativo',
+                'Observaciones'
+            ]);
 
             foreach ($loans as $loan) {
                 fputcsv($file, [
                     $loan->id,
-                    $loan->expedient->expedient_code,
-                    $loan->expedient->employee->full_name,
-                    $loan->requester->name,
-                    $loan->delivered_at?->format('Y-m-d H:i') ?? 'N/A',
-                    $loan->due_date?->format('Y-m-d') ?? 'N/A',
-                    optional($loan->status)->label() ?? 'N/A'
+                    $loan->expedient?->expedient_code ?? 'ELIMINADO',
+                    $loan->expedient?->employee ? ($loan->expedient->employee->first_name . ' ' . $loan->expedient->employee->last_name) : 'N/A',
+                    $loan->expedient?->employee?->rfc ?? 'N/A',
+                    $loan->requester?->name ?? 'Desconocido',
+                    $loan->requested_at ? $loan->requested_at->format('Y-m-d H:i:s') : 'N/A',
+                    $loan->delivered_at ? $loan->delivered_at->format('Y-m-d H:i:s') : 'N/A',
+                    $loan->due_date ? \Carbon\Carbon::parse($loan->due_date)->format('Y-m-d') : 'N/A',
+                    optional($loan->status)->label() ?? 'N/A',
+                    $loan->observations ?? ''
                 ]);
             }
 
             fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        }, 'prestamos_' . now()->format('Y-m-d_His') . '.csv', [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 
     public function render()
