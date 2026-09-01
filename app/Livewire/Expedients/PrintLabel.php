@@ -11,6 +11,7 @@ class PrintLabel extends Component
 
     public function mount(Expedient $expedient)
     {
+        $this->authorize('update', $expedient);
         $this->expedient = $expedient->load(['employee.branch', 'employee.department']);
     }
 

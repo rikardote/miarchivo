@@ -121,17 +121,19 @@
 
         <!-- Sidebar Detalles -->
         <div class="space-y-8">
-            <!-- Identificación Física (QR) -->
-            <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 text-center">
-                <div class="p-4">
-                    <h3 class="text-sm font-black text-slate-800 dark:text-slate-100 mb-6 uppercase tracking-widest">Identificación Física</h3>
-                    <div class="flex justify-center mb-6 bg-white p-4 rounded-3xl inline-block mx-auto border-4 border-slate-50 shadow-inner">
-                        {!! QrCode::size(140)->generate($expedient->qr_content) !!}
+            <!-- Identificación Física (QR) - Solo Administradores de Archivo -->
+            @can('update', $expedient)
+                <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 text-center">
+                    <div class="p-4">
+                        <h3 class="text-sm font-black text-slate-800 dark:text-slate-100 mb-6 uppercase tracking-widest">Identificación Física</h3>
+                        <div class="flex justify-center mb-6 bg-white p-4 rounded-3xl inline-block mx-auto border-4 border-slate-50 shadow-inner">
+                            {!! QrCode::size(140)->generate($expedient->qr_content) !!}
+                        </div>
+                        <div class="text-xs font-black tracking-[0.2em] text-slate-400 mb-8">{{ $expedient->expedient_code }}</div>
+                        <x-mary-button label="Imprimir Etiqueta" icon="o-printer" link="{{ route('expedients.print', $expedient) }}" external class="btn-primary btn-outline w-full rounded-2xl h-12" />
                     </div>
-                    <div class="text-xs font-black tracking-[0.2em] text-slate-400 mb-8">{{ $expedient->expedient_code }}</div>
-                    <x-mary-button label="Imprimir Etiqueta" icon="o-printer" link="{{ route('expedients.print', $expedient) }}" external class="btn-primary btn-outline w-full rounded-2xl h-12" />
-                </div>
-            </x-mary-card>
+                </x-mary-card>
+            @endcan
 
             <!-- En Posesión De -->
             @if($expedient->currentHolder)
