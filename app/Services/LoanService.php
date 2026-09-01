@@ -72,7 +72,37 @@ class LoanService
     }
 
     /**
-     * Admin delivers the expedient to the requester.
+     * Operator in Planta Baja extracts the folder from drawer and sends it to RH desk.
+     */
+    public function extractLoan(LoanRequest $loan): void
+    {
+        if (!in_array($loan->status, [LoanStatus::Pending, LoanStatus::Approved])) {
+            throw new \Exception('La solicitud no se encuentra en estado pendiente por extraer.');
+        }
+
+        DB::transaction(function () use ($loan) {
+            $loan->update([
+                'status' => LoanStatus::Reserved,
+            ]);
+
+            $expedient = $loan->expedient;
+            $expedient->update([
+                'current_status' => ExpedientStatus::Reserved,
+            ]);
+
+            $userName = Auth::user()?->name ?? 'Operativo de Archivo';
+            $this->expedientService->recordMovement(
+                $expedient,
+                MovementType::StatusChanged,
+                $expedient->current_location_id,
+                $expedient->current_location_id,
+                "Extraído físicamente de gaveta por {$userName} y enviado a Jefatura de RH para entrega."
+            );
+        });
+    }
+
+    /**
+     * Admin/Jefe RH delivers the expedient in person to the requester.
      */
     public function deliverLoan(LoanRequest $loan): void
     {

@@ -60,7 +60,7 @@ class DispatchTest extends TestCase
             ->assertStatus(403);
     }
 
-    public function test_operator_can_deliver_loan_single()
+    public function test_operator_can_extract_loan_single()
     {
         $employee = Employee::factory()->create(['rfc' => 'GOMA850215']);
         $expedient = Expedient::factory()->create([
@@ -78,15 +78,16 @@ class DispatchTest extends TestCase
 
         Livewire::actingAs($this->operator)
             ->test(Dispatch::class)
-            ->call('deliverSingle', $loan->id)
+            ->call('extractSingle', $loan->id)
             ->assertHasNoErrors();
 
-        $this->assertEquals(LoanStatus::Delivered, $loan->fresh()->status);
-        $this->assertEquals(ExpedientStatus::Loaned, $expedient->fresh()->current_status);
-        $this->assertEquals($this->requester->id, $expedient->fresh()->current_holder_id);
+        // Must be Reserved (Surtido / En Mesa RH), NOT yet delivered
+        $this->assertEquals(LoanStatus::Reserved, $loan->fresh()->status);
+        $this->assertEquals(ExpedientStatus::Reserved, $expedient->fresh()->current_status);
+        $this->assertNull($expedient->fresh()->current_holder_id);
     }
 
-    public function test_operator_can_dispatch_by_scanning_code()
+    public function test_operator_can_extract_by_scanning_code()
     {
         $employee = Employee::factory()->create(['rfc' => 'LOPE900101']);
         $expedient = Expedient::factory()->create([
@@ -108,8 +109,9 @@ class DispatchTest extends TestCase
             ->call('processScan')
             ->assertHasNoErrors();
 
-        $this->assertEquals(LoanStatus::Delivered, $loan->fresh()->status);
-        $this->assertEquals(ExpedientStatus::Loaned, $expedient->fresh()->current_status);
+        // Must be Reserved (Surtido / En Mesa RH)
+        $this->assertEquals(LoanStatus::Reserved, $loan->fresh()->status);
+        $this->assertEquals(ExpedientStatus::Reserved, $expedient->fresh()->current_status);
     }
 
     public function test_operator_can_return_loan_by_scanning_code()

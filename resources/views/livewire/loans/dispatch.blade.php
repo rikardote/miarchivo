@@ -95,7 +95,7 @@
                 </div>
                 <span class="text-xs font-black uppercase text-primary tracking-widest">Expedientes seleccionados</span>
             </div>
-            <x-mary-button label="Despachar Seleccionados" icon="o-check" wire:click="deliverBulk" class="btn-primary btn-sm rounded-xl" />
+            <x-mary-button label="Marcar Surtidos y Enviar a RH" icon="o-check" wire:click="extractBulk" class="btn-primary btn-sm rounded-xl" />
         </div>
     @endif
 
@@ -162,7 +162,7 @@
                         </div>
 
                         @if($tab === 'to_extract')
-                            <x-mary-button label="Despachar" icon="o-check" wire:click="deliverSingle({{ $loan->id }})" class="btn-primary rounded-xl h-11 px-5 font-black uppercase text-xs tracking-wider" spinner="deliverSingle({{ $loan->id }})" />
+                            <x-mary-button label="Marcar Surtido" icon="o-check" wire:click="extractSingle({{ $loan->id }})" class="btn-primary rounded-xl h-11 px-5 font-black uppercase text-xs tracking-wider" spinner="extractSingle({{ $loan->id }})" />
                         @else
                             <x-mary-button label="Re-archivar" icon="o-archive-box-arrow-down" wire:click="returnSingle({{ $loan->id }})" class="btn-success btn-outline rounded-xl h-11 px-5 font-black uppercase text-xs tracking-wider" spinner="returnSingle({{ $loan->id }})" />
                         @endif

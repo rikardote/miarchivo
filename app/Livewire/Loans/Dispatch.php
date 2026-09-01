@@ -66,7 +66,7 @@ class Dispatch extends Component
 
         if ($this->tab === 'to_extract') {
             $loan = LoanRequest::where('expedient_id', $expedient->id)
-                ->whereIn('status', [LoanStatus::Pending, LoanStatus::Approved, LoanStatus::Reserved])
+                ->whereIn('status', [LoanStatus::Pending, LoanStatus::Approved])
                 ->latest()
                 ->first();
 
@@ -77,10 +77,10 @@ class Dispatch extends Component
             }
 
             try {
-                $loanService->deliverLoan($loan);
-                $this->success("¡Expediente {$expedient->expedient_code} extraído y entregado a {$loan->requester->name}!");
+                $loanService->extractLoan($loan);
+                $this->success("¡Expediente {$expedient->expedient_code} extraído y enviado a Recursos Humanos para entrega!");
             } catch (\Exception $e) {
-                $this->error("Error al despachar: " . $e->getMessage());
+                $this->error("Error al surtir: " . $e->getMessage());
             }
         } else {
             // Tab to_return
@@ -107,20 +107,20 @@ class Dispatch extends Component
         $this->scannedCode = '';
     }
 
-    public function deliverSingle(int $loanId)
+    public function extractSingle(int $loanId)
     {
         $loan = LoanRequest::find($loanId);
         if (!$loan) return;
 
         try {
-            app(LoanService::class)->deliverLoan($loan);
-            $this->success("Expediente {$loan->expedient->expedient_code} entregado a {$loan->requester->name}.");
+            app(LoanService::class)->extractLoan($loan);
+            $this->success("Expediente {$loan->expedient->expedient_code} extraído y enviado a RH.");
         } catch (\Exception $e) {
             $this->error("Error: " . $e->getMessage());
         }
     }
 
-    public function deliverBulk()
+    public function extractBulk()
     {
         if (empty($this->selectedLoans)) {
             $this->error("Selecciona al menos un expediente.");
@@ -132,9 +132,9 @@ class Dispatch extends Component
 
         foreach ($this->selectedLoans as $loanId) {
             $loan = LoanRequest::find($loanId);
-            if ($loan && in_array($loan->status, [LoanStatus::Pending, LoanStatus::Approved, LoanStatus::Reserved])) {
+            if ($loan && in_array($loan->status, [LoanStatus::Pending, LoanStatus::Approved])) {
                 try {
-                    $loanService->deliverLoan($loan);
+                    $loanService->extractLoan($loan);
                     $count++;
                 } catch (\Exception $e) {
                     // Continue with next
@@ -142,7 +142,7 @@ class Dispatch extends Component
             }
         }
 
-        $this->success("Se despacharon {$count} expedientes con éxito.");
+        $this->success("Se marcaron como surtidos {$count} expedientes y enviados a RH.");
         $this->selectedLoans = [];
     }
 
@@ -165,7 +165,7 @@ class Dispatch extends Component
         $searchTerm = trim($this->search);
 
         if ($this->tab === 'to_extract') {
-            $query = LoanRequest::whereIn('status', [LoanStatus::Pending, LoanStatus::Approved, LoanStatus::Reserved])
+            $query = LoanRequest::whereIn('status', [LoanStatus::Pending, LoanStatus::Approved])
                 ->with(['expedient.employee', 'expedient.currentLocation.branch', 'requester']);
 
             if (!empty($searchTerm)) {
@@ -179,7 +179,7 @@ class Dispatch extends Component
 
             // Group by location for picking
             $items = $query->orderBy('created_at', 'asc')->paginate(15);
-            $totalPending = LoanRequest::whereIn('status', [LoanStatus::Pending, LoanStatus::Approved, LoanStatus::Reserved])->count();
+            $totalPending = LoanRequest::whereIn('status', [LoanStatus::Pending, LoanStatus::Approved])->count();
             $totalReturns = LoanRequest::where('status', LoanStatus::Delivered)->count();
         } else {
             $query = LoanRequest::where('status', LoanStatus::Delivered)

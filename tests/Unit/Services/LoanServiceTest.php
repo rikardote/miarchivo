@@ -76,6 +76,18 @@ class LoanServiceTest extends TestCase
         $this->assertEquals(ExpedientStatus::Reserved, $loan->expedient->current_status);
     }
 
+    public function test_an_operator_can_extract_a_loan()
+    {
+        $loan = LoanRequest::factory()->create(['status' => LoanStatus::Pending]);
+        
+        $this->loanService->extractLoan($loan);
+
+        $loan->refresh();
+        $this->assertEquals(LoanStatus::Reserved, $loan->status);
+        $this->assertEquals(ExpedientStatus::Reserved, $loan->expedient->current_status);
+        $this->assertNull($loan->expedient->current_holder_id);
+    }
+
     public function test_it_can_deliver_an_approved_loan()
     {
         $loan = LoanRequest::factory()->create(['status' => LoanStatus::Approved]);
