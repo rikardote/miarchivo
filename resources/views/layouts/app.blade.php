@@ -69,12 +69,13 @@
                     <div class="p-2 min-w-[200px]">
                         <x-mary-menu-item title="Mi Perfil" icon="o-user" link="/profile" class="rounded-xl text-sm font-bold" />
                         <x-mary-menu-separator class="my-2 opacity-50" />
-                        <x-mary-menu-item icon="o-arrow-right-on-rectangle" class="text-error font-black rounded-xl hover:bg-error/10">
-                            <form method="POST" action="{{ route('logout') }}" id="logout-form">
-                                @csrf
-                                <button type="submit" class="w-full text-left uppercase text-[10px] tracking-widest">Cerrar Sesión</button>
-                            </form>
-                        </x-mary-menu-item>
+                        <form method="POST" action="{{ route('logout') }}" class="w-full">
+                            @csrf
+                            <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-error hover:bg-error/10 text-xs font-black uppercase tracking-wider transition-colors text-left cursor-pointer">
+                                <x-mary-icon name="o-arrow-right-on-rectangle" class="w-4 h-4 text-error" />
+                                <span>Cerrar Sesión</span>
+                            </button>
+                        </form>
                     </div>
                 </x-mary-dropdown>
 
@@ -134,6 +135,16 @@
                         <x-mary-menu-item title="Usuarios" icon="o-users" link="{{ route('users.index') }}" active="{{ request()->routeIs('users.*') }}" class="rounded-3xl text-slate-600 dark:text-slate-300 dark:text-white/50 hover:text-primary dark:hover:text-white hover:bg-white dark:hover:bg-white/5 transition-premium font-black text-sm" />
                     @endcan
                 @endcanany
+
+                <div class="px-2 pt-6 mt-4 border-t border-slate-100 dark:border-white/5">
+                    <form method="POST" action="{{ route('logout') }}" class="w-full">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-error hover:bg-error/10 text-xs font-black uppercase tracking-wider transition-colors text-left cursor-pointer">
+                            <x-mary-icon name="o-arrow-right-on-rectangle" class="w-5 h-5 text-error" />
+                            <span>Cerrar Sesión</span>
+                        </button>
+                    </form>
+                </div>
 
             </x-mary-menu>
         </x-slot:sidebar>
