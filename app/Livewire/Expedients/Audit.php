@@ -30,18 +30,31 @@ class Audit extends Component
             'location_id' => 'required|exists:archive_locations,id'
         ]);
         $this->is_auditing = true;
-        $this->scanned_codes = [];
+        $this->scanned_codes = \Illuminate\Support\Facades\Cache::get("active_audit_{$this->location_id}", []);
     }
 
-    public function addScan()
+    public function addScan(?string $code = null)
     {
-        if (empty($this->current_scan)) return;
+        $rawCode = trim($code ?: $this->current_scan);
+        if (empty($rawCode)) return;
 
-        if (!in_array($this->current_scan, $this->scanned_codes)) {
-            $this->scanned_codes[] = $this->current_scan;
-            $this->success("Escaneado: " . $this->current_scan);
+        // Resolve barcode or QR code to actual expedient_code if applicable
+        $expedient = Expedient::where('expedient_code', $rawCode)
+            ->orWhere('barcode', $rawCode)
+            ->first();
+
+        $canonicalCode = $expedient ? $expedient->expedient_code : $rawCode;
+
+        // Pull latest from cache to ensure multi-device synchronization
+        $cachedCodes = \Illuminate\Support\Facades\Cache::get("active_audit_{$this->location_id}", $this->scanned_codes);
+
+        if (!in_array($canonicalCode, $cachedCodes)) {
+            $cachedCodes[] = $canonicalCode;
+            $this->scanned_codes = $cachedCodes;
+            \Illuminate\Support\Facades\Cache::put("active_audit_{$this->location_id}", $cachedCodes, now()->addHours(6));
+            $this->success("Escaneado: " . $canonicalCode);
         } else {
-            $this->warning("Ya escaneado: " . $this->current_scan);
+            $this->warning("Ya escaneado en esta sesión: " . $canonicalCode);
         }
 
         $this->current_scan = '';
@@ -49,6 +62,9 @@ class Audit extends Component
 
     public function resetAudit()
     {
+        if ($this->location_id) {
+            \Illuminate\Support\Facades\Cache::forget("active_audit_{$this->location_id}");
+        }
         $this->reset(['location_id', 'scanned_codes', 'is_auditing', 'current_scan']);
     }
 
@@ -114,6 +130,10 @@ class Audit extends Component
 
     public function render()
     {
+        if ($this->is_auditing && $this->location_id) {
+            $this->scanned_codes = \Illuminate\Support\Facades\Cache::get("active_audit_{$this->location_id}", $this->scanned_codes);
+        }
+
         $expectedCount = $this->location_id 
             ? Expedient::where('current_location_id', $this->location_id)->count()
             : 0;

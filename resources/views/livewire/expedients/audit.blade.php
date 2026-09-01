@@ -1,4 +1,4 @@
-<div>
+<div @if($is_auditing) wire:poll.2s @endif>
     <x-mary-header title="Auditoría de Inventario" subtitle="Verifica la consistencia física de un estante o gaveta" separator>
         <x-slot:actions>
             @if($is_auditing)
@@ -243,6 +243,23 @@
     @push('scripts')
     <script>
         window.html5QrCode = window.html5QrCode || null;
+        let isProcessingAuditScan = false;
+
+        function playAuditScanBeep() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.12);
+                if (navigator.vibrate) navigator.vibrate(80);
+            } catch (e) {}
+        }
 
         window.startAuditCamera = function() {
             const startBtn = document.getElementById('start-camera');
@@ -264,13 +281,24 @@
             const config = { fps: 15, qrbox: { width: 250, height: 250 } };
             
             window.html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
-                @this.set('current_scan', decodedText);
-                @this.addScan();
-                
+                if (isProcessingAuditScan) return;
+                isProcessingAuditScan = true;
+
+                playAuditScanBeep();
+
                 if (scanInput) {
-                    scanInput.classList.add('ring-2', 'ring-success');
-                    setTimeout(() => scanInput.classList.remove('ring-2', 'ring-success'), 500);
+                    scanInput.value = decodedText;
+                    scanInput.classList.add('ring-4', 'ring-emerald-500');
+                    setTimeout(() => scanInput.classList.remove('ring-4', 'ring-emerald-500'), 800);
                 }
+
+                @this.call('addScan', decodedText).then(() => {
+                    setTimeout(() => {
+                        isProcessingAuditScan = false;
+                    }, 1200);
+                }).catch(() => {
+                    isProcessingAuditScan = false;
+                });
             }).catch(err => {
                 console.error("Camera error:", err);
                 window.stopAuditCamera();
@@ -297,6 +325,7 @@
                 if (startBtn) startBtn.classList.remove('hidden');
                 if (stopBtn) stopBtn.classList.add('hidden');
             }
+            isProcessingAuditScan = false;
         }
 
         document.addEventListener('livewire:navigating', () => {
