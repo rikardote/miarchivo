@@ -9,6 +9,11 @@ class Scanner extends Component
 {
     use Toast;
 
+    public function mount()
+    {
+        $this->authorize('changeLocation', \App\Models\Expedient::class);
+    }
+
     #[\Livewire\Attributes\On('code-scanned')]
     public function goToExpedient($code)
     {
