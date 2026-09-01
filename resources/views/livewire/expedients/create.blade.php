@@ -112,50 +112,28 @@
                                 @endif
                             </div>
 
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Paso 2.1: Archivero / Mueble -->
                                 <div>
-                                    <label class="text-[11px] font-bold text-slate-400 block mb-2 uppercase tracking-wider">Paso 1: Archivero / Gaveta</label>
-                                    <div class="relative group">
-                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary">
-                                            <x-mary-icon name="o-building-office" class="w-5 h-5" />
-                                        </div>
-                                        <select 
-                                            wire:model.live="selectedCabinet"
-                                            class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-2xl h-14 pl-12 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none font-bold text-sm"
-                                        >
-                                            <option value="">Selecciona Archivero...</option>
-                                            @foreach($cabinets as $cabinet)
-                                                <option value="{{ $cabinet['id'] }}">{{ $cabinet['name'] }}</option>
-                                            @endforeach
-                                        </select>
-                                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
-                                            <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
-                                        </div>
-                                    </div>
+                                    <x-mary-select 
+                                        label="Paso 1: Archivero / Gaveta" 
+                                        wire:model.live="selectedCabinet" 
+                                        :options="$cabinets" 
+                                        placeholder="Selecciona Archivero..." 
+                                        icon="o-building-office" 
+                                    />
                                 </div>
 
                                 <!-- Paso 2.2: Cajón / Nivel -->
                                 <div>
-                                    <label class="text-[11px] font-bold text-slate-400 block mb-2 uppercase tracking-wider">Paso 2: Cajón y Rango</label>
-                                    <div class="relative group">
-                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary">
-                                            <x-mary-icon name="o-inbox-stack" class="w-5 h-5" />
-                                        </div>
-                                        <select 
-                                            wire:model="location_id"
-                                            @disabled(empty($selectedCabinet))
-                                            class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-2xl h-14 pl-12 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none font-bold text-sm disabled:bg-slate-100 dark:disabled:bg-white/5 disabled:opacity-60 disabled:cursor-not-allowed"
-                                        >
-                                            <option value="">{{ empty($selectedCabinet) ? 'Primero selecciona un archivero...' : 'Selecciona un cajón...' }}</option>
-                                            @foreach($drawers as $drawer)
-                                                <option value="{{ $drawer['id'] }}">{{ $drawer['name'] }}</option>
-                                            @endforeach
-                                        </select>
-                                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
-                                            <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
-                                        </div>
-                                    </div>
+                                    <x-mary-select 
+                                        label="Paso 2: Cajón y Rango" 
+                                        wire:model="location_id" 
+                                        :options="$drawers" 
+                                        placeholder="{{ empty($selectedCabinet) ? 'Primero selecciona un archivero...' : 'Selecciona un cajón...' }}" 
+                                        :disabled="empty($selectedCabinet)" 
+                                        icon="o-inbox-stack" 
+                                    />
                                 </div>
                             </div>
                             <p class="text-[10px] font-bold text-slate-400 pl-1">El código de barras y QR se generarán automáticamente vinculados a este cajón.</p>
