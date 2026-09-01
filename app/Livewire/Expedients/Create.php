@@ -19,7 +19,9 @@ class Create extends Component
     use Toast;
 
     public ?int $employee_id = null;
+    public ?string $selectedCabinet = null;
     public ?int $location_id = null;
+    public bool $isAutoSuggested = false;
     public string $searchEmployee = '';
     public array $searchResults = [];
 
@@ -43,7 +45,31 @@ class Create extends Component
             if ($found) {
                 $this->employee_id = $found->id;
                 $this->searchEmployee = $found->full_name;
+                $this->autoSuggestLocation($found);
             }
+        }
+    }
+
+    public function updatedSelectedCabinet($value)
+    {
+        $this->isAutoSuggested = false;
+        if ($this->location_id) {
+            $currentLoc = ArchiveLocation::find($this->location_id);
+            if (!$currentLoc || $currentLoc->cabinet !== $value) {
+                $this->location_id = null;
+            }
+        }
+    }
+
+    public function autoSuggestLocation(Employee $employee)
+    {
+        $initial = mb_substr(trim($employee->last_name ?: $employee->rfc), 0, 1, 'UTF-8');
+        $suggested = ArchiveLocation::findByInitialLetter($initial);
+
+        if ($suggested) {
+            $this->selectedCabinet = $suggested->cabinet;
+            $this->location_id = $suggested->id;
+            $this->isAutoSuggested = true;
         }
     }
 
@@ -122,6 +148,7 @@ class Create extends Component
             $this->employee_id = $employee->id;
             $this->searchEmployee = $employee->full_name;
             $this->searchResults = [];
+            $this->autoSuggestLocation($employee);
             $this->success("Empleado seleccionado: {$employee->full_name}");
         }
     }
@@ -165,6 +192,7 @@ class Create extends Component
         $this->searchEmployee = $employee->full_name;
         $this->searchResults = [];
         $this->showManualModal = false;
+        $this->autoSuggestLocation($employee);
 
         // Limpiar campos del formulario manual
         $this->reset([
@@ -181,10 +209,12 @@ class Create extends Component
     {
         $this->validate([
             'employee_id' => 'required|exists:employees,id',
+            'selectedCabinet' => 'required',
             'location_id' => 'required|exists:archive_locations,id',
         ], [
             'employee_id.required' => 'Debes seleccionar o capturar un empleado.',
-            'location_id.required' => 'Debes seleccionar una ubicación física.',
+            'selectedCabinet.required' => 'Debes seleccionar una gaveta o archivero.',
+            'location_id.required' => 'Debes seleccionar un cajón.',
         ]);
 
         $employee = Employee::find($this->employee_id);
@@ -203,10 +233,40 @@ class Create extends Component
 
     public function render()
     {
+        $cabinets = ArchiveLocation::where('is_active', true)
+            ->whereNotNull('cabinet')
+            ->select('cabinet', 'archive_name')
+            ->distinct()
+            ->orderBy('cabinet')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->cabinet,
+                    'name' => "Gaveta / Archivero {$item->cabinet}",
+                ];
+            });
+
+        $drawers = collect();
+        if ($this->selectedCabinet) {
+            $drawers = ArchiveLocation::where('is_active', true)
+                ->where('cabinet', $this->selectedCabinet)
+                ->orderBy('drawer')
+                ->get()
+                ->map(function ($item) {
+                    $label = "Cajón {$item->drawer}";
+                    if ($item->alpha_range) {
+                        $label .= "  —  [ Rango: {$item->alpha_range} ]";
+                    }
+                    return [
+                        'id' => $item->id,
+                        'name' => $label,
+                    ];
+                });
+        }
+
         return view('livewire.expedients.create', [
-            'locations' => ArchiveLocation::where('is_active', true)->orderBy('archive_name')->get(),
-            'branches' => Branch::where('is_active', true)->orderBy('name')->get(),
-            'departments' => Department::where('is_active', true)->orderBy('name')->get(),
+            'cabinets' => $cabinets,
+            'drawers' => $drawers,
         ]);
     }
 }

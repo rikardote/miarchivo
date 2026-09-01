@@ -52,6 +52,7 @@ class CreateExpedientTest extends TestCase
             ->call('saveManualEmployee')
             ->assertHasNoErrors()
             ->assertSet('searchEmployee', 'ALEJANDRO GOMEZ MARTINEZ')
+            ->set('selectedCabinet', 'A-01')
             ->set('location_id', $this->location->id)
             ->call('save')
             ->assertHasNoErrors();

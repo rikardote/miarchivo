@@ -14,13 +14,25 @@
                     <p class="font-bold">{{ $expedient->currentLocation->full_label ?? 'Sin asignar' }}</p>
                 </div>
 
-                <x-mary-select 
-                    label="Nueva Ubicación Física" 
-                    wire:model="location_id" 
-                    :options="$locations" 
-                    option-label="full_label" 
-                    icon="o-map-pin"
-                    hint="Selecciona la nueva caja o estante" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <x-mary-select 
+                            label="1. Archivero / Gaveta" 
+                            wire:model.live="selectedCabinet" 
+                            :options="$cabinets" 
+                            placeholder="Selecciona archivero..."
+                            icon="o-building-office" />
+                    </div>
+                    <div>
+                        <x-mary-select 
+                            label="2. Cajón y Rango" 
+                            wire:model="location_id" 
+                            :options="$drawers" 
+                            placeholder="{{ empty($selectedCabinet) ? 'Primero selecciona un archivero...' : 'Selecciona un cajón...' }}"
+                            :disabled="empty($selectedCabinet)"
+                            icon="o-inbox-stack" />
+                    </div>
+                </div>
 
                 <x-mary-textarea 
                     label="Notas de Movimiento (Opcional)" 

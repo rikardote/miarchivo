@@ -102,25 +102,63 @@
                         </div>
 
                         <div class="space-y-4">
-                            <label class="text-xs font-black uppercase tracking-widest text-slate-500 block mb-3">2. Ubicación Física</label>
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
-                                    <x-mary-icon name="o-map-pin" class="w-5 h-5" />
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">2. Ubicación Física en Archivo</label>
+                                @if($isAutoSuggested)
+                                    <span class="text-[10px] font-black uppercase tracking-wider bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2.5 py-1 rounded-lg border border-indigo-500/20 flex items-center gap-1 animate-pulse">
+                                        <x-mary-icon name="o-sparkles" class="w-3.5 h-3.5" />
+                                        Sugerencia Automática por Apellido
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Paso 2.1: Archivero / Mueble -->
+                                <div>
+                                    <label class="text-[11px] font-bold text-slate-400 block mb-2 uppercase tracking-wider">Paso 1: Archivero / Gaveta</label>
+                                    <div class="relative group">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary">
+                                            <x-mary-icon name="o-building-office" class="w-5 h-5" />
+                                        </div>
+                                        <select 
+                                            wire:model.live="selectedCabinet"
+                                            class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-2xl h-14 pl-12 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none font-bold text-sm"
+                                        >
+                                            <option value="">Selecciona Archivero...</option>
+                                            @foreach($cabinets as $cabinet)
+                                                <option value="{{ $cabinet['id'] }}">{{ $cabinet['name'] }}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+                                            <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
+                                        </div>
+                                    </div>
                                 </div>
-                                <select 
-                                    wire:model="location_id"
-                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl h-16 pl-14 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none"
-                                >
-                                    <option value="">Selecciona Gaveta, Caja o Estante...</option>
-                                    @foreach($locations as $location)
-                                        <option value="{{ $location['id'] }}">{{ $location['full_label'] }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
-                                    <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
+
+                                <!-- Paso 2.2: Cajón / Nivel -->
+                                <div>
+                                    <label class="text-[11px] font-bold text-slate-400 block mb-2 uppercase tracking-wider">Paso 2: Cajón y Rango</label>
+                                    <div class="relative group">
+                                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary">
+                                            <x-mary-icon name="o-inbox-stack" class="w-5 h-5" />
+                                        </div>
+                                        <select 
+                                            wire:model="location_id"
+                                            @disabled(empty($selectedCabinet))
+                                            class="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/10 rounded-2xl h-14 pl-12 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none font-bold text-sm disabled:bg-slate-100 dark:disabled:bg-white/5 disabled:opacity-60 disabled:cursor-not-allowed"
+                                        >
+                                            <option value="">{{ empty($selectedCabinet) ? 'Primero selecciona un archivero...' : 'Selecciona un cajón...' }}</option>
+                                            @foreach($drawers as $drawer)
+                                                <option value="{{ $drawer['id'] }}">{{ $drawer['name'] }}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
+                                            <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <p class="text-[10px] font-bold text-slate-400 pl-2">El código de barras se generará automáticamente tras la creación.</p>
+                            <p class="text-[10px] font-bold text-slate-400 pl-1">El código de barras y QR se generarán automáticamente vinculados a este cajón.</p>
                         </div>
                     </div>
 
