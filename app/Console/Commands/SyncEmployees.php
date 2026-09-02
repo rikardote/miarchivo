@@ -87,7 +87,7 @@ class SyncEmployees extends Command
 
                     DB::transaction(function () use ($items, $apiService, &$newlyAdded, &$addedInPeriod) {
                         foreach ($items as $item) {
-                            $created = $apiService->syncEmployee($item, onlyIfMissing: true, forceStatus: 'inactive');
+                            $created = $apiService->syncEmployee($item, onlyIfMissing: true, forceStatus: null);
                             if ($created && $created->wasRecentlyCreated) {
                                 $newlyAdded++;
                                 $addedInPeriod++;
@@ -103,7 +103,7 @@ class SyncEmployees extends Command
 
             $totalLocal = Employee::count();
             $this->info('¡Búsqueda histórica completada!');
-            $this->info("Se importaron en total {$newlyAdded} empleados históricos faltantes (registrados como inactivos).");
+            $this->info("Se importaron en total {$newlyAdded} empleados de quincenas anteriores que no estaban en la última.");
             $this->info("Total global en catálogo local: {$totalLocal} empleados.");
 
             return 0;
