@@ -245,3 +245,9 @@ input:focus {
     @apply ring-0 outline-none;
 }
 
+/* Disable native browser password reveal eye (Edge / IE) */
+input::-ms-reveal,
+input::-ms-clear {
+    display: none !important;
+}
+

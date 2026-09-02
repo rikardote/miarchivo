@@ -157,13 +157,13 @@
                                     </a>
                                 @endif
                             </div>
-                            <div class="relative">
+                            <div class="relative" x-data="{ show: false }">
                                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
                                     <x-mary-icon name="o-lock-closed" class="w-5 h-5" />
                                 </div>
                                 <input 
                                     id="password" 
-                                    type="password" 
+                                    :type="show ? 'text' : 'password'" 
                                     name="password" 
                                     required 
                                     autocomplete="current-password"
@@ -172,10 +172,15 @@
                                 />
                                 <button 
                                     type="button" 
-                                    onclick="const i=document.getElementById('password');const eyeOn=document.getElementById('eye-on');const eyeOff=document.getElementById('eye-off');if(i.type==='password'){i.type='text';eyeOn.classList.add('hidden');eyeOff.classList.remove('hidden');}else{i.type='password';eyeOn.classList.remove('hidden');eyeOff.classList.add('hidden');}"
-                                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
-                                    <x-mary-icon id="eye-on" name="o-eye" class="w-5 h-5" />
-                                    <x-mary-icon id="eye-off" name="o-eye-slash" class="w-5 h-5 hidden" />
+                                    @click="show = !show" 
+                                    tabindex="-1"
+                                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer">
+                                    <template x-if="!show">
+                                        <x-mary-icon name="o-eye" class="w-5 h-5" />
+                                    </template>
+                                    <template x-if="show">
+                                        <x-mary-icon name="o-eye-slash" class="w-5 h-5" />
+                                    </template>
                                 </button>
                             </div>
                             @if ($errors->has('password'))
