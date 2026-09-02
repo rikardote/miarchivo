@@ -105,7 +105,7 @@
                             </span>
                             @if($loan->expedient?->employee)
                                 <span class="text-xs font-bold text-slate-600 dark:text-slate-300 uppercase truncate">
-                                    {{ $loan->expedient->employee->first_name }} {{ $loan->expedient->employee->last_name }}
+                                    {{ $loan->expedient->employee->last_name }}, {{ $loan->expedient->employee->first_name }}
                                 </span>
                             @endif
                             <span class="md:hidden text-[10px] text-slate-400 font-bold mt-0.5">

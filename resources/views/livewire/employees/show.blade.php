@@ -16,7 +16,7 @@
                         <div class="relative">
                             <div class="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center text-white relative">
                                 <span class="text-xl font-black tracking-tighter">
-                                    {{ strtoupper(substr($employee->first_name, 0, 1) . substr($employee->last_name, 0, 1)) }}
+                                    {{ strtoupper(substr($employee->last_name, 0, 1) . substr($employee->first_name, 0, 1)) }}
                                 </span>
                             </div>
                         </div>

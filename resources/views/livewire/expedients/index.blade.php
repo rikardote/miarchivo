@@ -70,7 +70,7 @@
                 @scope('cell_expedient', $expedient)
                     <div class="flex flex-col py-2 pl-2 sm:pl-4">
                         <span class="font-bold text-slate-800 dark:text-slate-100 leading-tight text-sm sm:text-base">
-                            {{ $expedient->employee?->first_name ?? 'Sin empleado' }} {{ $expedient->employee?->last_name ?? '' }}
+                            {{ $expedient->employee ? "{$expedient->employee->last_name}, {$expedient->employee->first_name}" : 'Sin empleado' }}
                         </span>
                         <div class="flex items-center gap-2 mt-1 flex-wrap">
                             <span class="text-[10px] font-black text-primary uppercase tracking-widest">{{ $expedient->expedient_code }}</span>

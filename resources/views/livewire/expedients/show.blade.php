@@ -60,7 +60,7 @@
                 <div class="flex items-start sm:items-center gap-4 sm:gap-5">
                     <!-- Avatar con iniciales -->
                     <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-lg shadow-primary/20 shrink-0">
-                        {{ strtoupper(substr($expedient->employee->first_name, 0, 1) . substr($expedient->employee->last_name, 0, 1)) }}
+                        {{ strtoupper(substr($expedient->employee->last_name, 0, 1) . substr($expedient->employee->first_name, 0, 1)) }}
                     </div>
                     
                     <div class="space-y-1">
@@ -82,7 +82,7 @@
                         </div>
                         
                         <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
-                            {{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}
+                            {{ $expedient->employee->last_name }}, {{ $expedient->employee->first_name }}
                         </h1>
 
                         <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-2">

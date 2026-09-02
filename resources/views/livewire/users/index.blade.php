@@ -151,7 +151,7 @@
                                     @endif
                                 </div>
                                 <p class="text-sm font-black text-slate-900 dark:text-slate-100 uppercase">
-                                    {{ $loan->expedient->employee->first_name }} {{ $loan->expedient->employee->last_name }}
+                                    {{ $loan->expedient->employee->last_name }}, {{ $loan->expedient->employee->first_name }}
                                 </p>
                                 <div class="flex flex-wrap items-center gap-x-3 text-[10px] font-bold text-slate-400">
                                     <span>RFC: <strong class="text-slate-600 dark:text-slate-300">{{ $loan->expedient->employee->rfc }}</strong></span>

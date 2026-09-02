@@ -4,7 +4,7 @@
         <tr>
             <td colspan="2" style="height: 35px; border-bottom: 1px solid #f3f4f6; vertical-align: top;">
                 <div style="font-size: 11px; font-weight: 900; text-transform: uppercase; line-height: 1.1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-                    {{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}
+                    {{ $expedient->employee->last_name }}, {{ $expedient->employee->first_name }}
                 </div>
                 <div style="font-size: 9px; font-weight: 700; color: #6b7280; letter-spacing: 0.05em; margin-top: 2px;">
                     {{ $expedient->employee->rfc }}
