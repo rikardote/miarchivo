@@ -102,7 +102,7 @@ class ExpedientShowTest extends TestCase
         $this->actingAs($this->admin)
             ->get(route('expedients.show', $this->expedient))
             ->assertOk()
-            ->assertSee('Ficha de Consulta Rápida')
+            ->assertSee('Tomo '.$this->expedient->volume_number)
             ->assertSee('¿De quién es?')
             ->assertSee('¿Dónde está?')
             ->assertSee('Custodia / Préstamo')

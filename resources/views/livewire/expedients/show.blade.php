@@ -1,7 +1,37 @@
 <div>
-    <x-mary-header title="{{ $expedient->expedient_code }}" subtitle="Detalles y movimientos físicos" separator class="mb-4 sm:mb-6">
+    @php
+        $statusConfig = match($expedient->current_status) {
+            \App\Enums\ExpedientStatus::Available => [
+                'badge' => 'badge-success',
+                'dot' => 'bg-emerald-500 animate-pulse',
+            ],
+            \App\Enums\ExpedientStatus::Loaned => [
+                'badge' => 'badge-warning',
+                'dot' => 'bg-amber-500 animate-pulse',
+            ],
+            \App\Enums\ExpedientStatus::Requested => [
+                'badge' => 'badge-info',
+                'dot' => 'bg-sky-500',
+            ],
+            \App\Enums\ExpedientStatus::Lost => [
+                'badge' => 'badge-error',
+                'dot' => 'bg-rose-500 animate-ping',
+            ],
+            default => [
+                'badge' => 'badge-ghost',
+                'dot' => 'bg-slate-400',
+            ],
+        };
+    @endphp
+
+    <x-mary-header title="{{ $expedient->expedient_code }}" subtitle="{{ $expedient->employee->full_name }} • RFC: {{ $expedient->employee->rfc }} • Tomo {{ $expedient->volume_number }}" separator class="mb-6">
         <x-slot:actions>
             <div class="flex items-center gap-2 flex-wrap justify-end">
+                <div class="badge {{ $statusConfig['badge'] }} gap-2 py-2.5 px-3.5 font-black text-xs uppercase tracking-wider shadow-sm">
+                    <span class="w-2 h-2 rounded-full {{ $statusConfig['dot'] }}"></span>
+                    {{ $expedient->current_status->label() }}
+                </div>
+
                 <x-mary-button icon="o-arrow-left" class="btn-ghost btn-sm sm:btn-md" link="{{ route('expedients.index') }}">Volver</x-mary-button>
                 @can('loans.create')
                     @if($expedient->isAvailable())
@@ -22,59 +52,8 @@
         </x-slot:actions>
     </x-mary-header>
 
-    <!-- PANEL DE CONTROL OPERATIVO / LOCALIZACIÓN RÁPIDA (Sección 15) -->
-    <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 bg-white dark:bg-slate-900 rounded-3xl mb-8 overflow-hidden">
-        <div class="p-2 sm:p-4">
-            <!-- Barra Superior: Identificador y Estatus Operativo -->
-            <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
-                <div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Ficha de Consulta Rápida</span>
-                        <span class="badge badge-neutral badge-sm font-mono text-[10px] uppercase">Tomo {{ $expedient->volume_number }}</span>
-                    </div>
-                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">{{ $expedient->expedient_code }}</h1>
-                </div>
-
-                @php
-                    $statusConfig = match($expedient->current_status) {
-                        \App\Enums\ExpedientStatus::Available => [
-                            'badge' => 'badge-success',
-                            'dot' => 'bg-emerald-500 animate-pulse',
-                            'desc' => 'En estantería física • Disponible para préstamo'
-                        ],
-                        \App\Enums\ExpedientStatus::Loaned => [
-                            'badge' => 'badge-warning',
-                            'dot' => 'bg-amber-500 animate-pulse',
-                            'desc' => 'Fuera de sala • En préstamo activo'
-                        ],
-                        \App\Enums\ExpedientStatus::Requested => [
-                            'badge' => 'badge-info',
-                            'dot' => 'bg-sky-500',
-                            'desc' => 'Solicitud pendiente de entrega'
-                        ],
-                        \App\Enums\ExpedientStatus::Lost => [
-                            'badge' => 'badge-error',
-                            'dot' => 'bg-rose-500 animate-ping',
-                            'desc' => 'Alerta: Reportado como extraviado'
-                        ],
-                        default => [
-                            'badge' => 'badge-ghost',
-                            'dot' => 'bg-slate-400',
-                            'desc' => 'En resguardo institucional'
-                        ],
-                    };
-                @endphp
-                <div class="text-left sm:text-right">
-                    <div class="badge {{ $statusConfig['badge'] }} gap-2 py-3 px-4 font-black text-xs uppercase tracking-wider shadow-sm">
-                        <span class="w-2 h-2 rounded-full {{ $statusConfig['dot'] }}"></span>
-                        {{ $expedient->current_status->label() }}
-                    </div>
-                    <p class="text-[10px] text-slate-400 mt-1 font-bold">{{ $statusConfig['desc'] }}</p>
-                </div>
-            </div>
-
-            <!-- 4 Respuestas Operativas Inmediatas -->
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 pt-6">
+    <!-- 4 Pilares Operativos de Localización -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
                 <!-- 1. ¿De quién es? -->
                 <div class="bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors rounded-2xl p-4 sm:p-5 border border-slate-100 dark:border-slate-800">
                     <div class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-3">
@@ -204,8 +183,6 @@
                     @endif
                 </div>
             </div>
-        </div>
-    </x-mary-card>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         
