@@ -23,53 +23,50 @@
     </x-mary-header>
 
     <!-- PANEL DE CONTROL OPERATIVO / LOCALIZACIÓN RÁPIDA (Sección 15) -->
-    <div class="mb-8 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden border border-slate-700/50">
-        <!-- Resplandor decorativo -->
-        <div class="absolute -right-20 -top-20 w-80 h-80 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div class="relative z-10">
+    <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 bg-white dark:bg-slate-900 rounded-3xl mb-8 overflow-hidden">
+        <div class="p-2 sm:p-4">
             <!-- Barra Superior: Identificador y Estatus Operativo -->
-            <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10">
+            <div class="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
                 <div>
                     <div class="flex items-center gap-3">
-                        <span class="text-[10px] font-black uppercase tracking-[0.25em] text-primary">Ficha de Consulta Rápida</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-white/10 text-slate-300">Tomo {{ $expedient->volume_number }}</span>
+                        <span class="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Ficha de Consulta Rápida</span>
+                        <span class="badge badge-neutral badge-sm font-mono text-[10px] uppercase">Tomo {{ $expedient->volume_number }}</span>
                     </div>
-                    <h1 class="text-2xl sm:text-3xl font-black tracking-tight mt-1">{{ $expedient->expedient_code }}</h1>
+                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">{{ $expedient->expedient_code }}</h1>
                 </div>
 
                 @php
                     $statusConfig = match($expedient->current_status) {
                         \App\Enums\ExpedientStatus::Available => [
-                            'bg' => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
-                            'dot' => 'bg-emerald-400 animate-pulse',
+                            'badge' => 'badge-success',
+                            'dot' => 'bg-emerald-500 animate-pulse',
                             'desc' => 'En estantería física • Disponible para préstamo'
                         ],
                         \App\Enums\ExpedientStatus::Loaned => [
-                            'bg' => 'bg-amber-500/20 text-amber-300 border-amber-500/40',
-                            'dot' => 'bg-amber-400 animate-pulse',
+                            'badge' => 'badge-warning',
+                            'dot' => 'bg-amber-500 animate-pulse',
                             'desc' => 'Fuera de sala • En préstamo activo'
                         ],
                         \App\Enums\ExpedientStatus::Requested => [
-                            'bg' => 'bg-sky-500/20 text-sky-300 border-sky-500/40',
-                            'dot' => 'bg-sky-400',
+                            'badge' => 'badge-info',
+                            'dot' => 'bg-sky-500',
                             'desc' => 'Solicitud pendiente de entrega'
                         ],
                         \App\Enums\ExpedientStatus::Lost => [
-                            'bg' => 'bg-rose-500/20 text-rose-300 border-rose-500/40',
-                            'dot' => 'bg-rose-400 animate-ping',
+                            'badge' => 'badge-error',
+                            'dot' => 'bg-rose-500 animate-ping',
                             'desc' => 'Alerta: Reportado como extraviado'
                         ],
                         default => [
-                            'bg' => 'bg-slate-500/20 text-slate-300 border-slate-500/40',
+                            'badge' => 'badge-ghost',
                             'dot' => 'bg-slate-400',
                             'desc' => 'En resguardo institucional'
                         ],
                     };
                 @endphp
                 <div class="text-left sm:text-right">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl border {{ $statusConfig['bg'] }} font-black text-sm uppercase tracking-wider">
-                        <span class="w-2.5 h-2.5 rounded-full {{ $statusConfig['dot'] }}"></span>
+                    <div class="badge {{ $statusConfig['badge'] }} gap-2 py-3 px-4 font-black text-xs uppercase tracking-wider shadow-sm">
+                        <span class="w-2 h-2 rounded-full {{ $statusConfig['dot'] }}"></span>
                         {{ $expedient->current_status->label() }}
                     </div>
                     <p class="text-[10px] text-slate-400 mt-1 font-bold">{{ $statusConfig['desc'] }}</p>
@@ -77,131 +74,138 @@
             </div>
 
             <!-- 4 Respuestas Operativas Inmediatas -->
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 pt-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 pt-6">
                 <!-- 1. ¿De quién es? -->
-                <div class="bg-white/5 hover:bg-white/[0.08] transition-colors rounded-2xl p-4 border border-white/5">
-                    <div class="flex items-center gap-2 text-slate-400 mb-2">
-                        <x-mary-icon name="o-user" class="w-4 h-4 text-primary" />
-                        <span class="text-[10px] font-black uppercase tracking-wider">¿De quién es?</span>
+                <div class="bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors rounded-2xl p-4 sm:p-5 border border-slate-100 dark:border-slate-800">
+                    <div class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-3">
+                        <x-mary-icon name="o-user" class="w-4 h-4" />
                     </div>
-                    <p class="text-base font-black text-white truncate uppercase">{{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}</p>
-                    <div class="mt-2 space-y-1 text-xs">
-                        <p class="text-slate-300 font-bold flex justify-between">
-                            <span class="text-slate-400 font-normal">RFC:</span>
-                            <span class="font-mono text-primary font-black">{{ $expedient->employee->rfc }}</span>
-                        </p>
-                        <p class="text-slate-300 font-bold flex justify-between">
-                            <span class="text-slate-400 font-normal">No. Empleado:</span>
-                            <span>{{ $expedient->employee->employee_number ?? 'S/N' }}</span>
-                        </p>
-                        <p class="text-slate-400 text-[11px] truncate mt-1">
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">¿De quién es?</p>
+                    <p class="text-sm sm:text-base font-black text-slate-900 dark:text-slate-100 uppercase truncate">{{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}</p>
+                    <div class="mt-3 space-y-1.5 text-xs">
+                        <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                            <span class="text-[11px] text-slate-400 font-medium">RFC:</span>
+                            <span class="font-mono font-black text-primary">{{ $expedient->employee->rfc }}</span>
+                        </div>
+                        <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                            <span class="text-[11px] text-slate-400 font-medium">No. Empleado:</span>
+                            <span class="font-bold">{{ $expedient->employee->employee_number ?? 'S/N' }}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">
                             {{ $expedient->employee->position ?? 'Personal Operativo' }}
                         </p>
                     </div>
                 </div>
 
                 <!-- 2. ¿Dónde está físicamente? -->
-                <div class="bg-white/5 hover:bg-white/[0.08] transition-colors rounded-2xl p-4 border border-white/5">
-                    <div class="flex items-center gap-2 text-slate-400 mb-2">
-                        <x-mary-icon name="o-map-pin" class="w-4 h-4 text-emerald-400" />
-                        <span class="text-[10px] font-black uppercase tracking-wider">¿Dónde está?</span>
+                <div class="bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors rounded-2xl p-4 sm:p-5 border border-slate-100 dark:border-slate-800">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-3">
+                        <x-mary-icon name="o-map-pin" class="w-4 h-4" />
                     </div>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">¿Dónde está?</p>
                     @if($expedient->currentLocation)
-                        <p class="text-base font-black text-white leading-tight">
+                        <p class="text-sm sm:text-base font-black text-slate-900 dark:text-slate-100 leading-tight truncate">
                             {{ $expedient->currentLocation->archive_name }}
                         </p>
-                        <div class="mt-2 space-y-1 text-xs">
-                            <p class="text-slate-300 font-bold flex justify-between">
-                                <span class="text-slate-400 font-normal">Gaveta / Cajón:</span>
-                                <span class="text-emerald-300 font-black">G-{{ $expedient->currentLocation->cabinet }} • Cajón {{ $expedient->currentLocation->drawer }}</span>
-                            </p>
+                        <div class="mt-3 space-y-1.5 text-xs">
+                            <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                                <span class="text-[11px] text-slate-400 font-medium">Ubicación:</span>
+                                <span class="text-emerald-700 dark:text-emerald-400 font-black">G-{{ $expedient->currentLocation->cabinet }} • Cajón {{ $expedient->currentLocation->drawer }}</span>
+                            </div>
                             @if($expedient->currentLocation->alpha_range)
-                                <p class="text-slate-300 font-bold flex justify-between">
-                                    <span class="text-slate-400 font-normal">Rango:</span>
-                                    <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-white/10 text-emerald-200">{{ $expedient->currentLocation->alpha_range }}</span>
-                                </p>
+                                <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                                    <span class="text-[11px] text-slate-400 font-medium">Rango:</span>
+                                    <span class="badge badge-ghost badge-sm text-[9px] font-mono">{{ $expedient->currentLocation->alpha_range }}</span>
+                                </div>
                             @endif
-                            <p class="text-slate-400 text-[11px] truncate mt-1">
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">
                                 {{ $expedient->currentLocation->branch->name ?? 'Delegación Estatal' }}
                             </p>
                         </div>
                     @else
-                        <p class="text-base font-black text-amber-400">Sin ubicación asignada</p>
+                        <p class="text-sm sm:text-base font-black text-amber-600 dark:text-amber-400">Sin ubicación</p>
                         <p class="text-xs text-slate-400 mt-2">No se ha asignado a ningún archivero físico.</p>
                     @endif
                 </div>
 
                 <!-- 3. ¿Quién lo tiene y cuándo regresa? -->
-                <div class="bg-white/5 hover:bg-white/[0.08] transition-colors rounded-2xl p-4 border border-white/5">
-                    <div class="flex items-center gap-2 text-slate-400 mb-2">
-                        <x-mary-icon name="o-shield-check" class="w-4 h-4 text-amber-400" />
-                        <span class="text-[10px] font-black uppercase tracking-wider">Custodia / Préstamo</span>
+                <div class="bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors rounded-2xl p-4 sm:p-5 border border-slate-100 dark:border-slate-800">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-3">
+                        <x-mary-icon name="o-shield-check" class="w-4 h-4" />
                     </div>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Custodia / Préstamo</p>
                     @php
                         $activeLoan = $expedient->activeLoan();
                     @endphp
                     @if($expedient->currentHolder)
-                        <p class="text-base font-black text-white truncate">{{ $expedient->currentHolder->name }}</p>
-                        <div class="mt-2 space-y-1 text-xs">
+                        <p class="text-sm sm:text-base font-black text-slate-900 dark:text-slate-100 truncate">{{ $expedient->currentHolder->name }}</p>
+                        <div class="mt-3 space-y-1.5 text-xs">
                             @if($activeLoan && $activeLoan->delivered_at)
-                                <p class="text-slate-300 font-bold flex justify-between">
-                                    <span class="text-slate-400 font-normal">Salió:</span>
-                                    <span>{{ $activeLoan->delivered_at->format('d/m/Y') }}</span>
-                                </p>
+                                <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
+                                    <span class="text-[11px] text-slate-400 font-medium">Salió:</span>
+                                    <span class="font-bold">{{ $activeLoan->delivered_at->format('d/m/Y') }}</span>
+                                </div>
                             @endif
                             @if($activeLoan && $activeLoan->due_date)
                                 @php
                                     $isOverdue = $activeLoan->due_date->isPast();
                                     $daysDiff = abs((int) now()->diffInDays($activeLoan->due_date, false));
                                 @endphp
-                                <p class="font-bold flex justify-between {{ $isOverdue ? 'text-rose-400' : 'text-slate-300' }}">
-                                    <span class="text-slate-400 font-normal">Vence:</span>
-                                    <span>{{ $activeLoan->due_date->format('d/m/Y') }}</span>
-                                </p>
-                                <p class="text-[11px] font-black {{ $isOverdue ? 'text-rose-400' : 'text-emerald-400' }}">
-                                    {{ $isOverdue ? "¡Vencido hace {$daysDiff} día(s)!" : "Resta(n) {$daysDiff} día(s)" }}
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] text-slate-400 font-medium">Vence:</span>
+                                    <span class="font-bold {{ $isOverdue ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-200' }}">{{ $activeLoan->due_date->format('d/m/Y') }}</span>
+                                </div>
+                                <p class="text-[11px] font-black {{ $isOverdue ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400' }} pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">
+                                    {{ $isOverdue ? "¡Vencido hace {$daysDiff} día(s)!" : "Restan {$daysDiff} día(s)" }}
                                 </p>
                             @endif
                         </div>
                     @else
-                        <p class="text-base font-black text-emerald-400">En resguardo</p>
-                        <p class="text-xs text-slate-300 mt-2">Bajo custodia directa del Archivo Central.</p>
-                        <p class="text-[11px] text-slate-400 mt-1">Sin préstamo activo en curso.</p>
+                        <p class="text-sm sm:text-base font-black text-emerald-700 dark:text-emerald-400">En resguardo</p>
+                        <div class="mt-3 space-y-1 text-xs text-slate-500 dark:text-slate-400">
+                            <p class="text-[11px]">Bajo resguardo del Archivo Central.</p>
+                            <p class="text-[11px] font-bold text-slate-700 dark:text-slate-300 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">Sin préstamo activo</p>
+                        </div>
                     @endif
                 </div>
 
                 <!-- 4. Último Movimiento y Auditoría -->
-                <div class="bg-white/5 hover:bg-white/[0.08] transition-colors rounded-2xl p-4 border border-white/5">
-                    <div class="flex items-center gap-2 text-slate-400 mb-2">
-                        <x-mary-icon name="o-clock" class="w-4 h-4 text-violet-400" />
-                        <span class="text-[10px] font-black uppercase tracking-wider">Última Trazabilidad</span>
+                <div class="bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors rounded-2xl p-4 sm:p-5 border border-slate-100 dark:border-slate-800">
+                    <div class="w-8 h-8 rounded-xl bg-violet-500/10 text-violet-600 flex items-center justify-center mb-3">
+                        <x-mary-icon name="o-clock" class="w-4 h-4" />
                     </div>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Última Trazabilidad</p>
                     @php
                         $lastMovement = $expedient->movements->first();
                         $lastAudit = $expedient->currentLocation?->latestAudit;
                     @endphp
                     @if($lastMovement)
-                        <p class="text-sm font-black text-white leading-tight">
+                        <p class="text-sm sm:text-base font-black text-slate-900 dark:text-slate-100 leading-tight">
                             {{ $lastMovement->movement_type->label() }}
                         </p>
-                        <p class="text-[11px] text-slate-400 mt-0.5">
-                            {{ $lastMovement->created_at->diffForHumans() }} ({{ $lastMovement->created_at->format('d/m H:i') }})
-                        </p>
-                        <p class="text-xs text-slate-300 mt-1">Por: {{ $lastMovement->user->name ?? 'Sistema' }}</p>
+                        <div class="mt-3 space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+                            <div class="flex items-center justify-between text-[11px] text-slate-400">
+                                <span>Fecha:</span>
+                                <span class="font-bold text-slate-700 dark:text-slate-200">{{ $lastMovement->created_at->format('d/m/Y H:i') }}</span>
+                            </div>
+                            <p class="text-[11px] truncate pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">
+                                Por: <strong class="text-slate-800 dark:text-slate-100">{{ $lastMovement->user->name ?? 'Sistema' }}</strong>
+                            </p>
+                        </div>
                     @else
                         <p class="text-sm font-bold text-slate-400">Sin movimientos registrados</p>
                     @endif
 
                     @if($lastAudit)
-                        <div class="mt-2 pt-2 border-t border-white/10 text-[10px] text-slate-400">
+                        <div class="mt-2.5 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60 text-[10px] text-slate-400 flex items-center justify-between">
                             <span>Auditoría de cajón:</span>
-                            <span class="text-slate-300 font-bold ml-1">{{ $lastAudit->created_at->format('d/m/Y') }}</span>
+                            <span class="text-slate-700 dark:text-slate-200 font-bold">{{ $lastAudit->created_at->format('d/m/Y') }}</span>
                         </div>
                     @endif
                 </div>
             </div>
         </div>
-    </div>
+    </x-mary-card>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         
