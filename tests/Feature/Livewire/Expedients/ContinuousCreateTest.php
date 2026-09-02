@@ -224,4 +224,39 @@ class ContinuousCreateTest extends TestCase
 
         $this->assertEquals(1, Expedient::where('employee_id', $employee->id)->count());
     }
+
+    public function test_skip_creates_persistent_census_skip_record_and_resolves_upon_creation()
+    {
+        $employee = $this->createEmployee('Alejandro', 'Diaz Lopez', 'DILA850215');
+
+        $component = $this->openSession($this->location);
+
+        $component->call('openSkipModal')
+            ->assertSet('showSkipModal', true)
+            ->set('skipReason', 'Expediente en préstamo o trámite externo')
+            ->call('confirmSkip')
+            ->assertSet('showSkipModal', false);
+
+        $this->assertDatabaseHas('census_skips', [
+            'employee_id' => $employee->id,
+            'archive_location_id' => $this->location->id,
+            'user_id' => $this->admin->id,
+            'reason' => 'Expediente en préstamo o trámite externo',
+            'status' => 'deferred',
+        ]);
+
+        // Nueva sesión: verifica que el empleado sigue excluido de la cola principal y listado como aplazado
+        $newSession = $this->openSession($this->location);
+        $this->assertNull($newSession->get('currentEmployee'));
+        $newSession->assertSee('Aplazamientos Registrados en este Cajón')
+            ->call('restoreSkipped', $employee->id)
+            ->assertSee($employee->full_name)
+            ->call('createAndPrint')
+            ->assertSet('readyToPrint', true);
+
+        $this->assertDatabaseHas('census_skips', [
+            'employee_id' => $employee->id,
+            'status' => 'resolved',
+        ]);
+    }
 }
