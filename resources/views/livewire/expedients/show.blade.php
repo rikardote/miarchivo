@@ -223,7 +223,7 @@
         <x-slot:actions>
             <div class="flex gap-4 w-full justify-end pt-4">
                 <x-mary-button label="Cancelar" wire:click="$toggle('showLostModal')" class="btn-ghost rounded-xl px-6" />
-                <x-mary-button label="Confirmar Extravío" wire:click="markAsLost" class="btn-error text-white rounded-xl px-8 font-black uppercase text-xs tracking-widest shadow-xl shadow-error/20" spinner="markAsLost" />
+                <x-mary-button label="Confirmar Extravío" wire:click="confirmMarkAsLost" class="btn-error text-white rounded-xl px-8 font-black uppercase text-xs tracking-widest shadow-xl shadow-error/20" spinner="confirmMarkAsLost" />
             </div>
         </x-slot:actions>
     </x-mary-modal>

@@ -77,14 +77,22 @@ class ExpedientShowTest extends TestCase
     {
         Livewire::actingAs($this->admin)
             ->test(Show::class, ['expedient' => $this->expedient])
+            ->assertSee('confirmMarkAsLost')
             ->call('markAsLost')
             ->assertSet('showLostModal', true)
             ->set('notes', 'Carpeta no encontrada en gaveta')
             ->call('confirmMarkAsLost')
             ->assertSet('showLostModal', false)
+            ->assertSet('notes', '')
             ->assertHasNoErrors();
 
         $this->expedient->refresh();
         $this->assertEquals(ExpedientStatus::Lost, $this->expedient->current_status);
+
+        $this->assertDatabaseHas('expedient_movements', [
+            'expedient_id' => $this->expedient->id,
+            'movement_type' => MovementType::Lost,
+            'notes' => 'Carpeta no encontrada en gaveta',
+        ]);
     }
 }

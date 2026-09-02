@@ -35,6 +35,7 @@ class Show extends Component
         $service->reportLost($this->expedient, $this->notes ?: null);
         $this->expedient->refresh();
         $this->showLostModal = false;
+        $this->notes = '';
         $this->success('Expediente marcado como extraviado.');
     }
 
