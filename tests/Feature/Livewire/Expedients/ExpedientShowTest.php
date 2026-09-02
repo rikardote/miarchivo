@@ -1,0 +1,90 @@
+<?php
+
+namespace Tests\Feature\Livewire\Expedients;
+
+use App\Enums\ExpedientStatus;
+use App\Enums\MovementType;
+use App\Livewire\Expedients\Show;
+use App\Models\ArchiveLocation;
+use App\Models\Branch;
+use App\Models\Employee;
+use App\Models\Expedient;
+use App\Models\ExpedientMovement;
+use App\Models\User;
+use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
+
+class ExpedientShowTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected User $admin;
+
+    protected Expedient $expedient;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seed(RolePermissionSeeder::class);
+
+        $this->admin = User::factory()->create();
+        $this->admin->assignRole('admin');
+
+        $branch = Branch::create([
+            'name' => 'RH DELEGACION ESTATAL',
+            'code' => 'MEX',
+            'is_active' => true,
+        ]);
+
+        $location = ArchiveLocation::create([
+            'branch_id' => $branch->id,
+            'location_type' => 'Archivero',
+            'archive_name' => 'ARCHIVO ACTIVO',
+            'cabinet' => 'G-01',
+            'drawer' => '1',
+            'alpha_range' => 'A - C',
+            'is_active' => true,
+        ]);
+
+        $employee = Employee::factory()->create(['branch_id' => $branch->id]);
+
+        $this->expedient = Expedient::factory()->create([
+            'employee_id' => $employee->id,
+            'current_location_id' => $location->id,
+            'current_status' => 'available',
+        ]);
+
+        ExpedientMovement::create([
+            'expedient_id' => $this->expedient->id,
+            'user_id' => $this->admin->id,
+            'movement_type' => MovementType::Created,
+            'notes' => 'Expediente creado en sistema.',
+        ]);
+    }
+
+    public function test_it_renders_expedient_show_without_lazy_loading_violation(): void
+    {
+        $this->actingAs($this->admin)
+            ->get(route('expedients.show', $this->expedient))
+            ->assertOk()
+            ->assertSee($this->expedient->expedient_code)
+            ->assertSee($this->admin->name);
+    }
+
+    public function test_it_handles_livewire_action_updates_without_lazy_loading_violation(): void
+    {
+        Livewire::actingAs($this->admin)
+            ->test(Show::class, ['expedient' => $this->expedient])
+            ->call('markAsLost')
+            ->assertSet('showLostModal', true)
+            ->set('notes', 'Carpeta no encontrada en gaveta')
+            ->call('confirmMarkAsLost')
+            ->assertSet('showLostModal', false)
+            ->assertHasNoErrors();
+
+        $this->expedient->refresh();
+        $this->assertEquals(ExpedientStatus::Lost, $this->expedient->current_status);
+    }
+}

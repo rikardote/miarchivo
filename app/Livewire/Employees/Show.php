@@ -17,6 +17,8 @@ class Show extends Component
 
     public function render()
     {
+        $this->employee->loadMissing(['department', 'branch', 'expedients.currentLocation']);
+
         return view('livewire.employees.show');
     }
 }
