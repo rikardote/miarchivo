@@ -10,6 +10,7 @@ use App\Models\Branch;
 use App\Models\Employee;
 use App\Models\Expedient;
 use App\Models\ExpedientMovement;
+use App\Models\LoanRequest;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -109,5 +110,24 @@ class ExpedientShowTest extends TestCase
             ->assertSee('G-01')
             ->assertSee('A - C')
             ->assertSee($this->expedient->employee->rfc);
+    }
+
+    public function test_it_renders_expedient_with_loans_history(): void
+    {
+        LoanRequest::create([
+            'expedient_id' => $this->expedient->id,
+            'requester_id' => $this->admin->id,
+            'status' => 'delivered',
+            'requested_at' => now()->subDays(2),
+            'delivered_at' => now()->subDay(),
+            'due_date' => now()->addDays(5),
+            'observations' => 'Para revisión de trámite de jubilación',
+        ]);
+
+        $this->actingAs($this->admin)
+            ->get(route('expedients.show', $this->expedient))
+            ->assertOk()
+            ->assertSee('Historial de Préstamos')
+            ->assertSee('Para revisión de trámite de jubilación');
     }
 }
