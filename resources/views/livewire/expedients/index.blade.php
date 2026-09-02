@@ -80,9 +80,22 @@
                 @endscope
 
                 @scope('cell_current_status', $expedient)
-                    <div class="px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-xl bg-{{ $expedient->current_status->color() }}/10 text-{{ $expedient->current_status->color() }} text-[8px] sm:text-[9px] font-black uppercase text-center w-fit border border-{{ $expedient->current_status->color() }}/20 shadow-sm whitespace-nowrap">
+                    @php
+                        $expStatusClasses = match($expedient->current_status) {
+                            \App\Enums\ExpedientStatus::Available  => 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+                            \App\Enums\ExpedientStatus::Requested  => 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+                            \App\Enums\ExpedientStatus::Reserved   => 'bg-sky-500/10 text-sky-600 border-sky-500/20',
+                            \App\Enums\ExpedientStatus::Loaned     => 'bg-primary/10 text-primary border-primary/20',
+                            \App\Enums\ExpedientStatus::Returned   => 'bg-violet-500/10 text-violet-600 border-violet-500/20',
+                            \App\Enums\ExpedientStatus::Archived   => 'bg-slate-500/10 text-slate-600 border-slate-500/20',
+                            \App\Enums\ExpedientStatus::InStorage  => 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20',
+                            \App\Enums\ExpedientStatus::Lost       => 'bg-rose-500/10 text-rose-600 border-rose-500/20',
+                            default                                => 'bg-slate-500/10 text-slate-500 border-slate-500/20',
+                        };
+                    @endphp
+                    <span class="px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase border {{ $expStatusClasses }} whitespace-nowrap">
                         {{ $expedient->current_status->label() }}
-                    </div>
+                    </span>
                 @endscope
 
                 @scope('cell_actions', $expedient)
@@ -149,9 +162,22 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @foreach(\App\Enums\ExpedientStatus::cases() as $status)
                     <div class="flex flex-col gap-3 p-6 rounded-[1.5rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-premium group">
-                        <div class="px-4 py-1.5 rounded-xl bg-{{ $status->color() }}/10 text-{{ $status->color() }} text-[9px] font-black uppercase text-center w-fit border border-{{ $status->color() }}/20 shadow-sm group-hover:scale-105 transition-premium">
+                        @php
+                            $glossaryClasses = match($status) {
+                                \App\Enums\ExpedientStatus::Available  => 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+                                \App\Enums\ExpedientStatus::Requested  => 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+                                \App\Enums\ExpedientStatus::Reserved   => 'bg-sky-500/10 text-sky-600 border-sky-500/20',
+                                \App\Enums\ExpedientStatus::Loaned     => 'bg-primary/10 text-primary border-primary/20',
+                                \App\Enums\ExpedientStatus::Returned   => 'bg-violet-500/10 text-violet-600 border-violet-500/20',
+                                \App\Enums\ExpedientStatus::Archived   => 'bg-slate-500/10 text-slate-600 border-slate-500/20',
+                                \App\Enums\ExpedientStatus::InStorage  => 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20',
+                                \App\Enums\ExpedientStatus::Lost       => 'bg-rose-500/10 text-rose-600 border-rose-500/20',
+                                default                                => 'bg-slate-500/10 text-slate-500 border-slate-500/20',
+                            };
+                        @endphp
+                        <span class="px-4 py-1.5 rounded-xl text-[9px] font-black uppercase border w-fit group-hover:scale-105 transition-premium {{ $glossaryClasses }}">
                             {{ $status->label() }}
-                        </div>
+                        </span>
                         <p class="text-xs font-bold text-slate-600 dark:text-slate-300 dark:text-slate-500 leading-relaxed">
                             @switch($status)
                                 @case(\App\Enums\ExpedientStatus::Available) Ubicado físicamente en su estante asignado. @break

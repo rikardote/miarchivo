@@ -108,12 +108,25 @@
                         </div>
 
                         <div class="flex items-center gap-4 sm:gap-5 group pt-4 border-t border-slate-100 sm:col-span-2">
-                            <div class="p-2.5 sm:p-3 bg-{{ $expedient->current_status->color() }}/10 rounded-2xl">
-                                <x-mary-icon name="o-tag" class="w-6 h-6 sm:w-7 sm:h-7 text-{{ $expedient->current_status->color() }}" />
+                            @php
+                                $showStatusIcon = match($expedient->current_status) {
+                                    \App\Enums\ExpedientStatus::Available  => 'bg-emerald-500/10 text-emerald-600',
+                                    \App\Enums\ExpedientStatus::Requested  => 'bg-amber-500/10 text-amber-600',
+                                    \App\Enums\ExpedientStatus::Reserved   => 'bg-sky-500/10 text-sky-600',
+                                    \App\Enums\ExpedientStatus::Loaned     => 'bg-primary/10 text-primary',
+                                    \App\Enums\ExpedientStatus::Returned   => 'bg-violet-500/10 text-violet-600',
+                                    \App\Enums\ExpedientStatus::Archived   => 'bg-slate-500/10 text-slate-600',
+                                    \App\Enums\ExpedientStatus::InStorage  => 'bg-indigo-500/10 text-indigo-600',
+                                    \App\Enums\ExpedientStatus::Lost       => 'bg-rose-500/10 text-rose-600',
+                                    default                                => 'bg-slate-500/10 text-slate-500',
+                                };
+                            @endphp
+                            <div class="p-2.5 sm:p-3 {{ $showStatusIcon }} rounded-2xl">
+                                <x-mary-icon name="o-tag" class="w-6 h-6 sm:w-7 sm:h-7" />
                             </div>
                             <div>
                                 <p class="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Estado</p>
-                                <p class="text-lg sm:text-xl font-black text-{{ $expedient->current_status->color() }}">
+                                <p class="text-lg sm:text-xl font-black {{ explode(' ', $showStatusIcon)[1] }}">
                                     {{ $expedient->current_status->label() }}
                                 </p>
                             </div>

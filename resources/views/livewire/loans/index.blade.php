@@ -50,9 +50,21 @@
                 @endscope
 
                 @scope('cell_status', $loan)
-                    <div class="px-2.5 sm:px-4 py-1 sm:py-1.5 rounded-xl bg-{{ optional($loan->status)->color() ?? 'slate' }}-500/10 text-{{ optional($loan->status)->color() ?? 'slate' }}-500 text-[8px] sm:text-[9px] font-black uppercase text-center w-fit border border-{{ optional($loan->status)->color() ?? 'slate' }}-500/20 shadow-sm whitespace-nowrap">
+                    @php
+                        $statusClasses = match($loan->status) {
+                            \App\Enums\LoanStatus::Pending   => 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+                            \App\Enums\LoanStatus::Approved  => 'bg-sky-500/10 text-sky-600 border-sky-500/20',
+                            \App\Enums\LoanStatus::Reserved  => 'bg-slate-500/10 text-slate-600 border-slate-500/20',
+                            \App\Enums\LoanStatus::Delivered => 'bg-primary/10 text-primary border-primary/20',
+                            \App\Enums\LoanStatus::Returned  => 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+                            \App\Enums\LoanStatus::Rejected  => 'bg-rose-500/10 text-rose-600 border-rose-500/20',
+                            \App\Enums\LoanStatus::Cancelled => 'bg-neutral/10 text-neutral border-neutral/20',
+                            default                          => 'bg-slate-500/10 text-slate-500 border-slate-500/20',
+                        };
+                    @endphp
+                    <span class="px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase border {{ $statusClasses }}">
                         {{ optional($loan->status)->label() ?? 'Desconocido' }}
-                    </div>
+                    </span>
                 @endscope
 
                 @scope('cell_requested_at', $loan)

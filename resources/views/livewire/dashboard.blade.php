@@ -94,10 +94,10 @@
                                     <div class="absolute top-10 w-[2px] h-full bg-slate-100 dark:bg-slate-800/50 last:hidden"></div>
                                 </div>
                                 <div class="pb-8">
-                                    <p class="text-sm font-bold text-slate-800 dark:text-slate-100 dark:text-slate-200 leading-tight group-hover:text-primary transition-colors">{{ $activity->description }}</p>
+                                    <p class="text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight group-hover:text-primary transition-colors">{{ $activity->description }}</p>
                                     <div class="flex items-center gap-2 mt-2">
                                         <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
-                                        <span class="text-[9px] font-black text-slate-500 dark:text-slate-400 dark:text-slate-400 uppercase tracking-widest">{{ $activity->created_at->diffForHumans() }}</span>
+                                        <span class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{{ $activity->created_at->diffForHumans() }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -153,7 +153,7 @@
                                             <span class="font-bold text-slate-800 dark:text-slate-100">{{ $loan->expedient->expedient_code }}</span>
                                             <span class="px-2 py-0.5 bg-rose-100 text-rose-600 text-[10px] font-bold rounded-lg uppercase">HAZ {{ $loan->due_date->diffForHumans() }}</span>
                                         </div>
-                                        <div class="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 dark:text-slate-400">
+                                        <div class="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                                             <x-mary-icon name="o-user" class="w-3 h-3" />
                                             <span>{{ $loan->requester->name }}</span>
                                         </div>
@@ -222,11 +222,11 @@
                             <div class="w-2 h-2 rounded-full bg-primary mt-2"></div>
                             <div>
                                 <p class="text-sm text-slate-800 dark:text-slate-100">{{ $activity->description }}</p>
-                                <span class="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-400">{{ $activity->created_at->diffForHumans() }}</span>
+                                <span class="text-xs text-slate-500 dark:text-slate-400">{{ $activity->created_at->diffForHumans() }}</span>
                             </div>
                         </div>
                     @empty
-                        <div class="py-12 text-center text-slate-500 dark:text-slate-400 dark:text-slate-400">
+                        <div class="py-12 text-center text-slate-500 dark:text-slate-400">
                             <x-mary-icon name="o-clock" class="w-8 h-8 mx-auto mb-2 opacity-50" />
                             <p class="text-xs font-bold uppercase">Sin actividad</p>
                         </div>
@@ -241,14 +241,27 @@
         <div class="space-y-6">
             <div class="flex items-center gap-3 mb-8">
                 <div class="w-10 h-1 h-1 bg-primary rounded-full"></div>
-                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 dark:text-slate-400">Interpretación de Estatus</span>
+                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Interpretación de Estatus</span>
             </div>            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 @foreach(\App\Enums\ExpedientStatus::cases() as $status)
+                    @php
+                        $dashGlossaryClasses = match($status) {
+                            \App\Enums\ExpedientStatus::Available  => 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+                            \App\Enums\ExpedientStatus::Requested  => 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+                            \App\Enums\ExpedientStatus::Reserved   => 'bg-sky-500/10 text-sky-600 border-sky-500/20',
+                            \App\Enums\ExpedientStatus::Loaned     => 'bg-primary/10 text-primary border-primary/20',
+                            \App\Enums\ExpedientStatus::Returned   => 'bg-violet-500/10 text-violet-600 border-violet-500/20',
+                            \App\Enums\ExpedientStatus::Archived   => 'bg-slate-500/10 text-slate-600 border-slate-500/20',
+                            \App\Enums\ExpedientStatus::InStorage  => 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20',
+                            \App\Enums\ExpedientStatus::Lost       => 'bg-rose-500/10 text-rose-600 border-rose-500/20',
+                            default                                => 'bg-slate-500/10 text-slate-500 border-slate-500/20',
+                        };
+                    @endphp
                     <div class="flex flex-col gap-3 p-6 rounded-[1.5rem] border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-premium group">
-                        <div class="px-4 py-1.5 rounded-xl bg-{{ $status->color() }}/10 text-{{ $status->color() }} text-[9px] font-black uppercase text-center w-fit border border-{{ $status->color() }}/20 shadow-sm group-hover:scale-105 transition-premium">
+                        <span class="px-4 py-1.5 rounded-xl text-[9px] font-black uppercase border w-fit group-hover:scale-105 transition-premium {{ $dashGlossaryClasses }}">
                             {{ $status->label() }}
-                        </div>
-                        <p class="text-xs font-bold text-slate-600 dark:text-slate-300 dark:text-slate-500 leading-relaxed">
+                        </span>
+                        <p class="text-xs font-bold text-slate-600 dark:text-slate-300 leading-relaxed">
                             @switch($status)
                                 @case(\App\Enums\ExpedientStatus::Available) Ubicado físicamente en su estante asignado. @break
                                 @case(\App\Enums\ExpedientStatus::Requested) En proceso de validación administrativa. @break

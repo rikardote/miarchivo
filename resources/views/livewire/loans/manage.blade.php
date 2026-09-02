@@ -115,7 +115,7 @@
                 @elseif($loan->status === \App\Enums\LoanStatus::Pending)
                     <div class="space-y-4">
                         @can('loans.approve')
-                            <p class="text-sm text-gray-600">La solicitud está pendiente de revisión. Puedes aprobarla para reservar el expediente, o cancelarla.</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">La solicitud está pendiente de revisión. Puedes aprobarla para reservar el expediente, o cancelarla.</p>
                             <div class="flex space-x-2">
                                 <x-mary-button label="Aprobar" icon="o-check" class="btn-success" wire:click="triggerAction('approve')" spinner />
                                 <x-mary-button label="Rechazar" icon="o-x-mark" class="btn-error" wire:click="triggerAction('cancel')" spinner />
@@ -177,14 +177,14 @@
                 @elseif($loan->status === \App\Enums\LoanStatus::Delivered)
                     <div class="space-y-4">
                         @can('loans.return')
-                            <p class="text-sm text-gray-600">El expediente está actualmente en posesión del solicitante. Requiere verificación con contraseña (SUDO) para recibirlo de vuelta en el archivo.</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-300">El expediente está actualmente en posesión del solicitante. Requiere verificación con contraseña (SUDO) para recibirlo de vuelta en el archivo.</p>
                             <div class="space-y-3">
                                 <label class="text-xs font-black uppercase tracking-widest text-slate-500 block">Notas de devolución (opcional)</label>
                                 <textarea 
                                     wire:model="notes" 
                                     placeholder="Ej. Faltan hojas, carpeta dañada..." 
                                     rows="2"
-                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl p-5 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none resize-none"
+                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl p-4 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none resize-none text-xs"
                                 ></textarea>
                             </div>
                             <x-mary-button label="Registrar Devolución" icon="o-arrow-uturn-down" class="btn-accent w-full h-14 rounded-2xl font-black uppercase text-xs tracking-widest shadow-lg shadow-accent/20" wire:click="triggerAction('return')" spinner />
@@ -223,7 +223,20 @@
                                 <div class="p-5 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-white/5 space-y-2">
                                     <p class="text-xs font-bold text-slate-700 dark:text-slate-300">Estado del expediente físico:</p>
                                     <div class="flex items-center gap-2">
-                                        <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase bg-{{ $loan->expedient->current_status->color() }}-500/10 text-{{ $loan->expedient->current_status->color() }}-600">
+                                        @php
+                                            $expCurrentClasses = match($loan->expedient->current_status) {
+                                                \App\Enums\ExpedientStatus::Available  => 'bg-emerald-500/10 text-emerald-600',
+                                                \App\Enums\ExpedientStatus::Requested  => 'bg-amber-500/10 text-amber-600',
+                                                \App\Enums\ExpedientStatus::Reserved   => 'bg-sky-500/10 text-sky-600',
+                                                \App\Enums\ExpedientStatus::Loaned     => 'bg-primary/10 text-primary',
+                                                \App\Enums\ExpedientStatus::Returned   => 'bg-violet-500/10 text-violet-600',
+                                                \App\Enums\ExpedientStatus::Archived   => 'bg-slate-500/10 text-slate-600',
+                                                \App\Enums\ExpedientStatus::InStorage  => 'bg-indigo-500/10 text-indigo-600',
+                                                \App\Enums\ExpedientStatus::Lost       => 'bg-rose-500/10 text-rose-600',
+                                                default                                => 'bg-slate-500/10 text-slate-500',
+                                            };
+                                        @endphp
+                                        <span class="px-3 py-1 rounded-lg text-[10px] font-black uppercase {{ $expCurrentClasses }}">
                                             {{ $loan->expedient->current_status->label() }}
                                         </span>
                                     </div>
