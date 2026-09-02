@@ -23,6 +23,21 @@ El sistema ha sido diseñado con una arquitectura flexible por gavetas y cajones
 | **Ajustar el Archivo al Sistema**<br>*(Mover y reclasificar todo en papel antes de capturar)* | **Riesgo crítico.** Provoca pérdida temporal de carpetas activas, estrés severo en el personal y meses de trabajo a ciegas sin resultados visibles para las autoridades. | ❌ **No Recomendado** |
 | **Ajustar el Sistema al Archivo**<br>*(Metodología Bottom-Up por cajón cerrado)* | **Riesgo mínimo.** El sistema asimila la distribución actual de los archiveros (rangos alfabéticos y directivos), asignando códigos de barras inmediatos y blindando la custodia desde el día uno. | ✅ **Recomendado** |
 
+### 1.2 Nota Importante a Analizar para Exposición: ¿Clasificación Alfabética Estricta vs. Asignación Pura por Cajón?
+Durante el diseño e implementación del sistema surge una decisión operativa crucial para el área: **¿Debemos obligar a que cada cajón mantenga un rango de letras estricto (ej. A-C, D-F) o es viable prescindir de las letras y asignar los expedientes únicamente por Gaveta y Cajón conforme haya espacio físico disponible?**
+
+Esta segunda alternativa es conocida en la logística documental moderna como **"Almacenamiento Dinámico / Caos Organizado"** (modelo utilizado por centros de distribución de alta densidad y archivos generales):
+
+| Dimensión | Modelo Tradicional por Letras (A - Z) | Modelo Dinámico por Cajón (Sin Letras) |
+| :--- | :--- | :--- |
+| **Aprovechamiento del Espacio** | **Deficiente.** Los cajones de letras de alta frecuencia (G, M, R) se desbordan constantemente, mientras que cajones de letras poco comunes (K, U, W, X, Z) permanecen semivacíos. | **Óptimo (100%).** Cada cajón se llena al tope de su capacidad física sin importar el apellido. No existen huecos ociosos en los archiveros. |
+| **Ingreso de Nuevos Expedientes** | **Complejo y tardado.** Para insertar un expediente nuevo en un cajón lleno, el personal debe recorrer manualmente decenas de carpetas hacia cajones contiguos. | **Inmediato.** El nuevo expediente se guarda en el primer cajón con espacio disponible. El sistema asocia la ubicación al instante y la búsqueda lo localiza en segundos. |
+| **Dependencia Tecnológica** | **Baja.** Si la red o el equipo no están disponibles, el personal puede guiarse visualmente por el orden alfabético impreso en las carátulas. | **Total (100%).** El personal depende obligatoriamente del sistema para saber en qué gaveta y cajón está el expediente, ya que físicamente no guardan secuencia alfabética. |
+| **Compatibilidad con el Sistema** | **Soportada al 100%.** El sistema filtra automáticamente las colas por el rango alfabético del cajón (ej. `A - C`). | **Soportada al 100%.** El catálogo de archiveros permite dejar el campo de rango alfabético en blanco y trabajar únicamente con número de Gaveta y Cajón. |
+
+> **💡 Propuesta Híbrida Recomendada para Exposición:**  
+> Se sugiere la **"Clasificación Alfabética Flexible por Gaveta"**: cada Archivero/Gaveta completa ampara un bloque amplio de letras (ej. Gaveta 1: A–F, Gaveta 2: G–M, Gaveta 3: N–Z). Dentro de esa gaveta, el sistema asigna y guía con precisión milimétrica el cajón exacto (1, 2, 3 o 4) donde reside la carpeta, eliminando el reacomodo manual de expedientes y manteniendo orientación humana si el sistema no estuviese accesible.
+
 ---
 
 ## 2. PREPARATIVOS PREVIOS (CHECKLIST OPERATIVO)
