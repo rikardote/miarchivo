@@ -107,7 +107,7 @@ class ExpedientShowTest extends TestCase
             ->assertSee('Ubicación Física')
             ->assertSee('Custodia / Préstamo')
             ->assertSee('Última Trazabilidad')
-            ->assertSee('G-01')
+            ->assertSee('Gaveta 01')
             ->assertSee('A - C')
             ->assertSee($this->expedient->employee->rfc);
     }

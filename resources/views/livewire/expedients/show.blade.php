@@ -120,7 +120,7 @@
                                 {{ $expedient->currentLocation->archive_name }}
                             </p>
                             <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mt-0.5">
-                                G-{{ $expedient->currentLocation->cabinet }} • Cajón {{ $expedient->currentLocation->drawer }}
+                                Gaveta {{ preg_replace('/^G-?/i', '', $expedient->currentLocation->cabinet) }} • Cajón {{ $expedient->currentLocation->drawer }}
                                 @if($expedient->currentLocation->alpha_range)
                                     <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 ml-1 text-slate-600 dark:text-slate-300">
                                         {{ $expedient->currentLocation->alpha_range }}
