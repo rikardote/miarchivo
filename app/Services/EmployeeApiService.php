@@ -42,6 +42,7 @@ class EmployeeApiService
 
             if ($response->successful()) {
                 $data = $response->json();
+
                 // If it's a wrapped response return the data, otherwise return the whole response
                 return $data['data'] ?? $data ?? [];
             }
@@ -69,8 +70,8 @@ class EmployeeApiService
             return null;
         }
 
-        $employeeNumber = !empty($apiData['id_empleado']) ? mb_strtoupper(trim((string)$apiData['id_empleado']), 'UTF-8') : (!empty($apiData['employee_number']) ? mb_strtoupper(trim((string)$apiData['employee_number']), 'UTF-8') : null);
-        $externalApiId = !empty($apiData['id']) ? (int)$apiData['id'] : (!empty($apiData['external_api_id']) ? (int)$apiData['external_api_id'] : null);
+        $employeeNumber = ! empty($apiData['id_empleado']) ? mb_strtoupper(trim((string) $apiData['id_empleado']), 'UTF-8') : (! empty($apiData['employee_number']) ? mb_strtoupper(trim((string) $apiData['employee_number']), 'UTF-8') : null);
+        $externalApiId = ! empty($apiData['id']) ? (int) $apiData['id'] : (! empty($apiData['external_api_id']) ? (int) $apiData['external_api_id'] : null);
 
         // Determine status from API (map 'ACTIVO' to 'active', otherwise 'inactive')
         $apiStatus = strtoupper($apiData['estado_empleado'] ?? $apiData['estatus'] ?? $apiData['employment_status'] ?? 'ACTIVO');
@@ -80,7 +81,7 @@ class EmployeeApiService
         $employee = Employee::withTrashed()
             ->where(function ($q) use ($cleanRfc, $employeeNumber, $externalApiId) {
                 $q->where('rfc', $cleanRfc)
-                  ->orWhere('rfc', 'like', "{$cleanRfc}%");
+                    ->orWhere('rfc', 'like', "{$cleanRfc}%");
 
                 if ($employeeNumber) {
                     $q->orWhere('employee_number', $employeeNumber);
@@ -101,7 +102,7 @@ class EmployeeApiService
             'external_api_id' => $externalApiId,
             'employee_number' => $employeeNumber,
             'first_name' => $apiData['nombre'] ?? $apiData['first_name'] ?? '',
-            'last_name' => trim(($apiData['apellido_1'] ?? $apiData['last_name'] ?? '') . ' ' . ($apiData['apellido_2'] ?? '')),
+            'last_name' => trim(($apiData['apellido_1'] ?? $apiData['last_name'] ?? '').' '.($apiData['apellido_2'] ?? '')),
             'position' => $apiData['n_puesto_plaza'] ?? $apiData['position'] ?? null,
             'work_center' => $apiData['n_centro_trabajo'] ?? $apiData['work_center'] ?? null,
             'city' => $apiData['poblacion'] ?? $apiData['city'] ?? null,
@@ -110,26 +111,32 @@ class EmployeeApiService
         ];
 
         // Only assign branch if it's a new employee
-        if (!$employee) {
+        if (! $employee) {
             $data['branch_id'] = $this->determineBranch($apiData, $status);
+
             return Employee::create($data);
         }
 
         $employee->update($data);
+
         return $employee;
     }
+
+    protected ?int $cenBranchId = null;
+
+    protected ?int $mexBranchId = null;
 
     /**
      * Helper to guess the branch for NEW employees only.
      */
     protected function determineBranch(array $apiData, string $status): ?int
     {
-        // If employee is inactive (baja), they go to RH ALMANCEN (CEN)
+        // If employee is inactive (baja), they go to RH ALMACEN (CEN)
         if ($status === 'inactive') {
-            return Branch::where('code', 'CEN')->value('id');
+            return $this->cenBranchId ??= Branch::where('code', 'CEN')->value('id');
         }
 
         // Active employees go to RH DELEGACION ESTATAL (MEX)
-        return Branch::where('code', 'MEX')->value('id');
+        return $this->mexBranchId ??= Branch::where('code', 'MEX')->value('id');
     }
 }
