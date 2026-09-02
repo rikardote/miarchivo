@@ -15,7 +15,7 @@
 
 ## Framework y Stack Tecnológico
 
-- **Backend:** Laravel 12 (Framework v13) / PHP 8.4
+- **Backend:** Laravel 13 / PHP 8.4
 - **Frontend Reactivo:** Livewire 4.2 + Alpine.js
 - **Diseño y Componentes UI:** MaryUI 2.8 + DaisyUI + Tailwind CSS v4
 - **Base de Datos:** MySQL / PostgreSQL
@@ -219,20 +219,44 @@ Diseñado para digitalizar el archivo físico cajón por cajón cerrado sin fric
 
 ---
 
-# Estados del Sistema
+# Estados del Sistema y Máquina de Estados
 
 ## Estados del Expediente (`ExpedientStatus`)
 
-| Estado | Código Enum | Color UI | Significado Operativo |
+| Estado | Código Enum | Color UI | Significado Operativo Formal |
 | :--- | :--- | :--- | :--- |
-| **Disponible** | `available` | Verde (`success`) | En su gaveta asignada, listo para ser solicitado. |
-| **Solicitado** | `requested` | Amarillo (`warning`) | Con solicitud de préstamo pendiente de autorización. |
-| **Reservado** | `reserved` | Azul (`info`) | Autorizado por RH, en proceso de extracción física. |
-| **Prestado** | `loaned` | Primario (`primary`) | Fuera de archivo bajo custodia del solicitante. |
-| **Devuelto** | `returned` | Morado (`accent`) | En ventanilla de archivo pendiente de ser regresado al cajón. |
-| **Archivado** | `archived` | Gris (`neutral`) | Expediente inactivo o histórico de baja temporal. |
-| **En Almacén** | `in_storage` | Secundario (`secondary`) | En archivo de concentración o bodega externa. |
-| **Extraviado** | `lost` | Rojo (`error`) | Reportado como no localizado tras auditoría física. |
+| **Disponible** | `available` | Verde (`success`) | En su gaveta física asignada, listo para ser consultado o prestado. |
+| **Solicitado** | `requested` | Amarillo (`warning`) | Solicitud en trámite en la Mesa de Control de RH. |
+| **Reservado** | `reserved` | Azul (`info`) | Autorizado por RH y/o extraído por operador en Planta Baja. |
+| **Prestado** | `loaned` | Primario (`primary`) | Fuera de archivo físico bajo custodia del solicitante (`current_holder_id`). |
+| **Devuelto** | `returned` | Morado (`accent`) | En ventanilla de archivo, en espera de ser re-archivado en cajón. |
+| **Archivado** | `archived` | Gris (`neutral`) | **Histórico / Inactivo:** Expediente cerrado o de baja que ya no circula ordinariamente. *(Nota: No utilizar como sinónimo de devuelto al cajón)*. |
+| **En Almacén** | `in_storage` | Secundario (`secondary`) | En archivo de concentración o bóveda externa. |
+| **Extraviado** | `lost` | Rojo (`error`) | Declaratoria formal de no localización tras agotar investigación de auditoría. |
+
+### Máquina de Estados: Transiciones Permitidas
+
+```
+Flujo Ordinario de Préstamo:
+[AVAILABLE] ──> [REQUESTED] ──> [RESERVED] ──> [LOANED] ──> [RETURNED] ──> [AVAILABLE]
+
+Flujos Excepcionales:
+[AVAILABLE] ──> [IN_STORAGE] ──> [AVAILABLE]
+[AVAILABLE] ──> [ARCHIVED (Histórico)]
+[FALTANTE EN AUDITORÍA] ──(Investigación)──> [AVAILABLE (si aparece)] ó [LOST (extravío formal)]
+[LOST] ──> [FOUND] ──> [AVAILABLE]
+```
+*Regla Transaccional:* Se prohíben saltos directos arbitrarios (ej. de `LOANED` a `AVAILABLE` sin pasar por la recepción y notas de devolución física).
+
+## Semántica de Custodia: `current_holder_id`
+El campo `expedients.current_holder_id` representa **única y exclusivamente al usuario que tiene en su poder físico el expediente fuera del archivo**.
+- Se asigna automáticamente al momento de la entrega física (`deliverLoan`).
+- Se anula (`null`) inmediatamente cuando la carpeta ingresa a ventanilla de recepción (`returnLoan`).
+- No representa a quien autorizó, quien escaneó ni quien archivó.
+
+## Regla de Auditoría: Faltante en Auditoría ≠ Extraviado Formal
+- La no lectura de una carpeta física durante una corrida de auditoría se clasifica como **Faltante en investigación (`missing`)**, abriendo un plazo de verificación de 48 horas para rastrear si se encuentra en trámite o en otra oficina.
+- Solo si transcurrido el protocolo de investigación no es localizada, el Administrador de RH procederá a la declaratoria formal de **Extraviado (`lost`)**.
 
 ## Estados de la Solicitud de Préstamo (`LoanStatus`)
 
@@ -399,7 +423,7 @@ erDiagram
 | **Dashboard** | `/dashboard` | `dashboard` | `App\Livewire\Dashboard` | Tablero ejecutivo con indicadores en tiempo real |
 | **Expedientes** | `/expedients` | `expedients.index` | `App\Livewire\Expedients\Index` | Buscador central, filtrado y acciones masivas |
 | **Alta Manual** | `/expedients/create/{employee?}` | `expedients.create` | `App\Livewire\Expedients\Create` | Creación individual vinculada a empleado |
-| **Alta Continua** | `/expedients/continuous-create` | `expedients.continuous-create` | `App\Livewire\Expedients\ContinuousCreate` | Censo inductivo masivo por cajón cerrado (WIP) |
+| **Alta Continua** | `/expedients/continuous-create` | `expedients.continuous-create` | `App\Livewire\Expedients\ContinuousCreate` | Censo inductivo masivo por cajón cerrado (Piloto / Validación de Campo) |
 | **Detalle Expediente** | `/expedients/{expedient}` | `expedients.show` | `App\Livewire\Expedients\Show` | Ficha técnica completa, bitácora e historial |
 | **Búsqueda Directa** | `/expedients/find/{code}` | `expedients.find` | *Controlador / Closure* | Búsqueda y redirección instantánea por código de barras |
 | **Impresión Etiqueta** | `/expedients/{expedient}/print` | `expedients.print` | `App\Livewire\Expedients\PrintLabel` | Vista de impresión térmica Code128 + QR |
@@ -466,8 +490,9 @@ gantt
     Código de Barras y QR Local           :done, p6, 2026-06, 2026-07
     Escáner Inteligente y Auditoría Fís.  :done, p7, 2026-07, 2026-08
     Alta Continua e Impresión Térmica     :done, p8, 2026-08, 2026-09
-    section Fase 4: Consolidación
-    Puesta en Marcha y Censo Piloto       :active, p9, 2026-09, 2026-10
+    section Fase 4: Puesta en Marcha
+    Piloto en Campo y Censo por Gavetas   :active, p9, 2026-09, 2026-10
+    section Fase 5: Expansión Futura
     OCR y Digitalización Completa         :future, p10, 2026-11, 2027-02
 ```
 

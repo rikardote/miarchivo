@@ -2,7 +2,8 @@
     <x-mary-header title="Auditoría de Inventario" subtitle="Verifica la consistencia física de un estante o gaveta" separator>
         <x-slot:actions>
             @if($is_auditing)
-                <x-mary-button label="Nueva Auditoría" icon="o-arrow-path" wire:click="resetAudit" class="btn-ghost" />
+                <x-mary-button label="{{ $saved_audit ? 'Acta Guardada ✓' : 'Guardar Acta' }}" icon="o-document-check" wire:click="saveAuditReport" class="{{ $saved_audit ? 'btn-success' : 'btn-primary' }} btn-sm rounded-xl font-bold shadow-md shadow-primary/20" spinner="saveAuditReport" :disabled="$saved_audit" />
+                <x-mary-button label="Reiniciar" icon="o-arrow-path" wire:click="resetAudit" class="btn-ghost btn-sm" />
             @endif
         </x-slot:actions>
     </x-mary-header>
@@ -163,6 +164,20 @@
                                 <span class="text-lg font-black text-error tracking-tighter">{{ count($results['missing']) }}</span>
                             </div>
                         </div>
+
+                        @if(count($scanned_codes) > 0)
+                            <div class="mt-6 pt-4 border-t border-slate-100 dark:border-white/5 space-y-3">
+                                <x-mary-input label="Notas del Acta (Opcional)" placeholder="Observaciones de la sesión..." wire:model="audit_notes" class="input-sm" />
+                                <x-mary-button 
+                                    label="{{ $saved_audit ? 'Acta Guardada ✓' : 'Guardar Acta de Auditoría' }}" 
+                                    icon="o-document-check" 
+                                    wire:click="saveAuditReport" 
+                                    class="w-full {{ $saved_audit ? 'btn-success' : 'btn-primary' }} btn-sm rounded-xl font-bold" 
+                                    spinner="saveAuditReport" 
+                                    :disabled="$saved_audit" 
+                                />
+                            </div>
+                        @endif
                     </div>
                 </x-mary-card>
             @endif
@@ -171,13 +186,50 @@
         <!-- Resultados -->
         <div class="lg:col-span-2 space-y-8">
             @if(!$is_auditing)
-                <div class="flex flex-col items-center justify-center py-40 bg-slate-50/50 dark:bg-white/5 rounded-[3rem] border-2 border-dashed border-slate-100 dark:border-white/5">
+                <div class="flex flex-col items-center justify-center py-20 bg-slate-50/50 dark:bg-white/5 rounded-[3rem] border-2 border-dashed border-slate-100 dark:border-white/5">
                     <div class="p-8 bg-white dark:bg-slate-800 rounded-[2rem] shadow-sm mb-6">
                         <x-mary-icon name="o-magnifying-glass" class="w-16 h-16 text-slate-300" />
                     </div>
                     <h3 class="font-black text-slate-800 dark:text-slate-100 text-lg">Inicia una Auditoría</h3>
-                    <p class="text-sm text-slate-500 mt-2">Selecciona una ubicación física para verificar su consistencia.</p>
+                    <p class="text-sm text-slate-500 mt-2">Selecciona una ubicación física para verificar su consistencia en tiempo real.</p>
                 </div>
+
+                @if($pastAudits->isNotEmpty())
+                    <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest">Actas de Auditoría Recientes</h3>
+                                <span class="text-[10px] font-bold text-slate-400">Historial persistente</span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr class="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                            <th>Fecha / Hora</th>
+                                            <th>Ubicación</th>
+                                            <th>Auditor</th>
+                                            <th>Correctos</th>
+                                            <th>Faltantes</th>
+                                            <th>Fuera de Lugar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-xs font-bold">
+                                        @foreach($pastAudits as $pa)
+                                            <tr class="hover:bg-slate-50 dark:hover:bg-white/5">
+                                                <td class="whitespace-nowrap">{{ $pa->created_at->format('d/m/Y H:i') }}</td>
+                                                <td>{{ $pa->location->short_label ?? 'N/A' }}</td>
+                                                <td>{{ $pa->user->name ?? 'N/A' }}</td>
+                                                <td><span class="badge badge-success badge-sm font-black">{{ $pa->correct_count }}</span></td>
+                                                <td><span class="badge badge-error badge-sm font-black">{{ $pa->missing_count }}</span></td>
+                                                <td><span class="badge badge-warning badge-sm font-black">{{ $pa->misplaced_count }}</span></td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </x-mary-card>
+                @endif
             @else
                 <div class="space-y-8">
                     @if(count($results['misplaced']) > 0)
