@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Manual Metodológico de Implementación y Operación - Archivo ISSSTE</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 2.5cm 2cm 2.5cm 2cm;
+            @bottom-right {
+                content: counter(page);
+            }
+        }
+        body {
+            font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #2D3748;
+            margin: 0;
+            padding: 20px;
+        }
+        .header-table {
+            width: 100%;
+            border-bottom: 3px solid #13322B;
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+        }
+        .header-title {
+            color: #13322B;
+            font-size: 20pt;
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+        .header-subtitle {
+            color: #C4A462;
+            font-size: 12pt;
+            font-weight: 700;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .header-meta {
+            font-size: 9pt;
+            color: #718096;
+            text-align: right;
+            line-height: 1.4;
+        }
+        h1 {
+            color: #13322B;
+            font-size: 15pt;
+            font-weight: 800;
+            border-bottom: 1.5px solid #E2E8F0;
+            padding-bottom: 5px;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+        h2 {
+            color: #234E43;
+            font-size: 12.5pt;
+            font-weight: 700;
+            margin-top: 18px;
+            margin-bottom: 8px;
+        }
+        h3 {
+            color: #4A5568;
+            font-size: 11pt;
+            font-weight: 700;
+            margin-top: 14px;
+            margin-bottom: 6px;
+        }
+        p, li {
+            text-align: justify;
+            margin-bottom: 8px;
+        }
+        ul, ol {
+            margin-top: 4px;
+            margin-bottom: 12px;
+            padding-left: 24px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        .callout {
+            background-color: #F7FAFC;
+            border-left: 4px solid #13322B;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .callout-gold {
+            background-color: #FEFCF6;
+            border-left: 4px solid #C4A462;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .callout-title {
+            font-weight: 800;
+            font-size: 10pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            color: #13322B;
+        }
+        .callout-gold .callout-title {
+            color: #8C6D23;
+        }
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 20px 0;
+            font-size: 10pt;
+        }
+        table.data-table th {
+            background-color: #13322B;
+            color: #FFFFFF;
+            font-weight: 700;
+            text-align: left;
+            padding: 8px 12px;
+            border: 1px solid #13322B;
+            text-transform: uppercase;
+            font-size: 9pt;
+            letter-spacing: 0.5px;
+        }
+        table.data-table td {
+            padding: 8px 12px;
+            border: 1px solid #CBD5E0;
+            vertical-align: top;
+        }
+        table.data-table tr:nth-child(even) {
+            background-color: #F8FAFC;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 8.5pt;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-green { background-color: #DEF7EC; color: #03543F; }
+        .badge-red { background-color: #FDE8E8; color: #9B1C1C; }
+        .badge-yellow { background-color: #FEF08A; color: #713F12; }
+        .badge-gray { background-color: #EDF2F7; color: #4A5568; font-family: Consolas, monospace; }
+        .flow-container {
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .flow-step {
+            display: table;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .flow-number {
+            display: table-cell;
+            width: 35px;
+            font-weight: 800;
+            font-size: 14pt;
+            color: #C4A462;
+            vertical-align: top;
+        }
+        .flow-content {
+            display: table-cell;
+            vertical-align: top;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 10px;
+            border-top: 1px solid #E2E8F0;
+            font-size: 8.5pt;
+            color: #A0AEC0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <table class="header-table">
+        <tr>
+            <td style="vertical-align: middle;">
+                <div class="header-title">Manual Metodológico de Implementación</div>
+                <div class="header-subtitle">Sistema Integral de Gestión de Archivo</div>
+            </td>
+            <td class="header-meta" style="vertical-align: middle;">
+                <strong>ISSSTE BAJA CALIFORNIA</strong><br>
+                Subdelegación de Administración<br>
+                Departamento de Recursos Humanos<br>
+                Versión 1.0 (2026)
+            </td>
+        </tr>
+    </table>
+
+    <h1>1. Introducción y Enfoque Estratégico</h1>
+
+    <h3>1.1 El Dilema Clave: ¿Ajustar el Archivo al Sistema o el Sistema al Archivo?</h3>
+    <p>
+        Uno de los errores más comunes en la digitalización de archivos físicos es intentar ordenar y reclasificar todas las carpetas en papel antes de registrarlas en el sistema. En la práctica institucional, ese enfoque colapsa la operación diaria, genera extravíos temporales y agota el esfuerzo del personal sin mostrar avances tangibles a corto plazo.
+    </p>
+
+    <div class="callout-gold">
+        <div class="callout-title">Principio Rector Institucional</div>
+        <em>"No muevas el archivo para encajarlo en el software; modela el software para que refleje la realidad física de tus gavetas, y utiliza el software para gobernar el orden."</em>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 25%;">Enfoque</th>
+                <th style="width: 55%;">Impacto y Consecuencias Reales</th>
+                <th style="width: 20%; text-align: center;">Veredicto</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Ajustar el Archivo al Sistema</strong><br><small style="color:#718096;">Mover y reclasificar todo en papel antes de capturar</small></td>
+                <td>Riesgo crítico. Provoca pérdida temporal de carpetas activas, estrés severo en el personal y meses de trabajo a ciegas sin resultados visibles para las autoridades.</td>
+                <td style="text-align: center;"><span class="badge badge-red">No Recomendado</span></td>
+            </tr>
+            <tr>
+                <td><strong>Ajustar el Sistema al Archivo</strong><br><small style="color:#718096;">Metodología Bottom-Up por cajón cerrado</small></td>
+                <td>Riesgo mínimo. El sistema asimila la distribución actual de los archiveros (rangos alfabéticos y directivos), asignando códigos de barras inmediatos y blindando la custodia desde el día uno.</td>
+                <td style="text-align: center;"><span class="badge badge-green">Recomendado</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h1>2. Preparativos Previos (Checklist Operativo)</h1>
+    <p>Antes de iniciar formalmente las jornadas de captura en la sala de archivo, el área debe verificar los siguientes cuatro elementos:</p>
+    
+    <ul>
+        <li><strong>Estación de Trabajo:</strong> Computadora de escritorio o laptop conectada a la red local institucional con navegador moderno (Google Chrome o Microsoft Edge).</li>
+        <li><strong>Impresora Térmica de Etiquetas:</strong> Calibrada con rollos de etiquetas autoadhesivas estándar de archivo, verificando que la impresión de códigos de barras sea nítida y legible.</li>
+        <li><strong>Lectores Ópticos:</strong> Lector USB tipo pistola para la mesa de trabajo o teléfono móvil inteligente con la cámara habilitada (el sistema integra escáner autónomo sin internet).</li>
+        <li><strong>Catálogo Inicial de Archiveros:</strong> Registrar en el menú <span class="badge badge-gray">Sistema → Archiveros</span> las gavetas y cajones exactamente como se encuentran rotulados hoy en día (ejemplo: Gaveta <code>G-01</code>, Cajones <code>1</code> a <code>4</code> con sus rangos <code>A - C</code>, <code>D - G</code>, etc.).</li>
+    </ul>
+
+    <h1>3. Metodología en Tres Fases de Adopción</h1>
+
+    <div class="flow-container">
+        <div class="flow-step">
+            <div class="flow-number">1</div>
+            <div class="flow-content">
+                <strong>Fase 1: Censo y Etiquetado Masivo ("Cajón por Cajón")</strong><br>
+                Digitalización estricta gaveta por gaveta con el módulo de <em>Alta Continua</em>. Cada cajón concluido queda 100% blindado sin alterar su orden tradicional.
+            </div>
+        </div>
+        <div class="flow-step">
+            <div class="flow-number">2</div>
+            <div class="flow-content">
+                <strong>Fase 2: Circuito Estricto de Préstamos (Tolerancia Cero)</strong><br>
+                A partir del inicio del proyecto, ningún expediente sale de Recursos Humanos sin registro digital previo, aprovechando los préstamos para etiquetar carpetas rezagadas.
+            </div>
+        </div>
+        <div class="flow-step" style="margin-bottom: 0;">
+            <div class="flow-number">3</div>
+            <div class="flow-content">
+                <strong>Fase 3: Auditorías de Control y Reubicación Dinámica</strong><br>
+                Mantenimiento preventivo periódico con escáner inteligente para verificar que el contenido físico de los cajones coincida con la base de datos.
+            </div>
+        </div>
+    </div>
+
+    <h1>4. Fase 1: Procedimiento de Alta Continua</h1>
+    <p>Este módulo fue creado para capturar a gran velocidad sin necesidad de navegar entre pantallas:</p>
+
+    <ol>
+        <li>
+            <strong>Selección de Sesión:</strong> En el menú lateral, ingresar a <span class="badge badge-gray">Expedientes → Alta Continua (WIP)</span>. Seleccionar el archivero (ej. <code>G-01</code>) y el cajón correspondiente (ej. <code>Cajón 1 — [ Rango: A - C ]</code>). El sistema mostrará la cantidad de empleados pendientes y censados.
+        </li>
+        <li>
+            <strong>Extracción Física:</strong> El operador toma la primera carpeta física del cajón. En pantalla aparecerá automáticamente el primer empleado pendiente en orden alfabético.
+        </li>
+        <li>
+            <strong>Cotejo y Creación:</strong> Se confirma que los datos en pantalla (RFC, número de empleado, puesto) coincidan con la carpeta en mano y se presiona <strong>"Crear Expediente y Etiqueta"</strong>.
+        </li>
+        <li>
+            <strong>Impresión y Pegado:</strong> Se presiona el botón <strong>"Imprimir Etiqueta"</strong>. La impresora emite la etiqueta con código de barras institucional. Se adhiere al lomo de la carpeta y se regresa al cajón.
+        </li>
+        <li>
+            <strong>Avance Inmediato:</strong> Se presiona <strong>"Confirmar y Siguiente"</strong> y el sistema presenta automáticamente el siguiente expediente.
+        </li>
+    </ol>
+
+    <div class="callout">
+        <div class="callout-title">Protocolo para Excepciones Durante el Censo</div>
+        <ul>
+            <li><strong>Si el empleado en pantalla no tiene carpeta en ese cajón:</strong> Presionar el botón <strong>"Aplazar (carpeta no está en este lote)"</strong>. El empleado pasa a la bandeja inferior de espera y el flujo continúa sin trabarse.</li>
+            <li><strong>Si aparece una carpeta que pertenece a otra letra:</strong> Se aparta físicamente en una bandeja de "Pendientes de Reubicación" para ingresarla cuando se trabaje su cajón correspondiente.</li>
+            <li><strong>Doble verificación de seguridad:</strong> Si un empleado ya tenía expediente previo, el sistema bloquea automáticamente la creación para evitar duplicidades.</li>
+        </ul>
+    </div>
+
+    <h1>5. Fase 2: Circuito de Préstamos y Custodia</h1>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Etapa</th>
+                <th style="width: 25%;">Responsable</th>
+                <th style="width: 55%;">Acción Operativa</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1. Solicitud</strong></td>
+                <td>Usuario Solicitante / RH</td>
+                <td>Se registra la petición en el sistema especificando el motivo oficial del préstamo.</td>
+            </tr>
+            <tr>
+                <td><strong>2. Aprobación</strong></td>
+                <td>Encargado de Archivo (RH)</td>
+                <td>Valida la solicitud en la Mesa de Control. Al autorizar, se genera la orden de extracción para el operador.</td>
+            </tr>
+            <tr>
+                <td><strong>3. Extracción</strong></td>
+                <td>Operador (Planta Baja)</td>
+                <td>Localiza la carpeta en la gaveta y escanea el código de barras en la pantalla de Despacho. El estado cambia en tiempo real a "Extraído".</td>
+            </tr>
+            <tr>
+                <td><strong>4. Entrega</strong></td>
+                <td>Encargado de Archivo</td>
+                <td>Registra la nota de inspección física (número de fojas y estado de carátula) y entrega la carpeta física al solicitante.</td>
+            </tr>
+            <tr>
+                <td><strong>5. Devolución</strong></td>
+                <td>Operador / Encargado</td>
+                <td>Al recibir la carpeta devuelta, se escanea su código y se registra el estado físico en que se recibe. Se coloca en su gaveta y se confirma el re-archivado.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h1>6. Fase 3: Auditorías y Reubicación Dinámica</h1>
+    <p>Conforme los expedientes circulan por trámites administrativos, no es necesario volver a reorganizar el archivo a mano:</p>
+    <ul>
+        <li><strong>Reubicación Dinámica:</strong> Si un expediente devuelto ya no cabe en su cajón original, el operador accede a <span class="badge badge-gray">Expedientes → Escáner Inteligente</span>, escanea el código y le asigna una nueva gaveta. La base de datos y la bitácora histórica quedan actualizadas de inmediato.</li>
+        <li><strong>Auditoría Preventiva:</strong> En <span class="badge badge-gray">Expedientes → Auditoría</span>, el supervisor puede seleccionar un cajón y pistolear consecutivamente todos los expedientes presentes. El sistema marcará en verde los correctos, alertará si falta alguno prestado y detectará carpetas mal ubicadas.</li>
+    </ul>
+
+    <h1>7. Plan de Trabajo Recomendado (Primeras Dos Semanas)</h1>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Período</th>
+                <th style="width: 40%;">Objetivo Principal</th>
+                <th style="width: 40%;">Meta Tangible</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Semana 1 (Días 1-2)</strong></td>
+                <td>Configuración del catálogo de ubicaciones físicas y calibración de impresoras térmicas.</td>
+                <td>Catálogo completo de archiveros cargado en el sistema.</td>
+            </tr>
+            <tr>
+                <td><strong>Semana 1 (Días 3-5)</strong></td>
+                <td>Prueba piloto de Alta Continua con la Gaveta G-01 y capacitación del personal de ventanilla.</td>
+                <td>Primer cajón 100% etiquetado y personal familiarizado con el escáner.</td>
+            </tr>
+            <tr>
+                <td><strong>Semana 2 en adelante</strong></td>
+                <td>Cierre de préstamos manuales e inicio del censo progresivo diario.</td>
+                <td>Cero salidas informales sin folio digital y avance de 1 a 2 cajones censados por día.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        ISSSTE Baja California — Plataforma Integral de Gestión y Control Documental de Archivo (2026)
+    </div>
+
+</body>
+</html>

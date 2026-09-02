@@ -1,149 +1,108 @@
 # MANUAL METODOLÓGICO DE IMPLEMENTACIÓN Y OPERACIÓN
 ## Sistema Integral de Gestión de Archivo — ISSSTE Baja California
 
+**Órgano Emisor:** Subdelegación de Administración | Departamento de Recursos Humanos  
+**Ámbito:** Representación Estatal Baja California  
+**Versión:** 1.0 (2026)  
+**Estado:** Oficial — Guía de Implementación
+
 ---
 
 ## 1. INTRODUCCIÓN Y ENFOQUE ESTRATÉGICO
 
 ### 1.1 El Dilema Clave: ¿Ajustar el Archivo al Sistema o el Sistema al Archivo?
-Uno de los errores más comunes en la digitalización de archivos físicos es intentar "ordenar y reclasificar todas las carpetas antes de registrarlas en el sistema". En la práctica institucional, ese enfoque colapsa la operación diaria, extravía expedientes en tránsito y agota al personal.
+Uno de los errores más comunes en la digitalización de archivos físicos es intentar ordenar y reclasificar todas las carpetas en papel antes de registrarlas en el sistema. En la práctica institucional, ese enfoque colapsa la operación diaria, genera extravíos temporales y agota el esfuerzo del personal sin mostrar avances tangibles a corto plazo.
 
-> **Principio Rector:**  
-> **"No muevas el archivo para encajarlo en el software; registra el software para reflejar la realidad física de tus gavetas, y usa el software para gobernar el orden."**
+> ### 🏛️ PRINCIPIO RECTOR INSTITUCIONAL
+> *"No muevas el archivo para encajarlo en el software; modela el software para que refleje la realidad física de tus gavetas, y utiliza el software para gobernar el orden."*
 
-El sistema ha sido diseñado con una arquitectura **flexible por gavetas y cajones (rangos alfabéticos y secciones especiales como Directivos)**. Por lo tanto, la metodología institucional recomendada es la **Adopción Progresiva (Bottom-Up)**, donde cada cajón censado y etiquetado queda inmediatamente blindado y controlado.
+El sistema ha sido diseñado con una arquitectura flexible por gavetas y cajones (rangos alfabéticos y secciones especiales como Directivos). Por lo tanto, la metodología recomendada es la **Adopción Progresiva (Bottom-Up)**, donde cada cajón censado y etiquetado queda inmediatamente blindado y controlado.
 
----
-
-## 2. PREPARATIVOS PREVIOS (CHECKLIST TÉCNICO Y LOGÍSTICO)
-
-Antes de iniciar la jornada de captura, asegúrate de contar con lo siguiente en la sala de archivo:
-
-1. **Equipo de Cómputo / Estación de Trabajo:**
-   - Navegador web moderno (Chrome, Edge, Firefox) conectado a la red local de la delegación.
-2. **Impresora de Etiquetas:**
-   - Impresora térmica calibrada para etiquetas autoadhesivas estándar de archivo.
-   - Configurada en el sistema operativo para imprimir sin márgenes innecesarios.
-3. **Lector de Código de Barras / QR:**
-   - Lector USB tipo pistola o cámara de dispositivo móvil integrada (el sistema cuenta con escáner autónomo offline).
-4. **Catálogo de Ubicaciones Inicial:**
-   - En el menú **Sistema → Archiveros** (`/locations`), dar de alta las gavetas y cajones físicos tal cual están rotulados hoy en día en la oficina (ejemplo: Gaveta `G-01`, Cajones `1`, `2`, `3`, `4` con sus respectivos rangos `A - C`, `D - G`, etc.).
+| Enfoque Operativo | Impacto y Consecuencias Reales | Veredicto |
+| :--- | :--- | :---: |
+| **Ajustar el Archivo al Sistema**<br>*(Mover y reclasificar todo en papel antes de capturar)* | **Riesgo crítico.** Provoca pérdida temporal de carpetas activas, estrés severo en el personal y meses de trabajo a ciegas sin resultados visibles para las autoridades. | ❌ **No Recomendado** |
+| **Ajustar el Sistema al Archivo**<br>*(Metodología Bottom-Up por cajón cerrado)* | **Riesgo mínimo.** El sistema asimila la distribución actual de los archiveros (rangos alfabéticos y directivos), asignando códigos de barras inmediatos y blindando la custodia desde el día uno. | ✅ **Recomendado** |
 
 ---
 
-## 3. METODOLOGÍA DE IMPLEMENTACIÓN EN 3 FASES
+## 2. PREPARATIVOS PREVIOS (CHECKLIST OPERATIVO)
 
-```mermaid
-graph TD
-    A[FASE 1: Censo y Etiquetado Masivo] -->|Cajón por Cajón con Alta Continua| B[Cajones 100% Blindados]
-    B --> C[FASE 2: Filtro Estricto de Préstamos]
-    C -->|Carpetas solicitadas no censadas| D[Alta Rápida en Ventanilla]
-    C -->|Carpetas ya censadas| E[Circuito RH + Planta Baja con Escaneo]
-    E --> F[FASE 3: Auditoría y Reubicación Dinámica]
-```
+Antes de iniciar formalmente las jornadas de captura en la sala de archivo, el área debe verificar los siguientes cuatro elementos:
 
----
-
-## 4. FASE 1: CENSO Y ETIQUETADO MASIVO ("CAJÓN POR CAJÓN")
-
-Esta fase permite avanzar sistemáticamente sin interrumpir el servicio de consulta.
-
-### Paso 1: Selección del Cajón de Trabajo
-1. El operador se sitúa frente a una gaveta física específica (ejemplo: **Gaveta G-01, Cajón 1**).
-2. En el sistema, accede a: **Expedientes → Alta Continua (WIP)** (`/expedients/continuous-create`).
-3. Selecciona:
-   - **Gaveta / Archivero:** `G-01`
-   - **Cajón / Rango:** `Cajón 1 — [ Rango: A - C ]`
-4. El sistema activará la sesión y mostrará los contadores en tiempo real:
-   - *Rango alfabético activo*
-   - *Pendientes en cajón* (empleados de la plantilla sin expediente en ese rango)
-   - *Ya con expediente*
-
-### Paso 2: Flujo Carpeta en Mano → Generación de Etiqueta
-1. El operador extrae la primera carpeta física del cajón.
-2. En pantalla aparece automáticamente el empleado pendiente en orden alfabético estricto.
-3. **Verificación rápida:** Corrobora que el nombre del empleado físico coincida con el visor (RFC, número de empleado o puesto).
-4. Presiona el botón: **`Crear Expediente y Etiqueta`**.
-5. El sistema:
-   - Genera el código de barras institucional único (ejemplo: `EXP-00142-V1`).
-   - Muestra la vista previa de la etiqueta lista para impresión.
-6. Presiona **`Imprimir Etiqueta`** (o `Enter`), la etiquetadora expulsa la etiqueta.
-7. El operador pega la etiqueta en la ceja visible / lomo de la carpeta y la devuelve a su posición física en el cajón.
-8. Presiona **`Confirmar y Siguiente`**. La pantalla avanza inmediatamente al siguiente empleado.
-
-### Paso 3: Manejo de Casos Especiales durante el Censo
-- **Caso A: El empleado en pantalla no tiene carpeta física en ese lote:**
-  - Si en el cajón no encuentras la carpeta física de ese empleado, presiona **`Aplazar (carpeta no está en este lote)`**.
-  - El empleado no se borra ni se altera: pasa a la bandeja inferior de *Aplazados* para que la jornada continúe sin detenerse.
-- **Caso B: La carpeta física encontrada está fuera de orden alfabético:**
-  - Si aparece una carpeta que pertenece a otro cajón o letra, se aparta temporalmente en una bandeja de "Pendientes de Reubicación".
-- **Caso C: La persona ya cuenta con expediente previamente registrado:**
-  - El sistema detecta duplicados en milisegundos y muestra una alerta preventiva evitando dobles registros.
+1. **Estación de Trabajo:**  
+   Computadora de escritorio o laptop conectada a la red local institucional con navegador moderno (Google Chrome o Microsoft Edge).
+2. **Impresora Térmica de Etiquetas:**  
+   Calibrada con rollos de etiquetas autoadhesivas estándar de archivo, verificando que la impresión de códigos de barras sea nítida y legible.
+3. **Lectores Ópticos:**  
+   Lector USB tipo pistola para la mesa de trabajo o teléfono móvil inteligente con la cámara habilitada (el sistema integra escáner autónomo sin requerir internet).
+4. **Catálogo Inicial de Archiveros:**  
+   Registrar en el menú `Sistema → Archiveros` (`/locations`) las gavetas y cajones exactamente como se encuentran rotulados hoy en día (ejemplo: Gaveta `G-01`, Cajones `1` a `4` con sus rangos `A - C`, `D - G`, etc.).
 
 ---
 
-## 5. FASE 2: EL CIRCUITO DE PRÉSTAMOS (REGLA DE TOLERANCIA CERO)
+## 3. METODOLOGÍA EN TRES FASES DE ADOPCIÓN
 
-Desde el primer día de uso del sistema, se debe establecer la política institucional:
-
-> **"Ningún expediente físico sale de Recursos Humanos sin registro digital previo."**
-
-### 5.1 Solicitud y Aprobación (Mesa de Control - RH)
-1. El usuario solicitante o el encargado genera la petición desde **Préstamos → Solicitar Préstamo** (`/loans/request`).
-2. El Encargado de Archivo revisa la solicitud en **Préstamos → Mesa de Control** (`/loans/manage`):
-   - Puede aprobar o rechazar.
-   - En estado *Aprobado*, el operador de archivo recibe la notificación para la extracción física.
-
-### 5.2 Extracción y Despacho Físico (Planta Baja / Operador)
-1. El operador ingresa a **Préstamos → Despacho** (`/loans/dispatch`).
-2. Con la lista de extracción (o *Picking List*), localiza el expediente en la gaveta indicada.
-3. **Escaneo de Salida:** Escanea el código de barras de la carpeta con la pistola o cámara móvil.
-4. El estado cambia en tiempo real a **Extraído / En Espera de Entrega**.
-5. Al momento de entregar físicamente la carpeta al solicitante:
-   - El encargado registra la **Nota de Entrega** (ej. *"Se entrega con 120 fojas útiles, carátula en buen estado"*).
-   - Se confirma la entrega: el préstamo pasa a estado **Prestado (Activo)** con conteo regresivo de vencimiento.
-
-### 5.3 Retorno y Re-archivado
-1. Cuando el solicitante devuelve el expediente:
-   - El operador abre la pantalla de despacho y **escanea el código de barras**.
-   - Se capturan las notas de recepción física (ej. *"Recibido completo y sin tachaduras"*).
-2. El expediente pasa a **Devuelto (Por re-archivar)**.
-3. El operador vuelve a colocar la carpeta en su gaveta y confirma el re-archivado. El expediente queda nuevamente **Disponible**.
+* **Fase 1: Censo y Etiquetado Masivo ("Cajón por Cajón")**  
+  Digitalización estricta gaveta por gaveta con el módulo de *Alta Continua*. Cada cajón concluido queda 100% blindado sin alterar su orden tradicional.
+* **Fase 2: Circuito Estricto de Préstamos (Tolerancia Cero)**  
+  A partir del inicio del proyecto, ningún expediente sale de Recursos Humanos sin registro digital previo, aprovechando los préstamos para etiquetar carpetas rezagadas.
+* **Fase 3: Auditorías de Control y Reubicación Dinámica**  
+  Mantenimiento preventivo periódico con escáner inteligente para verificar que el contenido físico de los cajones coincida con la base de datos.
 
 ---
 
-## 6. FASE 3: AUDITORÍAS PERIÓDICAS Y REUBICACIÓN DINÁMICA
+## 4. FASE 1: PROCEDIMIENTO DE ALTA CONTINUA
 
-Conforme los expedientes circulan, no es necesario reordenar manualmente las carpetas en papel:
+Este módulo fue creado para capturar a gran velocidad sin necesidad de navegar entre pantallas ni recargar formularios:
 
-1. **Escáner Inteligente (`/expedients/scanner`):**
-   - Si un expediente devuelto debe guardarse en una gaveta distinta por falta de espacio, el operador abre el Escáner Inteligente, escanea el código y selecciona la nueva gaveta/cajón.
-   - El sistema actualiza el inventario físico instantáneamente y registra el movimiento en la bitácora de auditoría.
-2. **Auditoría de Control (`/expedients/audit`):**
-   - Periódicamente (ej. semanal o mensual), el supervisor abre un cajón, activa la auditoría y escanea consecutivamente todas las carpetas contenidas.
-   - El sistema marcará en verde las carpetas correctas, alertará si falta alguna y avisará si hay una carpeta "infiltrada" que pertenece a otra gaveta.
+1. **Selección de Sesión:**  
+   En el menú lateral, ingresar a `Expedientes → Alta Continua (WIP)` (`/expedients/continuous-create`). Seleccionar el archivero (ej. `G-01`) y el cajón correspondiente (ej. `Cajón 1 — [ Rango: A - C ]`). El sistema mostrará la cantidad de empleados pendientes y censados.
+2. **Extracción Física:**  
+   El operador toma la primera carpeta física del cajón. En pantalla aparecerá automáticamente el primer empleado pendiente en orden alfabético estricto.
+3. **Cotejo y Creación:**  
+   Se confirma que los datos en pantalla (RFC, número de empleado, puesto) coincidan con la carpeta en mano y se presiona **"Crear Expediente y Etiqueta"**.
+4. **Impresión y Pegado:**  
+   Se presiona el botón **"Imprimir Etiqueta"**. La impresora emite la etiqueta con código de barras institucional. Se adhiere al lomo o ceja de la carpeta y se regresa al cajón.
+5. **Avance Inmediato:**  
+   Se presiona **"Confirmar y Siguiente"** y el sistema presenta automáticamente el siguiente expediente en orden.
+
+> ### ⚠️ PROTOCOLO PARA EXCEPCIONES DURANTE EL CENSO
+> * **Si el empleado en pantalla no tiene carpeta en ese cajón:** Presionar el botón **"Aplazar (carpeta no está en este lote)"**. El empleado pasa a la bandeja inferior de espera y el flujo continúa sin trabarse.
+> * **Si aparece una carpeta que pertenece a otra letra:** Se aparta físicamente en una bandeja de "Pendientes de Reubicación" para ingresarla cuando se trabaje su cajón correspondiente.
+> * **Doble verificación de seguridad:** Si un empleado ya tenía expediente previo, el sistema bloquea automáticamente la creación para evitar duplicidades accidentales.
 
 ---
 
-## 7. ROLES Y RESPONSABILIDADES
+## 5. FASE 2: CIRCUITO DE PRÉSTAMOS Y CUSTODIA
 
-| Rol | Pantallas Clave | Responsabilidad Primaria |
+| Etapa | Responsable | Acción Operativa |
 | :--- | :--- | :--- |
-| **Administrador / Encargado de RH** | `Alta Continua`, `Mesa de Control`, `Archiveros`, `Usuarios` | Configurar gavetas, validar altas masivas, autorizar préstamos y supervisar reportes. |
-| **Operador de Archivo (Planta Baja)** | `Despacho`, `Picking List`, `Escáner Inteligente`, `Auditoría` | Extraer carpetas, escanear códigos de salida/retorno, inspección física de fojas y re-archivado. |
-| **Usuario Solicitante (Consultas)** | `Bandeja Personal`, `Solicitud de Préstamo` | Generar solicitudes de expedientes requeridos para trámites institucionales y dar seguimiento a sus devoluciones. |
+| **1. Solicitud** | Usuario Solicitante / RH | Se registra la petición en el sistema (`/loans/request`) especificando el motivo oficial del trámite. |
+| **2. Aprobación** | Encargado de Archivo (RH) | Valida la solicitud en la Mesa de Control (`/loans/manage`). Al autorizar, se genera la orden de extracción para el operador. |
+| **3. Extracción** | Operador (Planta Baja) | Localiza la carpeta en la gaveta y escanea el código de barras en la pantalla de Despacho (`/loans/dispatch`). El estado cambia a *"Extraído"*. |
+| **4. Entrega** | Encargado de Archivo | Registra la nota de inspección física (número de fojas y estado de carátula) y entrega la carpeta física al solicitante. |
+| **5. Devolución** | Operador / Encargado | Al recibir la carpeta devuelta, se escanea su código y se registra el estado físico de recepción. Se coloca en su gaveta y se confirma el re-archivado. |
 
 ---
 
-## 8. PLAN DE ACCIÓN RECOMENDADO (PRIMERAS 2 SEMANAS)
+## 6. FASE 3: AUDITORÍAS Y REUBICACIÓN DINÁMICA
 
-- **Semana 1: Configuración y Prueba Piloto**
-  - Día 1: Alta de Archiveros y Cajones actuales en `/locations`.
-  - Día 2: Prueba piloto con la primera gaveta (Cajón 1) utilizando `Alta Continua`. Ajuste de impresión térmica.
-  - Día 3-5: Capacitación al operador en escaneo de despacho y retorno con códigos de barras.
-- **Semana 2: Cierre de Préstamos Informales**
-  - Implementación obligatoria del módulo de Préstamos para todo expediente que salga del área.
-  - Censo progresivo de los cajones restantes (meta de 1 a 2 cajones diarios por turno).
+Conforme los expedientes circulan por trámites administrativos, no es necesario volver a reorganizar el archivo a mano:
+
+* **Reubicación Dinámica:**  
+  Si un expediente devuelto ya no cabe en su cajón original, el operador accede a `Expedientes → Escáner Inteligente`, escanea el código y le asigna una nueva gaveta. La base de datos y la bitácora histórica quedan actualizadas de inmediato.
+* **Auditoría Preventiva:**  
+  En `Expedientes → Auditoría`, el supervisor puede seleccionar un cajón y pistolear consecutivamente todos los expedientes presentes. El sistema marcará en verde los correctos, alertará si falta alguno prestado y detectará carpetas mal ubicadas.
 
 ---
-*Manual generado conforme a los estándares de desarrollo de la plataforma institucional ISSSTE Baja California (2026).*
+
+## 7. PLAN DE TRABAJO RECOMENDADO (PRIMERAS DOS SEMANAS)
+
+| Período | Objetivo Principal | Meta Tangible |
+| :--- | :--- | :--- |
+| **Semana 1 (Días 1-2)** | Configuración del catálogo de ubicaciones físicas y calibración de impresoras térmicas. | Catálogo completo de archiveros cargado en el sistema. |
+| **Semana 1 (Días 3-5)** | Prueba piloto de Alta Continua con la Gaveta G-01 y capacitación del personal de ventanilla. | Primer cajón 100% etiquetado y personal familiarizado con el escáner. |
+| **Semana 2 en adelante** | Cierre de préstamos manuales e inicio del censo progresivo diario. | Cero salidas informales sin folio digital y avance de 1 a 2 cajones censados por día. |
+
+---
+*ISSSTE Baja California — Plataforma Integral de Gestión y Control Documental de Archivo (2026).*
