@@ -155,7 +155,7 @@
                             @endif
                         @else
                             <p class="text-sm font-black text-emerald-700 dark:text-emerald-400">En resguardo</p>
-                            <p class="text-xs text-slate-400 mt-0.5">Custodia del Archivo Central</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Custodia del Archivo</p>
                         @endif
                     </div>
                 </div>
