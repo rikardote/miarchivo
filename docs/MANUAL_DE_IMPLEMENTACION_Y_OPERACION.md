@@ -27,7 +27,7 @@ Antes de iniciar la jornada de captura, asegúrate de contar con lo siguiente en
 3. **Lector de Código de Barras / QR:**
    - Lector USB tipo pistola o cámara de dispositivo móvil integrada (el sistema cuenta con escáner autónomo offline).
 4. **Catálogo de Ubicaciones Inicial:**
-   - En el menú **Sistema $\rightarrow$ Archiveros** (`/locations`), dar de alta las gavetas y cajones físicos tal cual están rotulados hoy en día en la oficina (ejemplo: Gaveta `G-01`, Cajones `1`, `2`, `3`, `4` con sus respectivos rangos `A - C`, `D - G`, etc.).
+   - En el menú **Sistema → Archiveros** (`/locations`), dar de alta las gavetas y cajones físicos tal cual están rotulados hoy en día en la oficina (ejemplo: Gaveta `G-01`, Cajones `1`, `2`, `3`, `4` con sus respectivos rangos `A - C`, `D - G`, etc.).
 
 ---
 
@@ -50,7 +50,7 @@ Esta fase permite avanzar sistemáticamente sin interrumpir el servicio de consu
 
 ### Paso 1: Selección del Cajón de Trabajo
 1. El operador se sitúa frente a una gaveta física específica (ejemplo: **Gaveta G-01, Cajón 1**).
-2. En el sistema, accede a: **Expedientes $\rightarrow$ Alta Continua (WIP)** (`/expedients/continuous-create`).
+2. En el sistema, accede a: **Expedientes → Alta Continua (WIP)** (`/expedients/continuous-create`).
 3. Selecciona:
    - **Gaveta / Archivero:** `G-01`
    - **Cajón / Rango:** `Cajón 1 — [ Rango: A - C ]`
@@ -59,7 +59,7 @@ Esta fase permite avanzar sistemáticamente sin interrumpir el servicio de consu
    - *Pendientes en cajón* (empleados de la plantilla sin expediente en ese rango)
    - *Ya con expediente*
 
-### Paso 2: Flujo Carpeta en Mano $\rightarrow$ Generación de Etiqueta
+### Paso 2: Flujo Carpeta en Mano → Generación de Etiqueta
 1. El operador extrae la primera carpeta física del cajón.
 2. En pantalla aparece automáticamente el empleado pendiente en orden alfabético estricto.
 3. **Verificación rápida:** Corrobora que el nombre del empleado físico coincida con el visor (RFC, número de empleado o puesto).
@@ -89,13 +89,13 @@ Desde el primer día de uso del sistema, se debe establecer la política institu
 > **"Ningún expediente físico sale de Recursos Humanos sin registro digital previo."**
 
 ### 5.1 Solicitud y Aprobación (Mesa de Control - RH)
-1. El usuario solicitante o el encargado genera la petición desde **Préstamos $\rightarrow$ Solicitar Préstamo** (`/loans/request`).
-2. El Encargado de Archivo revisa la solicitud en **Préstamos $\rightarrow$ Mesa de Control** (`/loans/manage`):
+1. El usuario solicitante o el encargado genera la petición desde **Préstamos → Solicitar Préstamo** (`/loans/request`).
+2. El Encargado de Archivo revisa la solicitud en **Préstamos → Mesa de Control** (`/loans/manage`):
    - Puede aprobar o rechazar.
    - En estado *Aprobado*, el operador de archivo recibe la notificación para la extracción física.
 
 ### 5.2 Extracción y Despacho Físico (Planta Baja / Operador)
-1. El operador ingresa a **Préstamos $\rightarrow$ Despacho** (`/loans/dispatch`).
+1. El operador ingresa a **Préstamos → Despacho** (`/loans/dispatch`).
 2. Con la lista de extracción (o *Picking List*), localiza el expediente en la gaveta indicada.
 3. **Escaneo de Salida:** Escanea el código de barras de la carpeta con la pistola o cámara móvil.
 4. El estado cambia en tiempo real a **Extraído / En Espera de Entrega**.
