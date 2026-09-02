@@ -130,4 +130,22 @@ class ExpedientShowTest extends TestCase
             ->assertSee('Historial de Préstamos')
             ->assertSee('Para revisión de trámite de jubilación');
     }
+
+    public function test_it_can_record_label_reprint_in_movement_history(): void
+    {
+        Livewire::actingAs($this->admin)
+            ->test(Show::class, ['expedient' => $this->expedient])
+            ->call('openReprintModal')
+            ->assertSet('showReprintModal', true)
+            ->set('reprintReason', 'Código de barras o QR ilegible / desgastado')
+            ->set('reprintNotes', 'Desgaste por uso continuo')
+            ->call('confirmReprint')
+            ->assertSet('showReprintModal', false);
+
+        $this->assertDatabaseHas('expedient_movements', [
+            'expedient_id' => $this->expedient->id,
+            'user_id' => $this->admin->id,
+            'movement_type' => 'label_reprinted',
+        ]);
+    }
 }

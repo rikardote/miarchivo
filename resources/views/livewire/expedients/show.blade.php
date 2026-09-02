@@ -303,13 +303,21 @@
                         
                         <p class="font-mono text-xs font-black tracking-[0.2em] text-slate-500 mb-6">{{ $expedient->expedient_code }}</p>
                         
-                        <x-mary-button 
-                            label="Imprimir Etiqueta Térmica" 
-                            icon="o-printer" 
-                            link="{{ route('expedients.print', $expedient) }}" 
-                            external 
-                            class="btn-primary w-full rounded-2xl h-12 font-black uppercase text-xs tracking-wider shadow-lg shadow-primary/20" 
-                        />
+                        <div class="space-y-2">
+                            <x-mary-button 
+                                label="Imprimir Etiqueta Térmica" 
+                                icon="o-printer" 
+                                link="{{ route('expedients.print', $expedient) }}" 
+                                external 
+                                class="btn-primary w-full rounded-2xl h-12 font-black uppercase text-xs tracking-wider shadow-lg shadow-primary/20" 
+                            />
+                            <x-mary-button 
+                                label="Reimpresión por Reposición" 
+                                icon="o-arrow-path" 
+                                wire:click="openReprintModal" 
+                                class="btn-ghost w-full rounded-2xl h-10 font-black uppercase text-[10px] tracking-wider text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-all border border-slate-200/60 dark:border-slate-700" 
+                            />
+                        </div>
                     </div>
                 </x-mary-card>
             @endcan
@@ -369,6 +377,45 @@
             <div class="flex gap-4 w-full justify-end pt-4">
                 <x-mary-button label="Cancelar" wire:click="$toggle('showLostModal')" class="btn-ghost rounded-xl px-6" />
                 <x-mary-button label="Confirmar Extravío" wire:click="confirmMarkAsLost" class="btn-error text-white rounded-xl px-8 font-black uppercase text-xs tracking-widest shadow-xl shadow-error/20" spinner="confirmMarkAsLost" />
+            </div>
+        </x-slot:actions>
+    </x-mary-modal>
+
+    <!-- Modal para Protocolo de Reimpresión de Etiqueta -->
+    <x-mary-modal wire:model="showReprintModal" class="p-8 modal-wide">
+        <div class="flex items-center gap-6 mb-6 border-b border-slate-100 dark:border-slate-800 pb-6">
+            <div class="w-16 h-16 bg-primary text-white rounded-2xl flex items-center justify-center font-black text-2xl shadow-xl shadow-primary/20">
+                <x-mary-icon name="o-printer" class="w-8 h-8" />
+            </div>
+            <div>
+                <h3 class="text-2xl font-black text-slate-900 dark:text-white tracking-tighter leading-none mb-1">Reimpresión de Etiqueta</h3>
+                <p class="text-[10px] font-black text-primary uppercase tracking-widest">Protocolo de auditoría y reposición</p>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <x-mary-alert icon="o-information-circle" class="alert-info bg-primary/10 text-primary border-none rounded-2xl text-xs font-bold leading-relaxed">
+                La reimpresión conservará exactamente el mismo folio (<strong>{{ $expedient->expedient_code }}</strong>). Esta acción quedará registrada en la bitácora física de movimientos con fecha y responsable.
+            </x-mary-alert>
+
+            <div class="space-y-2">
+                <label class="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">Motivo de la Reimpresión</label>
+                <select wire:model="reprintReason" class="select select-bordered w-full rounded-2xl text-sm font-bold border-slate-200 bg-white dark:bg-slate-900">
+                    <option value="Etiqueta rota o dañada">Etiqueta rota o dañada</option>
+                    <option value="Código de barras o QR ilegible / desgastado">Código de barras o QR ilegible / desgastado</option>
+                    <option value="Etiqueta despegada de la carpeta">Etiqueta despegada de la carpeta</option>
+                    <option value="Falla de impresora previa / reimpresión técnica">Falla de impresora previa / reimpresión técnica</option>
+                    <option value="Actualización de datos físicos de carátula">Actualización de datos físicos de carátula</option>
+                </select>
+            </div>
+
+            <x-mary-textarea label="Notas u Observaciones del Operador (Opcional)" wire:model="reprintNotes" placeholder="Detalles sobre el estado en que se encontró la etiqueta anterior..." rows="3" class="rounded-2xl border-slate-200 p-4" />
+        </div>
+
+        <x-slot:actions>
+            <div class="flex gap-4 w-full justify-end pt-4">
+                <x-mary-button label="Cancelar" wire:click="$toggle('showReprintModal')" class="btn-ghost rounded-xl px-6" />
+                <x-mary-button label="Registrar y Reimprimir" wire:click="confirmReprint" class="btn-primary rounded-xl px-8 font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20" spinner="confirmReprint" />
             </div>
         </x-slot:actions>
     </x-mary-modal>

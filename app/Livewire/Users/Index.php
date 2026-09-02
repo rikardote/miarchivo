@@ -2,22 +2,30 @@
 
 namespace App\Livewire\Users;
 
+use App\Enums\LoanStatus;
+use App\Models\LoanRequest;
 use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Spatie\Permission\Models\Role;
 
 class Index extends Component
 {
     use WithPagination;
 
     public string $search = '';
+
     public bool $userModal = false;
+
     public ?User $editingUser = null;
 
     // Form fields
     public string $name = '';
+
     public string $email = '';
+
     public string $password = '';
+
     public string $selectedRole = '';
 
     public array $sortBy = ['column' => 'name', 'direction' => 'asc'];
@@ -47,11 +55,11 @@ class Index extends Component
     {
         $rules = [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . ($this->editingUser->id ?? 'NULL'),
+            'email' => 'required|email|unique:users,email,'.($this->editingUser->id ?? 'NULL'),
             'selectedRole' => 'required|string',
         ];
 
-        if (!$this->editingUser || $this->password) {
+        if (! $this->editingUser || $this->password) {
             $rules['password'] = 'required|min:8';
         }
 
@@ -83,6 +91,26 @@ class Index extends Component
         $this->userModal = false;
     }
 
+    public bool $custodyModal = false;
+
+    public ?User $custodyUser = null;
+
+    public $custodyLoans = [];
+
+    public function showCustody(User $user)
+    {
+        $this->custodyUser = $user->load(['heldExpedients.employee']);
+        $this->custodyLoans = LoanRequest::where(function ($query) use ($user) {
+            $query->where('requester_id', $user->id)
+                ->orWhereIn('expedient_id', $user->heldExpedients->pluck('id'));
+        })
+            ->where('status', LoanStatus::Delivered)
+            ->with(['expedient.employee'])
+            ->get();
+
+        $this->custodyModal = true;
+    }
+
     public function clearFilters()
     {
         $this->reset(['search']);
@@ -91,18 +119,20 @@ class Index extends Component
 
     public function render()
     {
-        $this->authorize('viewAny', \App\Models\User::class);
+        $this->authorize('viewAny', User::class);
 
-        $query = \App\Models\User::query()->with('roles')
+        $query = User::query()
+            ->with(['roles', 'heldExpedients'])
+            ->withCount('heldExpedients')
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', "%{$this->search}%")
-                      ->orWhere('email', 'like', "%{$this->search}%");
+                    ->orWhere('email', 'like', "%{$this->search}%");
             })
             ->orderBy($this->sortBy['column'], $this->sortBy['direction']);
 
         return view('livewire.users.index', [
             'users' => $query->paginate(10),
-            'roles' => \Spatie\Permission\Models\Role::all(),
+            'roles' => Role::all(),
         ]);
     }
 }

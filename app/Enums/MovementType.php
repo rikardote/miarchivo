@@ -11,6 +11,7 @@ enum MovementType: string
     case StatusChanged = 'status_changed';
     case Lost = 'lost';
     case Found = 'found';
+    case LabelReprinted = 'label_reprinted';
 
     public function label(): string
     {
@@ -22,6 +23,7 @@ enum MovementType: string
             self::StatusChanged => 'Cambio de estado',
             self::Lost => 'Extraviado',
             self::Found => 'Encontrado',
+            self::LabelReprinted => 'Reimpresión de etiqueta',
         };
     }
 
@@ -35,6 +37,7 @@ enum MovementType: string
             self::StatusChanged => 'o-arrow-path',
             self::Lost => 'o-exclamation-triangle',
             self::Found => 'o-magnifying-glass',
+            self::LabelReprinted => 'o-printer',
         };
     }
 }
