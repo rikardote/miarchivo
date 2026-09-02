@@ -19,6 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/expedients/audit', \App\Livewire\Expedients\Audit::class)->name('expedients.audit');
     Route::get('/expedients', \App\Livewire\Expedients\Index::class)->name('expedients.index');
     Route::get('/expedients/create/{employee?}', \App\Livewire\Expedients\Create::class)->name('expedients.create');
+    Route::get('/expedients/continuous-create', \App\Livewire\Expedients\ContinuousCreate::class)->name('expedients.continuous-create');
     Route::get('/expedients/{expedient}', \App\Livewire\Expedients\Show::class)->name('expedients.show');
     Route::get('/expedients/find/{code}', function($code) {
         $expedient = \App\Models\Expedient::where('expedient_code', $code)->first();
