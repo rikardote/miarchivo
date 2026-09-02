@@ -39,6 +39,8 @@ COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
 # Copiar el script de inicio
 COPY docker/php/entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
+# Sincronizar UID/GID de www-data con el host (1000:1000)
+RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
 
 # Expose port 9000 and start php-fpm server via entrypoint
 EXPOSE 9000
