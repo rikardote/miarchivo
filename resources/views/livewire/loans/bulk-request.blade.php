@@ -135,7 +135,6 @@
     </div>
 
     @push('scripts')
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <script>
         let html5QrCode = null;
         let isScanning = false;

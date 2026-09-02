@@ -37,7 +37,7 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="{{ asset('vendor/html5-qrcode/html5-qrcode.min.js') }}"></script>
     <style>
         /* Desactivar el botón de cierre (X) por defecto de los modales */
         .modal-box > label.btn-circle {
