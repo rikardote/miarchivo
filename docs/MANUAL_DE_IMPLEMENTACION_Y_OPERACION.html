@@ -242,51 +242,102 @@
     </table>
 
     <div class="callout-blue">
-        <div class="callout-title">Nota Importante a Analizar para Exposición: ¿Clasificación Alfabética Estricta vs. Asignación Pura por Cajón?</div>
-        <p style="margin-bottom: 8px;">
-            Durante el diseño e implementación del sistema surge una decisión operativa crucial para el área: <strong>¿Debemos obligar a que cada cajón mantenga un rango de letras estricto (ej. A-C, D-F) o es viable prescindir de las letras y asignar los expedientes únicamente por Gaveta y Cajón conforme haya espacio físico disponible?</strong>
+        <div class="callout-title" style="font-size: 11pt; border-bottom: 1.5px solid #CBD5E0; padding-bottom: 6px; margin-bottom: 10px;">
+            Nota Estratégica para Exposición: ¿Clasificación Alfabética Rígida, Caos Organizado o Modelo Híbrido Inteligente?
+        </div>
+        
+        <p style="margin-bottom: 10px;">
+            Durante la presentación del sistema a las autoridades y al equipo operativo, surgirá una pregunta clave de infraestructura física: <strong>¿Es obligatorio rotular cada cajón con un rango cerrado de letras (ej. Cajón 1: A-C, Cajón 2: D-F), o podemos prescindir de las letras y ubicar carpetas donde haya espacio disponible?</strong>
         </p>
-        <p style="margin-bottom: 8px;">
-            Esta segunda alternativa es conocida en la logística documental moderna como <strong>"Almacenamiento Dinámico / Caos Organizado"</strong> (modelo utilizado por centros de distribución de alta densidad y archivos generales). A continuación se expone la comparativa para el análisis institucional:
+        <p style="margin-bottom: 12px;">
+            Para responder con solidez institucional, se presenta el contraste entre los dos extremos y la <strong>Propuesta Híbrida Recomendada</strong>:
         </p>
 
-        <table class="data-table" style="background-color: #FFFFFF; margin-top: 10px;">
+        <!-- Tabla comparativa de extremos -->
+        <table class="data-table" style="background-color: #FFFFFF; margin-top: 5px; margin-bottom: 16px;">
             <thead>
                 <tr>
-                    <th style="width: 25%;">Dimensión</th>
-                    <th style="width: 37.5%;">Modelo Tradicional por Letras (A - Z)</th>
-                    <th style="width: 37.5%;">Modelo Dinámico por Cajón (Sin Letras)</th>
+                    <th style="width: 22%;">Criterio</th>
+                    <th style="width: 39%;">Extremo 1: Alfabético Rígido por Cajón</th>
+                    <th style="width: 39%;">Extremo 2: Caos Organizado Puro (Sin Letras)</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td><strong>Aprovechamiento del Espacio</strong></td>
-                    <td><strong>Deficiente.</strong> Los cajones de letras de alta frecuencia (G, M, R) se desbordan constantemente, mientras que cajones de letras poco comunes (K, U, W, X, Z) permanecen semivacíos.</td>
-                    <td><strong>Óptimo (100%).</strong> Cada cajón se llena al tope de su capacidad física sin importar el apellido. No existen huecos ociosos en los archiveros.</td>
+                    <td><strong>Distribución de Espacio</strong></td>
+                    <td><strong>Incipiente y desbalanceado.</strong> Letras comunes (G, M, R) revientan cajones; letras poco frecuentes (K, U, W, X, Z) desperdician hasta un 60% del volumen del mueble.</td>
+                    <td><strong>Óptima al 100%.</strong> Cada cajón se llena al tope físico sin importar el apellido. Cero espacio muerto en la sala.</td>
                 </tr>
                 <tr>
-                    <td><strong>Ingreso de Nuevos Expedientes</strong></td>
-                    <td><strong>Complejo y tardado.</strong> Para insertar un expediente nuevo en un cajón lleno, el personal debe recorrer manualmente decenas de carpetas hacia cajones contiguos.</td>
-                    <td><strong>Inmediato.</strong> El nuevo expediente se guarda en el primer cajón con espacio disponible. El sistema asocia la ubicación al instante y la búsqueda lo localiza en segundos.</td>
+                    <td><strong>Nuevos Ingresos y Altas</strong></td>
+                    <td><strong>Efecto dominó tortuoso.</strong> Para meter una carpeta nueva en un cajón lleno, el operador debe recorrer a mano 40 o 50 carpetas hacia los cajones siguientes.</td>
+                    <td><strong>Inmediato.</strong> La carpeta se guarda en el primer cajón con hueco físico; el sistema la vincula en un segundo.</td>
                 </tr>
                 <tr>
-                    <td><strong>Dependencia Tecnológica</strong></td>
-                    <td><strong>Baja.</strong> Si la red o el equipo no están disponibles, el personal puede guiarse visualmente por el orden alfabético impreso en las carátulas.</td>
-                    <td><strong>Total (100%).</strong> El personal depende obligatoriamente del sistema para saber en qué gaveta y cajón está el expediente, ya que físicamente no guardan secuencia alfabética.</td>
+                    <td><strong>Dependencia del Sistema</strong></td>
+                    <td><strong>Baja.</strong> Si no hay luz o red, el archivo se puede consultar a mano siguiendo el abecedario.</td>
+                    <td><strong>Absoluta (100%).</strong> Si el sistema se apaga, nadie sabe dónde está un expediente porque no existe orden visual en las gavetas.</td>
                 </tr>
                 <tr>
-                    <td><strong>Compatibilidad con el Sistema</strong></td>
-                    <td><strong>Soportada al 100%.</strong> El sistema filtra automáticamente las colas por el rango alfabético del cajón (ej. <code>A - C</code>).</td>
-                    <td><strong>Soportada al 100%.</strong> El catálogo de archiveros permite dejar el campo de rango alfabético en blanco y trabajar únicamente con número de Gaveta y Cajón.</td>
+                    <td><strong>Curva de Resistencia del Personal</strong></td>
+                    <td><strong>Nula.</strong> Es el método tradicional en papel de toda la vida.</td>
+                    <td><strong>Muy Alta.</strong> Genera desconfianza y sensación de "desorden" en el personal acostumbrado al papel.</td>
                 </tr>
             </tbody>
         </table>
 
-        <div style="background-color: #FFFFFF; border: 1px solid #CBD5E0; border-radius: 6px; padding: 10px 14px; margin-top: 10px;">
-            <strong style="color: #13322B; font-size: 9.5pt; text-transform: uppercase;">Propuesta Híbrida Recomendada para Exposición:</strong>
-            <p style="margin: 4px 0 0 0; font-size: 9.5pt; color: #4A5568;">
-                Para combinar la alta eficiencia de espacio con la tranquilidad operativa del personal, se recomienda la <strong>"Clasificación Alfabética Flexible por Gaveta"</strong>: cada Archivero/Gaveta completa ampara un bloque amplio de letras (ej. Gaveta 1: A–F, Gaveta 2: G–M, Gaveta 3: N–Z). Dentro de esa gaveta, el sistema asigna y guía con precisión milimétrica el cajón exacto (1, 2, 3 o 4) donde reside la carpeta, eliminando el reacomodo manual de expedientes.
+        <!-- DESARROLLO A FONDO DE LA PROPUESTA HÍBRIDA -->
+        <div style="background-color: #FFFFFF; border: 2px solid #2B6CB0; border-radius: 8px; padding: 16px 20px; margin-top: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid #E2E8F0; padding-bottom: 8px; margin-bottom: 12px;">
+                <span style="font-size: 11pt; font-weight: 800; color: #2B6CB0; text-transform: uppercase; letter-spacing: 0.5px;">
+                    ⭐ La Solución Institucional: Modelo Híbrido "Alfabético Flexible por Gaveta"
+                </span>
+                <span class="badge badge-green" style="font-size: 9pt;">Altamente Recomendado</span>
+            </div>
+
+            <p style="margin-bottom: 10px; color: #2D3748;">
+                El <strong>Modelo Híbrido</strong> resuelve el conflicto entre espacio y seguridad operativa asignando el abecedario a nivel <strong>Mueble/Gaveta Completa</strong> en lugar de encasillarlo a nivel de cajón individual:
             </p>
+
+            <div style="background-color: #F8FAFC; border: 1px solid #CBD5E0; border-radius: 6px; padding: 12px; margin-bottom: 14px;">
+                <strong style="color: #13322B; font-size: 9.5pt; text-transform: uppercase; display: block; margin-bottom: 6px;">
+                    ¿Cómo se estructura físicamente en la sala?
+                </strong>
+                <ul style="margin: 0; padding-left: 20px; font-size: 10pt; color: #4A5568;">
+                    <li><strong>Gaveta G-01 (Mueble Completo de 4 cajones):</strong> Ampara el bloque alfabético amplio de la <strong>A a la D</strong>.</li>
+                    <li><strong>Gaveta G-02:</strong> Ampara el bloque de la <strong>E a la L</strong>.</li>
+                    <li><strong>Gaveta G-03:</strong> Ampara el bloque de la <strong>M a la Q</strong>.</li>
+                    <li><strong>Gaveta G-04:</strong> Ampara el bloque de la <strong>R a la Z</strong>.</li>
+                </ul>
+            </div>
+
+            <h4 style="color: #2B6CB0; font-size: 10.5pt; font-weight: 700; margin: 12px 0 6px 0; text-transform: uppercase;">
+                Las 4 Grandes Ventajas para Presentar en la Exposición:
+            </h4>
+
+            <ol style="margin-top: 4px; margin-bottom: 12px; padding-left: 22px; font-size: 10pt; color: #2D3748;">
+                <li style="margin-bottom: 8px;">
+                    <strong>Elimina el "Efecto Dominó" del Reacomodo Manual:</strong><br>
+                    Si el Cajón 1 (donde están los apellidos con <em>A</em>) se llena, las nuevas carpetas que ingresen de la letra <em>A</em> o <em>B</em> se pueden colocar en el Cajón 2 o 3 de la misma gaveta. <strong>El sistema sabe con precisión milimétrica en cuál de los 4 cajones quedó guardada cada carpeta</strong> (ej. <em>"Gaveta G-01, Cajón 3"</em>), evitando tener que empujar y mover carpetas físicamente entre muebles.
+                </li>
+                <li style="margin-bottom: 8px;">
+                    <strong>Tranquilidad Operativa ante Contingencias (No quedas a ciegas):</strong><br>
+                    Si un día se interrumpe el suministro eléctrico o la red local, el personal no queda paralizado: sabe con certeza que cualquier expediente con apellido <em>"García"</em> se encuentra forzosamente dentro de los 4 cajones de la <strong>Gaveta G-02</strong>. No hay que revisar todo el archivo.
+                </li>
+                <li style="margin-bottom: 8px;">
+                    <strong>Flexibilidad Total en el Software:</strong><br>
+                    El sistema ya está programado para permitir que una gaveta tenga rangos amplios por mueble o rangos por cajón sin tocar una sola línea de código. En el catálogo de archiveros (`/locations`) basta con nombrar los cajones acorde al esquema elegido.
+                </li>
+                <li style="margin-bottom: 4px;">
+                    <strong>Fácil Adopción para el Personal Sindicalizado y de Base:</strong><br>
+                    Para los archivistas veteranos, pasar de un orden de papel a un "caos ciego" causa rechazo inmediato. El modelo híbrido respeta su lógica visual tradicional de ubicación por archivero mientras les brinda la velocidad y exactitud del código de barras.
+                </li>
+            </ol>
+
+            <div style="background-color: #FEFCF6; border-left: 3px solid #C4A462; padding: 8px 12px; margin-top: 10px; font-size: 9.5pt; color: #8C6D23;">
+                <strong>Argumento Clave de Cierre para la Exposición:</strong>  
+                <em>"El modelo híbrido no obliga al archivo a sufrir un desorden ciego ni obliga al personal a mover miles de carpetas para abrir un centímetro de espacio. Es el equilibrio óptimo entre rigor institucional y eficiencia tecnológica moderna."</em>
+            </div>
         </div>
     </div>
 
