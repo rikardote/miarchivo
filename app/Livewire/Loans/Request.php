@@ -27,9 +27,23 @@ class Request extends Component
         }
     }
 
-    public function search(string $value = '')
+    public function search(string $value = ''): void
     {
         $this->searchExpedient = trim($value);
+    }
+
+    public function selectExpedient(int $id): void
+    {
+        $this->expedient_id = $id;
+        $this->preSelectedExpedient = Expedient::with('employee')->find($id);
+        $this->searchExpedient = '';
+    }
+
+    public function clearExpedient(): void
+    {
+        $this->expedient_id = null;
+        $this->preSelectedExpedient = null;
+        $this->searchExpedient = '';
     }
 
     public function save(LoanService $loanService)
