@@ -4,185 +4,188 @@
             \App\Enums\ExpedientStatus::Available => [
                 'badge' => 'badge-success',
                 'dot' => 'bg-emerald-500 animate-pulse',
+                'label' => 'Disponible en estantería',
             ],
             \App\Enums\ExpedientStatus::Loaned => [
                 'badge' => 'badge-warning',
                 'dot' => 'bg-amber-500 animate-pulse',
+                'label' => 'En préstamo activo',
             ],
             \App\Enums\ExpedientStatus::Requested => [
                 'badge' => 'badge-info',
                 'dot' => 'bg-sky-500',
+                'label' => 'Solicitud pendiente',
             ],
             \App\Enums\ExpedientStatus::Lost => [
                 'badge' => 'badge-error',
                 'dot' => 'bg-rose-500 animate-ping',
+                'label' => 'Reportado extraviado',
             ],
             default => [
                 'badge' => 'badge-ghost',
                 'dot' => 'bg-slate-400',
+                'label' => 'En resguardo',
             ],
         };
+        $activeLoan = $expedient->activeLoan();
     @endphp
 
-    <x-mary-header title="{{ $expedient->expedient_code }}" subtitle="{{ $expedient->employee->full_name }} • RFC: {{ $expedient->employee->rfc }} • Tomo {{ $expedient->volume_number }}" separator class="mb-6">
-        <x-slot:actions>
-            <div class="flex items-center gap-2 flex-wrap justify-end">
-                <div class="badge {{ $statusConfig['badge'] }} gap-2 py-2.5 px-3.5 font-black text-xs uppercase tracking-wider shadow-sm">
-                    <span class="w-2 h-2 rounded-full {{ $statusConfig['dot'] }}"></span>
-                    {{ $expedient->current_status->label() }}
+    <!-- BARRA DE ACCIONES SUPERIOR -->
+    <div class="flex items-center justify-between gap-4 mb-6">
+        <x-mary-button icon="o-arrow-left" class="btn-ghost btn-sm" link="{{ route('expedients.index') }}">Volver</x-mary-button>
+        <div class="flex items-center gap-2 flex-wrap justify-end">
+            @can('loans.create')
+                @if($expedient->isAvailable())
+                    <x-mary-button icon="o-document-text" class="btn-secondary btn-sm" link="{{ route('loans.request', ['expedient' => $expedient->id]) }}">Solicitar Préstamo</x-mary-button>
+                @else
+                    <x-mary-button icon="o-document-text" class="btn-secondary btn-sm" disabled label="No Disponible" />
+                @endif
+            @endcan
+            @can('update', $expedient)
+                @if($expedient->current_status->value !== 'lost')
+                    <x-mary-button icon="o-exclamation-triangle" class="btn-error btn-outline btn-sm" label="Extraviado" wire:click="markAsLost" />
+                @else
+                    <x-mary-button icon="o-check-circle" class="btn-success btn-outline btn-sm" label="Recuperado" wire:click="markAsFound" />
+                @endif
+                <x-mary-button icon="o-pencil" class="btn-primary btn-sm" link="{{ route('expedients.edit', $expedient) }}">Editar</x-mary-button>
+            @endcan
+        </div>
+    </div>
+
+    <!-- TARJETA HERO UNIFICADA (Credencial Institucional del Expediente) -->
+    <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 bg-white dark:bg-slate-900 rounded-3xl mb-8 overflow-hidden">
+        <div class="p-4 sm:p-6 space-y-6">
+            <!-- Fila Principal: Identidad del Empleado, Código y Estatus -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-start sm:items-center gap-4 sm:gap-5">
+                    <!-- Avatar con iniciales -->
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary text-white flex items-center justify-center font-black text-xl sm:text-2xl shadow-lg shadow-primary/20 shrink-0">
+                        {{ strtoupper(substr($expedient->employee->first_name, 0, 1) . substr($expedient->employee->last_name, 0, 1)) }}
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="font-mono font-black text-xs sm:text-sm px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                                {{ $expedient->expedient_code }}
+                            </span>
+                            <span class="text-xs font-black uppercase px-2.5 py-0.5 rounded-lg bg-primary/10 text-primary border border-primary/20">
+                                Tomo {{ $expedient->volume_number }}
+                            </span>
+                            <span class="text-xs font-mono font-bold text-slate-500">
+                                RFC: <strong class="text-slate-800 dark:text-slate-200">{{ $expedient->employee->rfc }}</strong>
+                            </span>
+                            @if($expedient->employee->employee_number)
+                                <span class="text-xs font-bold text-slate-400">
+                                    • No. {{ $expedient->employee->employee_number }}
+                                </span>
+                            @endif
+                        </div>
+                        
+                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
+                            {{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}
+                        </h1>
+
+                        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex flex-wrap items-center gap-2">
+                            <span>{{ $expedient->employee->position ?? 'Personal Operativo' }}</span>
+                            <span>•</span>
+                            <span>{{ $expedient->employee->work_center ?? 'Delegación' }} ({{ $expedient->employee->city ?? 'B.C.' }})</span>
+                            <span>•</span>
+                            <span class="text-primary font-bold">{{ $expedient->employee->branch->name ?? 'Sucursal Principal' }}</span>
+                        </p>
+                    </div>
                 </div>
 
-                <x-mary-button icon="o-arrow-left" class="btn-ghost btn-sm sm:btn-md" link="{{ route('expedients.index') }}">Volver</x-mary-button>
-                @can('loans.create')
-                    @if($expedient->isAvailable())
-                        <x-mary-button icon="o-document-text" class="btn-secondary btn-sm sm:btn-md" link="{{ route('loans.request', ['expedient' => $expedient->id]) }}">Solicitar</x-mary-button>
-                    @else
-                        <x-mary-button icon="o-document-text" class="btn-secondary btn-sm sm:btn-md" disabled label="No Disponible" />
-                    @endif
-                @endcan
-                @can('update', $expedient)
-                    @if($expedient->current_status->value !== 'lost')
-                        <x-mary-button icon="o-exclamation-triangle" class="btn-error btn-outline btn-sm sm:btn-md" label="Extraviado" wire:click="markAsLost" />
-                    @else
-                        <x-mary-button icon="o-check-circle" class="btn-success btn-outline btn-sm sm:btn-md" label="Recuperado" wire:click="markAsFound" />
-                    @endif
-                    <x-mary-button icon="o-pencil" class="btn-primary btn-sm sm:btn-md" link="{{ route('expedients.edit', $expedient) }}">Editar</x-mary-button>
-                @endcan
+                <!-- Estatus Operativo Destacado -->
+                <div class="flex lg:flex-col items-center lg:items-end justify-between gap-2 shrink-0 pt-3 lg:pt-0 border-t lg:border-t-0 border-slate-100 dark:border-slate-800">
+                    <div class="badge {{ $statusConfig['badge'] }} gap-2 py-3 px-4 font-black text-xs uppercase tracking-wider shadow-sm">
+                        <span class="w-2.5 h-2.5 rounded-full {{ $statusConfig['dot'] }}"></span>
+                        {{ $expedient->current_status->label() }}
+                    </div>
+                    <span class="text-[11px] font-bold text-slate-400">{{ $statusConfig['label'] }}</span>
+                </div>
             </div>
-        </x-slot:actions>
-    </x-mary-header>
 
-    <!-- 4 Pilares Operativos de Localización -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
-                <!-- 1. ¿De quién es? -->
-                <div class="bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors rounded-2xl p-4 sm:p-5 border border-slate-100 dark:border-slate-800">
-                    <div class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-3">
-                        <x-mary-icon name="o-user" class="w-4 h-4" />
+            <!-- Fila Inferior Integrada: Ubicación Física + Custodia Actual + Última Trazabilidad -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- Ubicación Física -->
+                <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                        <x-mary-icon name="o-map-pin" class="w-5 h-5" />
                     </div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">¿De quién es?</p>
-                    <p class="text-sm sm:text-base font-black text-slate-900 dark:text-slate-100 uppercase truncate">{{ $expedient->employee->first_name }} {{ $expedient->employee->last_name }}</p>
-                    <div class="mt-3 space-y-1.5 text-xs">
-                        <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
-                            <span class="text-[11px] text-slate-400 font-medium">RFC:</span>
-                            <span class="font-mono font-black text-primary">{{ $expedient->employee->rfc }}</span>
-                        </div>
-                        <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
-                            <span class="text-[11px] text-slate-400 font-medium">No. Empleado:</span>
-                            <span class="font-bold">{{ $expedient->employee->employee_number ?? 'S/N' }}</span>
-                        </div>
-                        <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">
-                            {{ $expedient->employee->position ?? 'Personal Operativo' }}
-                        </p>
-                    </div>
-                </div>
-
-                <!-- 2. ¿Dónde está físicamente? -->
-                <div class="bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors rounded-2xl p-4 sm:p-5 border border-slate-100 dark:border-slate-800">
-                    <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-3">
-                        <x-mary-icon name="o-map-pin" class="w-4 h-4" />
-                    </div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">¿Dónde está?</p>
-                    @if($expedient->currentLocation)
-                        <p class="text-sm sm:text-base font-black text-slate-900 dark:text-slate-100 leading-tight truncate">
-                            {{ $expedient->currentLocation->archive_name }}
-                        </p>
-                        <div class="mt-3 space-y-1.5 text-xs">
-                            <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
-                                <span class="text-[11px] text-slate-400 font-medium">Ubicación:</span>
-                                <span class="text-emerald-700 dark:text-emerald-400 font-black">G-{{ $expedient->currentLocation->cabinet }} • Cajón {{ $expedient->currentLocation->drawer }}</span>
-                            </div>
-                            @if($expedient->currentLocation->alpha_range)
-                                <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
-                                    <span class="text-[11px] text-slate-400 font-medium">Rango:</span>
-                                    <span class="badge badge-ghost badge-sm text-[9px] font-mono">{{ $expedient->currentLocation->alpha_range }}</span>
-                                </div>
-                            @endif
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">
-                                {{ $expedient->currentLocation->branch->name ?? 'Delegación Estatal' }}
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Ubicación Física</p>
+                        @if($expedient->currentLocation)
+                            <p class="text-sm font-black text-slate-800 dark:text-slate-100 truncate">
+                                {{ $expedient->currentLocation->archive_name }}
                             </p>
-                        </div>
-                    @else
-                        <p class="text-sm sm:text-base font-black text-amber-600 dark:text-amber-400">Sin ubicación</p>
-                        <p class="text-xs text-slate-400 mt-2">No se ha asignado a ningún archivero físico.</p>
-                    @endif
+                            <p class="text-xs font-bold text-emerald-700 dark:text-emerald-400 mt-0.5">
+                                G-{{ $expedient->currentLocation->cabinet }} • Cajón {{ $expedient->currentLocation->drawer }}
+                                @if($expedient->currentLocation->alpha_range)
+                                    <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 ml-1 text-slate-600 dark:text-slate-300">
+                                        {{ $expedient->currentLocation->alpha_range }}
+                                    </span>
+                                @endif
+                            </p>
+                        @else
+                            <p class="text-xs font-bold text-amber-600 mt-0.5">Sin ubicación asignada</p>
+                        @endif
+                    </div>
                 </div>
 
-                <!-- 3. ¿Quién lo tiene y cuándo regresa? -->
-                <div class="bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors rounded-2xl p-4 sm:p-5 border border-slate-100 dark:border-slate-800">
-                    <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center mb-3">
-                        <x-mary-icon name="o-shield-check" class="w-4 h-4" />
+                <!-- Custodia Actual -->
+                <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0 mt-0.5">
+                        <x-mary-icon name="o-shield-check" class="w-5 h-5" />
                     </div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Custodia / Préstamo</p>
-                    @php
-                        $activeLoan = $expedient->activeLoan();
-                    @endphp
-                    @if($expedient->currentHolder)
-                        <p class="text-sm sm:text-base font-black text-slate-900 dark:text-slate-100 truncate">{{ $expedient->currentHolder->name }}</p>
-                        <div class="mt-3 space-y-1.5 text-xs">
-                            @if($activeLoan && $activeLoan->delivered_at)
-                                <div class="flex items-center justify-between text-slate-600 dark:text-slate-300">
-                                    <span class="text-[11px] text-slate-400 font-medium">Salió:</span>
-                                    <span class="font-bold">{{ $activeLoan->delivered_at->format('d/m/Y') }}</span>
-                                </div>
-                            @endif
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Custodia / Préstamo</p>
+                        @if($expedient->currentHolder)
+                            <p class="text-sm font-black text-slate-800 dark:text-slate-100 truncate">
+                                {{ $expedient->currentHolder->name }}
+                            </p>
                             @if($activeLoan && $activeLoan->due_date)
                                 @php
                                     $isOverdue = $activeLoan->due_date->isPast();
                                     $daysDiff = abs((int) now()->diffInDays($activeLoan->due_date, false));
                                 @endphp
-                                <div class="flex items-center justify-between">
-                                    <span class="text-[11px] text-slate-400 font-medium">Vence:</span>
-                                    <span class="font-bold {{ $isOverdue ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-200' }}">{{ $activeLoan->due_date->format('d/m/Y') }}</span>
-                                </div>
-                                <p class="text-[11px] font-black {{ $isOverdue ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400' }} pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">
-                                    {{ $isOverdue ? "¡Vencido hace {$daysDiff} día(s)!" : "Restan {$daysDiff} día(s)" }}
+                                <p class="text-xs font-black {{ $isOverdue ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500' }} mt-0.5">
+                                    {{ $isOverdue ? "Vencido hace {$daysDiff} día(s)" : "Vence: {$activeLoan->due_date->format('d/m/Y')}" }}
                                 </p>
                             @endif
-                        </div>
-                    @else
-                        <p class="text-sm sm:text-base font-black text-emerald-700 dark:text-emerald-400">En resguardo</p>
-                        <div class="mt-3 space-y-1 text-xs text-slate-500 dark:text-slate-400">
-                            <p class="text-[11px]">Bajo resguardo del Archivo Central.</p>
-                            <p class="text-[11px] font-bold text-slate-700 dark:text-slate-300 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">Sin préstamo activo</p>
-                        </div>
-                    @endif
-                </div>
-
-                <!-- 4. Último Movimiento y Auditoría -->
-                <div class="bg-slate-50 dark:bg-slate-800/60 hover:bg-slate-100/70 dark:hover:bg-slate-800 transition-colors rounded-2xl p-4 sm:p-5 border border-slate-100 dark:border-slate-800">
-                    <div class="w-8 h-8 rounded-xl bg-violet-500/10 text-violet-600 flex items-center justify-center mb-3">
-                        <x-mary-icon name="o-clock" class="w-4 h-4" />
+                        @else
+                            <p class="text-sm font-black text-emerald-700 dark:text-emerald-400">En resguardo</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Custodia del Archivo Central</p>
+                        @endif
                     </div>
-                    <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Última Trazabilidad</p>
-                    @php
-                        $lastMovement = $expedient->movements->first();
-                        $lastAudit = $expedient->currentLocation?->latestAudit;
-                    @endphp
-                    @if($lastMovement)
-                        <p class="text-sm sm:text-base font-black text-slate-900 dark:text-slate-100 leading-tight">
-                            {{ $lastMovement->movement_type->label() }}
-                        </p>
-                        <div class="mt-3 space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
-                            <div class="flex items-center justify-between text-[11px] text-slate-400">
-                                <span>Fecha:</span>
-                                <span class="font-bold text-slate-700 dark:text-slate-200">{{ $lastMovement->created_at->format('d/m/Y H:i') }}</span>
-                            </div>
-                            <p class="text-[11px] truncate pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">
-                                Por: <strong class="text-slate-800 dark:text-slate-100">{{ $lastMovement->user->name ?? 'Sistema' }}</strong>
-                            </p>
-                        </div>
-                    @else
-                        <p class="text-sm font-bold text-slate-400">Sin movimientos registrados</p>
-                    @endif
-
-                    @if($lastAudit)
-                        <div class="mt-2.5 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60 text-[10px] text-slate-400 flex items-center justify-between">
-                            <span>Auditoría de cajón:</span>
-                            <span class="text-slate-700 dark:text-slate-200 font-bold">{{ $lastAudit->created_at->format('d/m/Y') }}</span>
-                        </div>
-                    @endif
                 </div>
+
+                <!-- Última Trazabilidad -->
+                <div class="p-3.5 sm:p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-violet-500/10 text-violet-600 flex items-center justify-center shrink-0 mt-0.5">
+                        <x-mary-icon name="o-clock" class="w-5 h-5" />
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Última Trazabilidad</p>
+                        @php
+                            $lastMovement = $expedient->movements->first();
+                        @endphp
+                        @if($lastMovement)
+                            <p class="text-sm font-black text-slate-800 dark:text-slate-100 truncate">
+                                {{ $lastMovement->movement_type->label() }}
+                            </p>
+                            <p class="text-xs font-bold text-slate-400 mt-0.5">
+                                {{ $lastMovement->created_at->diffForHumans() }} ({{ $lastMovement->user->name ?? 'Sistema' }})
+                            </p>
+                        @else
+                            <p class="text-xs font-bold text-slate-400 mt-0.5">Sin movimientos registrados</p>
+                        @endif
+                    </div>
+                </div>
+
             </div>
+        </div>
+    </x-mary-card>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         
