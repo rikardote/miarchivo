@@ -95,4 +95,19 @@ class ExpedientShowTest extends TestCase
             'notes' => 'Carpeta no encontrada en gaveta',
         ]);
     }
+
+    public function test_it_renders_operational_fast_lookup_cockpit_answering_key_questions(): void
+    {
+        $this->actingAs($this->admin)
+            ->get(route('expedients.show', $this->expedient))
+            ->assertOk()
+            ->assertSee('Ficha de Consulta Rápida')
+            ->assertSee('¿De quién es?')
+            ->assertSee('¿Dónde está?')
+            ->assertSee('Custodia / Préstamo')
+            ->assertSee('Última Trazabilidad')
+            ->assertSee('G-01')
+            ->assertSee('A - C')
+            ->assertSee($this->expedient->employee->rfc);
+    }
 }
