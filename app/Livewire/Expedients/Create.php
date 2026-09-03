@@ -3,50 +3,49 @@
 namespace App\Livewire\Expedients;
 
 use App\Models\ArchiveLocation;
-use App\Models\Branch;
-use App\Models\Department;
-use App\Models\Expedient;
 use App\Models\Employee;
+use App\Models\Expedient;
+use App\Rules\ValidRfc;
 use App\Services\EmployeeApiService;
 use App\Services\ExpedientService;
 use Livewire\Component;
 use Mary\Traits\Toast;
-
-use App\Rules\ValidRfc;
 
 class Create extends Component
 {
     use Toast;
 
     public ?int $employee_id = null;
+
     public ?string $selectedCabinet = null;
+
     public ?int $location_id = null;
+
     public bool $isAutoSuggested = false;
+
     public string $searchEmployee = '';
+
     public array $searchResults = [];
 
     // Captura Manual de Empleado
     public bool $showManualModal = false;
+
     public string $manual_rfc = '';
+
     public string $manual_first_name = '';
+
     public string $manual_last_name = '';
+
     public ?string $manual_employee_number = null;
 
-    public function mount($employee = null)
+    public function mount(?Employee $employee = null)
     {
         $this->authorize('create', Expedient::class);
 
         if ($employee) {
-            $found = Employee::where('id', $employee)
-                ->orWhere('employee_number', $employee)
-                ->orWhere('rfc', $employee)
-                ->first();
-
-            if ($found) {
-                $this->employee_id = $found->id;
-                $this->searchEmployee = $found->full_name;
-                $this->autoSuggestLocation($found);
-            }
+            $this->employee_id = $employee->id;
+            $this->searchEmployee = $employee->full_name;
+            $this->autoSuggestLocation($employee);
         }
     }
 
@@ -55,7 +54,7 @@ class Create extends Component
         $this->isAutoSuggested = false;
         if ($this->location_id) {
             $currentLoc = ArchiveLocation::find($this->location_id);
-            if (!$currentLoc || $currentLoc->cabinet !== $value) {
+            if (! $currentLoc || $currentLoc->cabinet !== $value) {
                 $this->location_id = null;
             }
         }
@@ -76,9 +75,10 @@ class Create extends Component
     public function updatedSearchEmployee($value)
     {
         $value = trim($value);
-        
+
         if (strlen($value) < 3) {
             $this->searchResults = [];
+
             return;
         }
 
@@ -106,10 +106,11 @@ class Create extends Component
             $apiResults = collect($results)
                 ->sortByDesc('id')
                 ->map(function ($item) {
-                    $rfc10 = !empty($item['id_legal']) ? mb_strtoupper(mb_substr(trim($item['id_legal']), 0, 10), 'UTF-8') : 'S/RFC';
+                    $rfc10 = ! empty($item['id_legal']) ? mb_strtoupper(mb_substr(trim($item['id_legal']), 0, 10), 'UTF-8') : 'S/RFC';
+
                     return [
                         'id' => $rfc10,
-                        'name' => trim(($item['nombre'] ?? '') . ' ' . ($item['apellido_1'] ?? '') . ' ' . ($item['apellido_2'] ?? '')),
+                        'name' => trim(($item['nombre'] ?? '').' '.($item['apellido_1'] ?? '').' '.($item['apellido_2'] ?? '')),
                         'rfc' => $rfc10,
                         'employee_number' => $item['id_empleado'] ?? 'S/N',
                         'source' => 'api',
@@ -160,7 +161,7 @@ class Create extends Component
         $term = trim($this->searchEmployee);
         if (strlen($term) >= 10 && preg_match('/^[A-Za-z0-9]+$/', $term)) {
             $this->manual_rfc = strtoupper($term);
-        } elseif (!empty($term) && !is_numeric($term)) {
+        } elseif (! empty($term) && ! is_numeric($term)) {
             $this->manual_first_name = $term;
         }
 
@@ -170,7 +171,7 @@ class Create extends Component
     public function saveManualEmployee()
     {
         $this->validate([
-            'manual_rfc' => ['required', 'string', new ValidRfc(), 'unique:employees,rfc'],
+            'manual_rfc' => ['required', 'string', new ValidRfc, 'unique:employees,rfc'],
             'manual_first_name' => 'required|string|max:100',
             'manual_last_name' => 'required|string|max:100',
             'manual_employee_number' => 'nullable|string|max:50|unique:employees,employee_number',
@@ -227,6 +228,7 @@ class Create extends Component
             ]);
 
             $this->success('Expediente creado con éxito.');
+
             return redirect()->route('expedients.show', $expedient);
         } catch (\Exception $e) {
             $this->error($e->getMessage());
@@ -259,6 +261,7 @@ class Create extends Component
                     if ($item->alpha_range) {
                         $label .= "  —  [ Rango: {$item->alpha_range} ]";
                     }
+
                     return [
                         'id' => $item->id,
                         'name' => $label,
@@ -272,4 +275,3 @@ class Create extends Component
         ]);
     }
 }
-

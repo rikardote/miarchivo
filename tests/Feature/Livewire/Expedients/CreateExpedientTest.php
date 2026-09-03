@@ -43,6 +43,30 @@ class CreateExpedientTest extends TestCase
         ]);
     }
 
+    public function test_employee_coming_from_employees_list_is_preloaded_on_create_screen()
+    {
+        $employee = Employee::factory()->create([
+            'first_name' => 'ALEJANDRO',
+            'last_name' => 'GOMEZ MARTINEZ',
+            'rfc' => 'GOMA850215',
+            'employee_number' => null,
+            'employment_status' => 'active',
+        ]);
+
+        // El botón "+" en /employees genera la URL con el slug del empleado.
+        // El empleado debe llegar preseleccionado en el snapshot del componente
+        // (employee_id seteado y búsqueda precargada), sin volver a buscarlo.
+        $snapshot = htmlspecialchars('"employee_id":'.$employee->id, ENT_QUOTES);
+        $searchField = htmlspecialchars('"searchEmployee":"GOMEZ MARTINEZ, ALEJANDRO"', ENT_QUOTES);
+
+        $this->actingAs($this->admin)
+            ->get(route('expedients.create', $employee))
+            ->assertOk()
+            ->assertSee('GOMEZ MARTINEZ, ALEJANDRO')
+            ->assertSee($snapshot, escape: false)
+            ->assertSee($searchField, escape: false);
+    }
+
     public function test_it_can_create_an_employee_manually_and_link_it_to_an_expedient()
     {
         Livewire::actingAs($this->admin)
