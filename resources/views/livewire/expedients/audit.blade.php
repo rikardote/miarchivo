@@ -235,19 +235,25 @@
                     @if(count($results['misplaced']) > 0)
                         <x-mary-card shadow class="border-none shadow-xl shadow-warning/10 bg-warning/5 overflow-hidden">
                             <div class="p-4">
-                                <div class="flex justify-between items-center mb-6">
-                                    <h3 class="text-sm font-black text-warning uppercase tracking-widest">Fuera de Lugar ({{ count($results['misplaced']) }})</h3>
-                                    <x-mary-button label="Corregir Todos" icon="o-check-circle" wire:click="fixAllMisplaced" class="btn-xs btn-warning px-4 rounded-lg" spinner="fixAllMisplaced" />
+                                <div class="flex justify-between items-center mb-4">
+                                    <div>
+                                        <h3 class="text-sm font-black text-warning uppercase tracking-widest">⚠️ Expedientes en Cajón Incorrecto ({{ count($results['misplaced']) }})</h3>
+                                        <p class="text-[10px] text-warning/80 font-bold uppercase tracking-wider">Fueron encontrados y escaneados aquí, pero su ubicación oficial es otra gaveta</p>
+                                    </div>
+                                    <x-mary-button label="Asignar a este Cajón" icon="o-check-circle" wire:click="fixAllMisplaced" class="btn-xs btn-warning px-4 rounded-lg font-bold" spinner="fixAllMisplaced" tooltip="Cambiar su ubicación oficial a este cajón" />
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     @foreach($results['misplaced'] as $exp)
-                                        <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-warning/10 flex justify-between items-center group/item hover:scale-[1.02] transition-premium">
+                                        <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-warning/20 flex justify-between items-center group/item hover:scale-[1.01] transition-premium">
                                             <div>
                                                 <div class="font-black text-slate-800 dark:text-slate-100">{{ $exp->expedient_code }}</div>
-                                                <div class="text-[9px] font-black text-slate-400 uppercase tracking-wider mt-1">Registrado en: {{ $exp->currentLocation->full_label ?? 'N/A' }}</div>
+                                                <div class="text-xs text-slate-600 dark:text-slate-300 font-bold">{{ $exp->employee?->full_name }}</div>
+                                                <div class="text-[10px] font-bold text-amber-600 dark:text-amber-400 mt-1">
+                                                    📍 Su lugar oficial es: <strong>{{ $exp->currentLocation->short_label ?? 'N/A' }}</strong>
+                                                </div>
                                             </div>
-                                            <x-mary-button icon="o-map-pin" wire:click="fixMisplaced({{ $exp->id }})" class="btn-xs btn-warning btn-ghost hover:bg-warning/10 rounded-lg opacity-0 group-hover/item:opacity-100 transition-opacity" tooltip="Traer aquí" spinner />
+                                            <x-mary-button icon="o-arrow-path" wire:click="fixMisplaced({{ $exp->id }})" class="btn-xs btn-warning btn-outline rounded-lg" tooltip="Reasignar oficialmente a este cajón" spinner />
                                         </div>
                                     @endforeach
                                 </div>
