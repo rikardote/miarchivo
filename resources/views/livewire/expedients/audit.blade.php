@@ -1,318 +1,554 @@
-<div @if($is_auditing) wire:poll.800ms="checkRemoteGunAuditScans" @endif x-data="{
+<div @if($is_auditing) wire:poll.800ms="checkRemoteGunAuditScans" @endif class="space-y-6" x-data="{
     init() {
-        window.addEventListener('audit-remote-gun-beep', () => {
+        window.addEventListener('audit-remote-gun-beep', (e) => {
             if (window.playAuditScanBeep) window.playAuditScanBeep();
         });
     }
 }">
-    <x-mary-header title="Auditoría de Inventario" subtitle="Verifica la consistencia física de un estante o gaveta" separator>
-        <x-slot:actions>
-            @if($is_auditing)
-                <x-mary-button label="{{ $saved_audit ? 'Acta Guardada ✓' : 'Guardar Acta' }}" icon="o-document-check" wire:click="saveAuditReport" class="{{ $saved_audit ? 'btn-success' : 'btn-primary' }} btn-sm rounded-xl font-bold shadow-md shadow-primary/20" spinner="saveAuditReport" :disabled="$saved_audit" />
-                <x-mary-button label="Reiniciar" icon="o-arrow-path" wire:click="resetAudit" class="btn-ghost btn-sm" />
-            @endif
-        </x-slot:actions>
-    </x-mary-header>
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Panel de Control -->
-        <div class="space-y-8">
-            <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50">
-                <div class="p-4 space-y-6">
-                    <div class="flex flex-col gap-1 mb-4">
-                        <h3 class="text-xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter">Configuración</h3>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-primary">Paso 1: Seleccione ubicación</p>
-                    </div>
-
-                    <div class="space-y-6">
-                        <!-- Stage 1: Branch -->
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">1. Seleccione Sede</label>
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
-                                    <x-mary-icon name="o-building-office" class="w-5 h-5" />
-                                </div>
-                                <select 
-                                    wire:model.live="selectedBranch"
-                                    @if($is_auditing) disabled @endif
-                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl h-16 pl-14 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none disabled:opacity-50 disabled:cursor-not-allowed font-bold"
-                                >
-                                    <option value="">-- Todas las Sedes --</option>
-                                    @foreach($branches as $branch)
-                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
-                                    <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Stage 2: Type -->
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">2. Tipo de Archivo</label>
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
-                                    <x-mary-icon name="o-tag" class="w-5 h-5" />
-                                </div>
-                                <select 
-                                    wire:model.live="selectedType"
-                                    @if($is_auditing) disabled @endif
-                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl h-16 pl-14 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none disabled:opacity-50 disabled:cursor-not-allowed font-bold"
-                                >
-                                    <option value="">-- Todos los Tipos --</option>
-                                    @foreach($types as $type)
-                                        <option value="{{ $type['id'] }}">{{ $type['name'] }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
-                                    <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Stage 3: Specific Location -->
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-primary block font-black">3. Ubicación Específica</label>
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
-                                    <x-mary-icon name="o-map-pin" class="w-5 h-5" />
-                                </div>
-                                <select 
-                                    wire:model="location_id"
-                                    @if($is_auditing) disabled @endif
-                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl h-16 pl-14 pr-10 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 appearance-none outline-none disabled:opacity-50 disabled:cursor-not-allowed font-bold"
-                                >
-                                    <option value="">-- Seleccione Gabinete/Cajón --</option>
-                                    @foreach($locations as $location)
-                                        <option value="{{ $location['id'] }}">{{ $location['short_label'] }}</option>
-                                    @endforeach
-                                </select>
-                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
-                                    <x-mary-icon name="o-chevron-down" class="w-4 h-4" />
-                                </div>
-                            </div>
-                            @if(count($locations) == 0)
-                                <p class="text-[10px] text-amber-600 font-bold mt-1">No hay ubicaciones registradas con estos filtros.</p>
-                            @endif
-                        </div>
-                    </div>
-                    
-                    @if(!$is_auditing)
-                        <x-mary-button 
-                            label="Comenzar Auditoría" 
-                            icon="o-play" 
-                            wire:click="startAudit" 
-                            class="btn-primary w-full h-14 rounded-2xl shadow-lg shadow-primary/20 mt-2 font-black uppercase text-xs tracking-widest" 
-                            spinner="startAudit" />
-                    @endif
+    {{-- HEADER PRINCIPAL --}}
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-2 border-b border-slate-200/60 dark:border-white/5">
+        <div>
+            <div class="flex items-center gap-2.5">
+                <div class="p-2.5 rounded-2xl bg-gradient-to-br from-[#0F1E36] to-[#1E3A8A] text-[#C4A462] shadow-md shadow-[#0F1E36]/20">
+                    <x-mary-icon name="o-clipboard-document-check" class="w-6 h-6" />
                 </div>
-            </x-mary-card>
-
-            @if($is_auditing)
-                <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50">
-                    <div class="p-4 space-y-6">
-                        <div class="flex flex-col gap-1 mb-4">
-                            <h3 class="text-xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter">Escaneo</h3>
-                            <p class="text-[10px] font-black uppercase tracking-widest text-primary">Paso 2: Procesar Códigos</p>
-                        </div>
-
-                        {{-- Indicador de Pistola Móvil Conectada --}}
-                        <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2.5 text-xs text-emerald-700 dark:text-emerald-300">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
-                            <div class="leading-tight">
-                                <strong class="block font-black uppercase text-[10px] tracking-wider">📱 Pistola Celular Conectada</strong>
-                                <span class="text-[11px] text-slate-600 dark:text-slate-300">Escanea con tu teléfono en <code>/scanner</code>; los expedientes se agregarán automáticamente aquí.</span>
-                            </div>
-                        </div>
-
-                        <div id="reader" class="hidden mb-6 rounded-2xl overflow-hidden bg-slate-50 border-4 border-slate-100 shadow-inner" wire:ignore></div>
-                        
-                        <div class="flex gap-2 mb-6">
-                            <x-mary-button label="Usar Cámara" icon="o-camera" id="start-camera" onclick="startAuditCamera()" class="btn-primary btn-outline flex-1 rounded-xl h-12" />
-                            <x-mary-button label="Detener" icon="o-stop" id="stop-camera" onclick="stopAuditCamera()" class="btn-error btn-outline hidden flex-1 rounded-xl h-12" />
-                        </div>
-
-                        <form wire:submit.prevent="addScan" class="flex-1">
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-slate-400 transition-colors group-focus-within:text-primary">
-                                    <x-mary-icon name="o-qr-code" class="w-5 h-5" />
-                                </div>
-                                <input 
-                                    id="scan-input"
-                                    type="text"
-                                    placeholder="Escanear o escribir..." 
-                                    wire:model="current_scan" 
-                                    autofocus 
-                                    autocomplete="off"
-                                    class="w-full bg-white dark:bg-slate-950 border border-slate-100 dark:border-white/5 rounded-2xl h-16 pl-14 pr-6 focus:border-primary/40 focus:ring-4 focus:ring-primary/5 shadow-sm transition-premium text-slate-800 dark:text-slate-100 placeholder:text-slate-400 outline-none"
-                                />
-                            </div>
-                            <x-mary-button type="submit" class="hidden" />
-                        </form>
-                        
-                        <div class="mt-8 p-6 bg-primary/5 rounded-[2rem] border border-primary/10 flex flex-col items-center group transition-premium hover:bg-primary/10">
-                            <div class="text-5xl font-black text-primary tracking-tighter mb-1">{{ count($scanned_codes) }}</div>
-                            <div class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Escaneados en sesión</div>
-                        </div>
-                    </div>
-                </x-mary-card>
-
-                <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50">
-                    <div class="p-4">
-                        <h3 class="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest mb-6">Resumen de Auditoría</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center p-3 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-100 dark:border-white/5">
-                                <span class="text-xs font-bold text-slate-500">Esperados:</span>
-                                <span class="text-lg font-black text-slate-800 dark:text-slate-100 tracking-tighter">{{ $expectedCount }}</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-success/5 rounded-xl border border-success/10">
-                                <span class="text-xs font-bold text-success">Correctos:</span>
-                                <span class="text-lg font-black text-success tracking-tighter">{{ count($results['correct']) }}</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-warning/5 rounded-xl border border-warning/10">
-                                <span class="text-xs font-bold text-warning">Fuera de lugar:</span>
-                                <span class="text-lg font-black text-warning tracking-tighter">{{ count($results['misplaced']) }}</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-error/5 rounded-xl border border-error/10">
-                                <span class="text-xs font-bold text-error">Faltantes:</span>
-                                <span class="text-lg font-black text-error tracking-tighter">{{ count($results['missing']) }}</span>
-                            </div>
-                        </div>
-
-                        @if(count($scanned_codes) > 0)
-                            <div class="mt-6 pt-4 border-t border-slate-100 dark:border-white/5 space-y-3">
-                                <x-mary-input label="Notas del Acta (Opcional)" placeholder="Observaciones de la sesión..." wire:model="audit_notes" class="input-sm" />
-                                <x-mary-button 
-                                    label="{{ $saved_audit ? 'Acta Guardada ✓' : 'Guardar Acta de Auditoría' }}" 
-                                    icon="o-document-check" 
-                                    wire:click="saveAuditReport" 
-                                    class="w-full {{ $saved_audit ? 'btn-success' : 'btn-primary' }} btn-sm rounded-xl font-bold" 
-                                    spinner="saveAuditReport" 
-                                    :disabled="$saved_audit" 
-                                />
-                            </div>
-                        @endif
-                    </div>
-                </x-mary-card>
-            @endif
+                <div>
+                    <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Auditoría de Inventario</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Conciliación física en tiempo real de expedientes por gaveta y estantería</p>
+                </div>
+            </div>
         </div>
 
-        <!-- Resultados -->
-        <div class="lg:col-span-2 space-y-8">
-            @if(!$is_auditing)
-                <div class="flex flex-col items-center justify-center py-20 bg-slate-50/50 dark:bg-white/5 rounded-[3rem] border-2 border-dashed border-slate-100 dark:border-white/5">
-                    <div class="p-8 bg-white dark:bg-slate-800 rounded-[2rem] shadow-sm mb-6">
-                        <x-mary-icon name="o-magnifying-glass" class="w-16 h-16 text-slate-300" />
-                    </div>
-                    <h3 class="font-black text-slate-800 dark:text-slate-100 text-lg">Inicia una Auditoría</h3>
-                    <p class="text-sm text-slate-500 mt-2">Selecciona una ubicación física para verificar su consistencia en tiempo real.</p>
-                </div>
-
-                @if($pastAudits->isNotEmpty())
-                    <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50">
-                        <div class="p-4">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest">Actas de Auditoría Recientes</h3>
-                                <span class="text-[10px] font-bold text-slate-400">Historial persistente</span>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="table table-sm">
-                                    <thead>
-                                        <tr class="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                                            <th>Fecha / Hora</th>
-                                            <th>Ubicación</th>
-                                            <th>Auditor</th>
-                                            <th>Correctos</th>
-                                            <th>Faltantes</th>
-                                            <th>Fuera de Lugar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="text-xs font-bold">
-                                        @foreach($pastAudits as $pa)
-                                            <tr class="hover:bg-slate-50 dark:hover:bg-white/5">
-                                                <td class="whitespace-nowrap">{{ $pa->created_at->format('d/m/Y H:i') }}</td>
-                                                <td>{{ $pa->location->short_label ?? 'N/A' }}</td>
-                                                <td>{{ $pa->user->name ?? 'N/A' }}</td>
-                                                <td><span class="badge badge-success badge-sm font-black">{{ $pa->correct_count }}</span></td>
-                                                <td><span class="badge badge-error badge-sm font-black">{{ $pa->missing_count }}</span></td>
-                                                <td><span class="badge badge-warning badge-sm font-black">{{ $pa->misplaced_count }}</span></td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </x-mary-card>
-                @endif
-            @else
-                <div class="space-y-8">
-                    @if(count($results['misplaced']) > 0)
-                        <x-mary-card shadow class="border-none shadow-xl shadow-warning/10 bg-warning/5 overflow-hidden">
-                            <div class="p-4">
-                                <div class="flex justify-between items-center mb-4">
-                                    <div>
-                                        <h3 class="text-sm font-black text-warning uppercase tracking-widest">⚠️ Expedientes en Cajón Incorrecto ({{ count($results['misplaced']) }})</h3>
-                                        <p class="text-[10px] text-warning/80 font-bold uppercase tracking-wider">Fueron encontrados y escaneados aquí, pero su ubicación oficial es otra gaveta</p>
-                                    </div>
-                                    <x-mary-button label="Asignar a este Cajón" icon="o-check-circle" wire:click="fixAllMisplaced" class="btn-xs btn-warning px-4 rounded-lg font-bold" spinner="fixAllMisplaced" tooltip="Cambiar su ubicación oficial a este cajón" />
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    @foreach($results['misplaced'] as $exp)
-                                        <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-warning/20 flex justify-between items-center group/item hover:scale-[1.01] transition-premium">
-                                            <div>
-                                                <div class="font-black text-slate-800 dark:text-slate-100">{{ $exp->expedient_code }}</div>
-                                                <div class="text-xs text-slate-600 dark:text-slate-300 font-bold">{{ $exp->employee?->full_name }}</div>
-                                                <div class="text-[10px] font-bold text-amber-600 dark:text-amber-400 mt-1">
-                                                    📍 Su lugar oficial es: <strong>{{ $exp->currentLocation->short_label ?? 'N/A' }}</strong>
-                                                </div>
-                                            </div>
-                                            <x-mary-button icon="o-arrow-path" wire:click="fixMisplaced({{ $exp->id }})" class="btn-xs btn-warning btn-outline rounded-lg" tooltip="Reasignar oficialmente a este cajón" spinner />
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </x-mary-card>
-                    @endif
-
-                    @if(count($results['missing']) > 0)
-                        <x-mary-card shadow class="border-none shadow-xl shadow-error/10 bg-error/5">
-                            <div class="p-4">
-                                <h3 class="text-sm font-black text-error uppercase tracking-widest mb-1">Faltantes ({{ count($results['missing']) }})</h3>
-                                <p class="text-[10px] text-error/70 font-bold mb-6 uppercase tracking-wider">Pendientes de escanear en esta ubicación</p>
-                                
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    @foreach($results['missing'] as $exp)
-                                        <div class="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-error/10">
-                                            <div class="font-black text-slate-800 dark:text-slate-100">{{ $exp->expedient_code }}</div>
-                                            <div class="text-xs font-bold text-slate-500 mt-1">{{ $exp->employee->full_name }}</div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </x-mary-card>
-                    @endif
-
-                    <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50">
-                        <div class="p-4">
-                            <h3 class="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest mb-1">Confirmados ({{ count($results['correct']) }})</h3>
-                            <p class="text-[10px] text-slate-400 font-bold mb-6 uppercase tracking-wider">Encontrados correctamente en su sitio</p>
-
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                @foreach($results['correct'] as $exp)
-                                    <div class="p-3 bg-success/5 rounded-xl border border-success/10 text-center group hover:bg-success/10 transition-colors">
-                                        <div class="text-[10px] font-black text-success tracking-tighter">{{ $exp->expedient_code }}</div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </x-mary-card>
-                </div>
+        <div class="flex items-center gap-2.5">
+            @if($is_auditing)
+                <button 
+                    type="button" 
+                    wire:click="$set('showNotesModal', true)" 
+                    class="btn btn-sm btn-primary font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-primary/20 gap-2 h-10 px-4">
+                    <x-mary-icon name="o-document-check" class="w-4 h-4" />
+                    <span>Guardar Acta Oficial</span>
+                </button>
+                <button 
+                    type="button" 
+                    wire:click="resetAudit" 
+                    wire:confirm="¿Estás seguro de salir de esta auditoría? Los escaneos no guardados se descartarán."
+                    class="btn btn-sm btn-ghost border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 font-bold text-xs uppercase tracking-wider rounded-xl h-10 px-3">
+                    <x-mary-icon name="o-arrow-left" class="w-4 h-4" />
+                    <span>Salir</span>
+                </button>
             @endif
         </div>
     </div>
 
+    @if(!$is_auditing)
+        {{-- ========================================================= --}}
+        {{-- VISTA DE SELECCIÓN Y CONFIGURACIÓN (CUANDO NO ESTÁ AUDITANDO) --}}
+        {{-- ========================================================= --}}
+        <div class="space-y-8">
+            {{-- Barra de Filtros Rápidos --}}
+            <div class="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-white/5 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h2 class="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">1. Selecciona la Gaveta o Ubicación a Auditar</h2>
+                        <p class="text-xs text-slate-500">Filtra por sede o tipo para localizar rápidamente el archivero</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div>
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Sede / Delegación</label>
+                        <select wire:model.live="selectedBranch" class="select select-sm w-full rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-white/10 font-bold text-xs">
+                            <option value="">-- Todas las Sedes --</option>
+                            @foreach($branches as $b)
+                                <option value="{{ $b->id }}">{{ $b->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Tipo de Archivo</label>
+                        <select wire:model.live="selectedType" class="select select-sm w-full rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-white/10 font-bold text-xs">
+                            <option value="">-- Todos los Tipos --</option>
+                            @foreach($types as $t)
+                                <option value="{{ $t['id'] }}">{{ $t['name'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="flex items-end">
+                        <div class="w-full text-right sm:text-left text-xs font-bold text-slate-400 px-1 py-2">
+                            <span>Mostrando <strong>{{ count($locations) }}</strong> gavetas disponibles</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Grid Visual de Gavetas Disponibles --}}
+            <div class="space-y-3">
+                <h3 class="text-xs font-black uppercase tracking-widest text-slate-400">Gavetas y Archiveros Físicos</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    @forelse($locations as $loc)
+                        <div class="group relative p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-white/5 shadow-sm hover:shadow-md hover:border-[#C4A462]/50 transition-all flex flex-col justify-between">
+                            <div class="space-y-2">
+                                <div class="flex items-start justify-between gap-2">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                                        <x-mary-icon name="o-archive-box" class="w-3 h-3 text-[#C4A462]" />
+                                        {{ $loc->cabinet ?: 'Archivero' }}
+                                    </span>
+                                    @if($loc->drawer)
+                                        <span class="text-[10px] font-black uppercase text-slate-400">Cajón {{ $loc->drawer }}</span>
+                                    @endif
+                                </div>
+
+                                <div>
+                                    <h4 class="font-black text-sm text-slate-900 dark:text-white group-hover:text-primary transition-colors line-clamp-1">
+                                        {{ $loc->archive_name }}
+                                    </h4>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">{{ $loc->branch?->name }}</p>
+                                </div>
+
+                                @if($loc->alpha_range)
+                                    <div class="inline-block px-2.5 py-1 rounded-xl bg-[#0F1E36]/5 dark:bg-white/5 border border-[#0F1E36]/10 dark:border-white/10 text-xs font-black text-slate-800 dark:text-[#C4A462]">
+                                        Rango: {{ $loc->alpha_range }}
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div class="pt-4 mt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-slate-500">
+                                    <strong>{{ $loc->expedients_count ?? 0 }}</strong> expedientes
+                                </span>
+                                <button 
+                                    type="button" 
+                                    wire:click="selectLocationAndStart({{ $loc->id }})" 
+                                    class="btn btn-xs btn-primary rounded-lg font-black uppercase tracking-wider text-[10px] gap-1 shadow-sm">
+                                    <span>Auditar</span>
+                                    <x-mary-icon name="o-chevron-right" class="w-3 h-3" />
+                                </button>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-span-full py-12 text-center text-slate-400 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-white/10">
+                            <x-mary-icon name="o-archive-box-x-mark" class="w-10 h-10 mx-auto mb-2 text-slate-300" />
+                            <p class="text-xs font-bold">No se encontraron gavetas con los filtros seleccionados.</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- Historial Reciente de Actas --}}
+            @if($pastAudits->isNotEmpty())
+                <div class="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-white/5 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">Historial de Actas de Auditoría Recientes</h3>
+                            <p class="text-xs text-slate-500">Registro histórico persistente de conciliaciones físicas</p>
+                        </div>
+                        <span class="badge badge-sm badge-ghost font-bold text-[10px]">{{ count($pastAudits) }} registradas</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr class="text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-white/5">
+                                    <th>Fecha y Hora</th>
+                                    <th>Ubicación Auditada</th>
+                                    <th>Auditor</th>
+                                    <th class="text-center">Esperados</th>
+                                    <th class="text-center">Correctos</th>
+                                    <th class="text-center">Faltantes</th>
+                                    <th class="text-center">Incorrectos</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-xs font-bold divide-y divide-slate-100 dark:divide-white/5">
+                                @foreach($pastAudits as $pa)
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-white/5">
+                                        <td class="whitespace-nowrap text-slate-500">{{ $pa->created_at->format('d/m/Y H:i') }}</td>
+                                        <td class="font-black text-slate-900 dark:text-white">{{ $pa->location?->short_label ?? 'N/A' }}</td>
+                                        <td class="text-slate-600 dark:text-slate-300">{{ $pa->user?->name ?? 'N/A' }}</td>
+                                        <td class="text-center"><span class="badge badge-ghost badge-sm font-bold">{{ $pa->expected_count }}</span></td>
+                                        <td class="text-center"><span class="badge badge-success badge-sm font-black text-slate-950">{{ $pa->correct_count }}</span></td>
+                                        <td class="text-center"><span class="badge badge-error badge-sm font-black text-white">{{ $pa->missing_count }}</span></td>
+                                        <td class="text-center">
+                                            @if($pa->misplaced_count > 0)
+                                                <span class="badge badge-warning badge-sm font-black text-slate-950">{{ $pa->misplaced_count }}</span>
+                                            @else
+                                                <span class="text-slate-400 text-[11px]">0</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
+        </div>
+
+    @else
+        {{-- ========================================================= --}}
+        {{-- VISTA DE AUDITORÍA ACTIVA (HEADS-UP DISPLAY INTERACTIVO) --}}
+        {{-- ========================================================= --}}
+        <div class="space-y-6">
+            {{-- HERO HUD: Ubicación actual, progreso y contadores --}}
+            <div class="p-6 rounded-3xl bg-gradient-to-br from-[#0F1E36] via-[#112240] to-[#0A1526] text-white shadow-xl border border-white/10 space-y-6">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                    {{-- Datos de la gaveta --}}
+                    <div class="space-y-1.5">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-lg bg-[#C4A462] text-[#0F1E36] font-black text-[10px] uppercase tracking-wider shadow-sm">
+                                AUDITORÍA EN CURSO
+                            </span>
+                            <span class="text-xs text-slate-300 font-bold">{{ $currentLocation?->branch?->name }}</span>
+                        </div>
+                        <h2 class="text-2xl lg:text-3xl font-black text-white tracking-tight">
+                            {{ $currentLocation?->full_label }}
+                        </h2>
+                        <p class="text-xs text-slate-300 font-medium flex items-center gap-2">
+                            <span>Archivo: <strong>{{ $currentLocation?->archive_name }}</strong></span>
+                            <span>•</span>
+                            <span>Rango Oficial: <strong class="text-[#C4A462]">{{ $currentLocation?->alpha_range ?: 'General' }}</strong></span>
+                        </p>
+                    </div>
+
+                    {{-- Mini Tarjetas de Métricas en Vivo --}}
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-center">
+                            <div class="text-[10px] font-black uppercase tracking-wider text-slate-400">Total Esperados</div>
+                            <div class="text-2xl font-black text-white tracking-tight mt-0.5">{{ $expectedCount }}</div>
+                        </div>
+
+                        <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center">
+                            <div class="text-[10px] font-black uppercase tracking-wider text-emerald-400">Confirmados</div>
+                            <div class="text-2xl font-black text-emerald-300 tracking-tight mt-0.5">{{ count($results['correct']) }}</div>
+                        </div>
+
+                        <div class="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-center">
+                            <div class="text-[10px] font-black uppercase tracking-wider text-rose-400">Faltantes</div>
+                            <div class="text-2xl font-black text-rose-300 tracking-tight mt-0.5">{{ count($results['missing']) }}</div>
+                        </div>
+
+                        <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center">
+                            <div class="text-[10px] font-black uppercase tracking-wider text-amber-400">Cajón Incorrecto</div>
+                            <div class="text-2xl font-black text-amber-300 tracking-tight mt-0.5">{{ count($results['misplaced']) }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Barra de Progreso del Cajón --}}
+                <div class="space-y-1.5 pt-2 border-t border-white/10">
+                    <div class="flex items-center justify-between text-xs font-bold">
+                        <span class="text-slate-300">Progreso de Conciliación Física</span>
+                        <span class="text-[#C4A462] font-black">{{ $progressPercentage }}% ({{ count($results['correct']) }} de {{ $expectedCount }} verificados)</span>
+                    </div>
+                    <div class="w-full h-3 rounded-full bg-white/10 overflow-hidden p-0.5">
+                        <div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-500 ease-out" style="width: {{ $progressPercentage }}%"></div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- COMANDOS DE ESCANEO Y ENLACE CELULAR --}}
+            <div class="p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-white/5 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                    {{-- Input Principal para Pistola USB o Teclado --}}
+                    <form wire:submit.prevent="addScan" class="flex-1">
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-primary transition-colors">
+                                <x-mary-icon name="o-qr-code" class="w-5 h-5" />
+                            </div>
+                            <input 
+                                id="scan-input"
+                                type="text" 
+                                placeholder="Escanear con pistola física, escribir código o dar Enter..." 
+                                wire:model="current_scan"
+                                autofocus
+                                autocomplete="off"
+                                class="input input-bordered w-full h-12 pl-12 pr-28 rounded-2xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-white/10 text-xs font-black tracking-wider focus:border-primary"
+                            />
+                            <div class="absolute inset-y-0 right-0 pr-2 flex items-center">
+                                <button type="submit" class="btn btn-xs btn-primary rounded-xl font-black uppercase text-[10px] px-3">
+                                    Registrar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    {{-- Botón para activar webcam local (opcional) --}}
+                    <div class="flex items-center gap-2">
+                        <button 
+                            type="button" 
+                            wire:click="$toggle('showCamera')"
+                            class="btn btn-sm btn-ghost border border-slate-200 dark:border-white/10 rounded-2xl text-xs font-bold gap-1.5 h-12 px-3.5">
+                            <x-mary-icon name="o-camera" class="w-4 h-4 text-slate-500" />
+                            <span>{{ $showCamera ? 'Ocultar Cámara PC' : 'Cámara Web PC' }}</span>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Banner Informativo: Pistola Celular Conectada --}}
+                <div class="p-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/20 flex items-center justify-between gap-3 text-xs text-emerald-800 dark:text-emerald-300">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                        <div class="leading-tight">
+                            <strong class="font-black uppercase text-[10px] tracking-wider block">📱 Pistola Celular Enlazada en Vivo</strong>
+                            <span class="text-[11px] opacity-90">Abre <code>/scanner</code> en tu teléfono con tu misma cuenta. Cada escaneo que hagas en el archivero se registrará aquí al instante.</span>
+                        </div>
+                    </div>
+                    <span class="badge badge-sm badge-success font-black text-[9px] uppercase px-2 py-0.5 text-slate-950 shrink-0">Canal Activo</span>
+                </div>
+
+                {{-- Cámara Web Integrada si el usuario la activa --}}
+                @if($showCamera)
+                    <div class="p-4 rounded-2xl bg-slate-950 border border-white/10 space-y-3" wire:ignore>
+                        <div class="flex items-center justify-between text-xs text-slate-400 font-bold">
+                            <span>Lector de Cámara Web</span>
+                            <div class="flex gap-2">
+                                <button type="button" onclick="startAuditCamera()" class="btn btn-xs btn-success text-slate-950 font-black">Iniciar</button>
+                                <button type="button" onclick="stopAuditCamera()" class="btn btn-xs btn-ghost text-slate-400">Detener</button>
+                            </div>
+                        </div>
+                        <div id="reader" class="rounded-xl overflow-hidden max-w-md mx-auto"></div>
+                    </div>
+                @endif
+            </div>
+
+            {{-- WORKSPACE DE EXPEDIENTES (TABS INTERACTIVOS) --}}
+            <div class="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-white/5 shadow-sm space-y-4">
+                {{-- Navegación de Tabs y Buscador --}}
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/5 pb-4">
+                    <div class="flex items-center gap-2 overflow-x-auto py-1">
+                        {{-- Tab: Faltantes --}}
+                        <button 
+                            type="button" 
+                            wire:click="$set('activeTab', 'missing')" 
+                            class="px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 {{ $activeTab === 'missing' ? 'bg-rose-500 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}">
+                            <span>⏳ Faltantes por Escanear</span>
+                            <span class="badge badge-xs {{ $activeTab === 'missing' ? 'bg-white text-rose-600' : 'badge-ghost' }} font-bold">{{ count($results['missing']) }}</span>
+                        </button>
+
+                        {{-- Tab: Confirmados --}}
+                        <button 
+                            type="button" 
+                            wire:click="$set('activeTab', 'correct')" 
+                            class="px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 {{ $activeTab === 'correct' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}">
+                            <span>✅ Confirmados en Sitio</span>
+                            <span class="badge badge-xs {{ $activeTab === 'correct' ? 'bg-white text-emerald-700' : 'badge-ghost' }} font-bold">{{ count($results['correct']) }}</span>
+                        </button>
+
+                        {{-- Tab: En Cajón Incorrecto --}}
+                        <button 
+                            type="button" 
+                            wire:click="$set('activeTab', 'misplaced')" 
+                            class="px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 {{ $activeTab === 'misplaced' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}">
+                            <span>⚠️ Cajón Incorrecto</span>
+                            <span class="badge badge-xs {{ $activeTab === 'misplaced' ? 'bg-slate-950 text-amber-400' : 'badge-ghost' }} font-bold">{{ count($results['misplaced']) }}</span>
+                        </button>
+                    </div>
+
+                    {{-- Buscador en Vivo dentro de los Resultados --}}
+                    <div class="relative w-full sm:w-64">
+                        <input 
+                            type="text" 
+                            wire:model.live="searchFilter" 
+                            placeholder="Filtrar por código o nombre..." 
+                            class="input input-xs input-bordered w-full rounded-xl bg-slate-50 dark:bg-slate-950 text-xs font-medium pl-8"
+                        />
+                        <x-mary-icon name="o-magnifying-glass" class="w-3.5 h-3.5 absolute left-2.5 top-2 text-slate-400 pointer-events-none" />
+                    </div>
+                </div>
+
+                {{-- CONTENIDO DEL TAB SELECCIONADO --}}
+                @if($activeTab === 'missing')
+                    {{-- TAB: FALTANTES --}}
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between text-xs text-slate-500 font-bold">
+                            <span>Expedientes que el sistema tiene registrados en este cajón pero aún no has escaneado:</span>
+                            <span>{{ count($results['missing']) }} pendientes</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            @php
+                                $filteredMissing = collect($results['missing'])->filter(function($e) {
+                                    if (empty($this->searchFilter)) return true;
+                                    $s = mb_strtolower($this->searchFilter);
+                                    return str_contains(mb_strtolower($e->expedient_code), $s) || str_contains(mb_strtolower($e->employee?->full_name ?? ''), $s);
+                                });
+                            @endphp
+
+                            @forelse($filteredMissing as $exp)
+                                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/70 dark:border-white/5 flex items-start justify-between gap-3">
+                                    <div class="space-y-1">
+                                        <span class="font-black font-mono text-sm text-slate-900 dark:text-white">{{ $exp->expedient_code }}</span>
+                                        <p class="text-xs font-bold text-slate-700 dark:text-slate-300 line-clamp-1">{{ $exp->employee?->full_name }}</p>
+                                        <span class="text-[10px] text-slate-400 font-mono">{{ $exp->employee?->rfc }}</span>
+                                    </div>
+                                    <span class="badge badge-sm badge-error badge-outline font-black text-[9px] uppercase tracking-wider shrink-0">Pendiente</span>
+                                </div>
+                            @empty
+                                <div class="col-span-full py-8 text-center text-slate-400">
+                                    @if(empty($results['missing']))
+                                        <div class="p-3 bg-emerald-500/10 text-emerald-500 rounded-2xl inline-block mb-2">
+                                            <x-mary-icon name="o-check-badge" class="w-8 h-8" />
+                                        </div>
+                                        <p class="text-sm font-black text-emerald-600 dark:text-emerald-400">¡Felicidades! Todos los expedientes esperados fueron escaneados en su sitio.</p>
+                                    @else
+                                        <p class="text-xs font-bold">No hay expedientes faltantes que coincidan con la búsqueda.</p>
+                                    @endif
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+
+                @elseif($activeTab === 'correct')
+                    {{-- TAB: CONFIRMADOS --}}
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between text-xs text-slate-500 font-bold">
+                            <span>Expedientes escaneados físicamente que coinciden con su registro oficial:</span>
+                            <span>{{ count($results['correct']) }} verificados</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            @php
+                                $filteredCorrect = collect($results['correct'])->filter(function($e) {
+                                    if (empty($this->searchFilter)) return true;
+                                    $s = mb_strtolower($this->searchFilter);
+                                    return str_contains(mb_strtolower($e->expedient_code), $s) || str_contains(mb_strtolower($e->employee?->full_name ?? ''), $s);
+                                });
+                            @endphp
+
+                            @forelse($filteredCorrect as $exp)
+                                <div class="p-3.5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-500/20 flex items-start justify-between gap-3 group">
+                                    <div class="space-y-1">
+                                        <span class="font-black font-mono text-sm text-emerald-700 dark:text-emerald-400">{{ $exp->expedient_code }}</span>
+                                        <p class="text-xs font-bold text-slate-700 dark:text-slate-300 line-clamp-1">{{ $exp->employee?->full_name }}</p>
+                                        <span class="text-[10px] text-slate-400 font-mono">{{ $exp->employee?->rfc }}</span>
+                                    </div>
+                                    <button 
+                                        type="button" 
+                                        wire:click="removeScan('{{ $exp->expedient_code }}')" 
+                                        class="btn btn-ghost btn-xs text-slate-400 hover:text-rose-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" 
+                                        tooltip="Descartar este escaneo">
+                                        <x-mary-icon name="o-trash" class="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+                            @empty
+                                <div class="col-span-full py-8 text-center text-slate-400">
+                                    <p class="text-xs font-bold">Aún no has escaneado ningún expediente en este cajón.</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+
+                @elseif($activeTab === 'misplaced')
+                    {{-- TAB: EN CAJÓN INCORRECTO --}}
+                    <div class="space-y-3">
+                        <div class="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-800 dark:text-amber-300">
+                            <div>
+                                <strong class="font-black uppercase tracking-wider block">⚠️ Expedientes Ajenos Encontrados Aquí</strong>
+                                <span class="text-[11px] opacity-90">Fueron encontrados físicamente en este cajón, pero su registro oficial corresponde a otra gaveta.</span>
+                            </div>
+                            @if(count($results['misplaced']) > 0)
+                                <button 
+                                    type="button" 
+                                    wire:click="fixAllMisplaced" 
+                                    class="btn btn-xs btn-warning rounded-xl font-black uppercase tracking-wider text-[10px] px-3 shadow-sm shrink-0">
+                                    Asignar Todos a Este Cajón
+                                </button>
+                            @endif
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            @forelse($results['misplaced'] as $exp)
+                                <div class="p-4 rounded-2xl bg-white dark:bg-slate-950 border border-amber-500/30 shadow-sm flex items-start justify-between gap-4">
+                                    <div class="space-y-1.5">
+                                        <span class="font-black font-mono text-base text-amber-600 dark:text-amber-400">{{ $exp->expedient_code }}</span>
+                                        <p class="text-xs font-black text-slate-800 dark:text-slate-100">{{ $exp->employee?->full_name }}</p>
+                                        <div class="text-[11px] font-bold text-slate-500">
+                                            📍 Su lugar oficial registrado es: <strong class="text-slate-800 dark:text-white">{{ $exp->currentLocation?->short_label ?? 'Sin ubicación' }}</strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex flex-col items-end gap-1.5 shrink-0">
+                                        <button 
+                                            type="button" 
+                                            wire:click="fixMisplaced({{ $exp->id }})" 
+                                            class="btn btn-xs btn-warning rounded-xl font-black uppercase text-[10px] gap-1 shadow-sm">
+                                            <x-mary-icon name="o-arrow-path" class="w-3 h-3" />
+                                            <span>Reubicar Aquí</span>
+                                        </button>
+                                        <button 
+                                            type="button" 
+                                            wire:click="removeScan('{{ $exp->expedient_code }}')" 
+                                            class="btn btn-ghost btn-xs text-slate-400 hover:text-rose-500 text-[10px]">
+                                            Descartar
+                                        </button>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="col-span-full py-8 text-center text-slate-400">
+                                    <p class="text-xs font-bold">No se detectaron expedientes ajenos en este cajón.</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        {{-- MODAL: GUARDAR ACTA OFICIAL DE AUDITORÍA --}}
+        @if($showNotesModal)
+            <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in duration-200">
+                <div class="w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-2xl overflow-hidden p-6 space-y-6">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-white/5">
+                        <div class="flex items-center gap-2.5">
+                            <div class="p-2 rounded-xl bg-primary/10 text-primary">
+                                <x-mary-icon name="o-document-check" class="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h3 class="font-black text-base text-slate-900 dark:text-white">Generar Acta Oficial de Auditoría</h3>
+                                <p class="text-xs text-slate-400">{{ $currentLocation?->short_label }}</p>
+                            </div>
+                        </div>
+                        <button type="button" wire:click="$set('showNotesModal', false)" class="btn btn-sm btn-ghost btn-circle text-slate-400">✕</button>
+                    </div>
+
+                    {{-- Resumen de Cifras del Acta --}}
+                    <div class="grid grid-cols-3 gap-2.5 text-center">
+                        <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-white/5">
+                            <span class="text-[10px] font-black uppercase text-slate-400 block">Correctos</span>
+                            <span class="text-xl font-black text-emerald-600 dark:text-emerald-400">{{ count($results['correct']) }}</span>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-white/5">
+                            <span class="text-[10px] font-black uppercase text-slate-400 block">Faltantes</span>
+                            <span class="text-xl font-black text-rose-600 dark:text-rose-400">{{ count($results['missing']) }}</span>
+                        </div>
+                        <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-white/5">
+                            <span class="text-[10px] font-black uppercase text-slate-400 block">Cajón Mal</span>
+                            <span class="text-xl font-black text-amber-600 dark:text-amber-400">{{ count($results['misplaced']) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Observaciones / Notas del Acta (Opcional)</label>
+                        <textarea 
+                            wire:model="audit_notes" 
+                            rows="3" 
+                            placeholder="Escribe comentarios sobre el estado físico de la gaveta, anomalías detectadas o justificaciones..." 
+                            class="textarea textarea-bordered w-full rounded-2xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-white/10 text-xs font-medium focus:border-primary"></textarea>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2.5 pt-2">
+                        <button type="button" wire:click="$set('showNotesModal', false)" class="btn btn-sm btn-ghost rounded-xl font-bold text-xs uppercase">Cancelar</button>
+                        <button type="button" wire:click="saveAuditReport" class="btn btn-sm btn-primary rounded-xl font-black text-xs uppercase px-5 shadow-lg shadow-primary/20">
+                            Confirmar y Guardar Acta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endif
+
+    {{-- SCRIPTS DE AUDITORÍA (CÁMARA WEB Y SONIDO) --}}
     @push('scripts')
     <script>
         window.html5QrCode = window.html5QrCode || null;
@@ -327,19 +563,16 @@
                 gain.connect(audioCtx.destination);
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
                 osc.start();
                 osc.stop(audioCtx.currentTime + 0.12);
-                if (navigator.vibrate) navigator.vibrate(80);
+                if (navigator.vibrate) navigator.vibrate(90);
             } catch (e) {}
         }
 
         window.startAuditCamera = function() {
-            const startBtn = document.getElementById('start-camera');
-            const stopBtn = document.getElementById('stop-camera');
             const readerDiv = document.getElementById('reader');
             const scanInput = document.getElementById('scan-input');
-
             if (!readerDiv) return;
 
             if (window.html5QrCode) {
@@ -347,11 +580,14 @@
             }
 
             window.html5QrCode = new Html5Qrcode("reader");
-            readerDiv.classList.remove('hidden');
-            if (startBtn) startBtn.classList.add('hidden');
-            if (stopBtn) stopBtn.classList.remove('hidden');
-
-            const config = { fps: 15, qrbox: { width: 250, height: 250 } };
+            const config = { 
+                fps: 15, 
+                qrbox: { width: 250, height: 250 },
+                formatsToSupport: [
+                    Html5QrcodeSupportedFormats.QR_CODE,
+                    Html5QrcodeSupportedFormats.CODE_128
+                ]
+            };
             
             window.html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
                 if (isProcessingAuditScan) return;
@@ -366,37 +602,18 @@
                 }
 
                 @this.call('addScan', decodedText).then(() => {
-                    setTimeout(() => {
-                        isProcessingAuditScan = false;
-                    }, 1200);
+                    setTimeout(() => { isProcessingAuditScan = false; }, 1200);
                 }).catch(() => {
                     isProcessingAuditScan = false;
                 });
             }).catch(err => {
                 console.error("Camera error:", err);
-                window.stopAuditCamera();
             });
         }
 
         window.stopAuditCamera = function() {
-            const startBtn = document.getElementById('start-camera');
-            const stopBtn = document.getElementById('stop-camera');
-            const readerDiv = document.getElementById('reader');
-
             if (window.html5QrCode) {
-                window.html5QrCode.stop().then(() => {
-                    if (readerDiv) readerDiv.classList.add('hidden');
-                    if (startBtn) startBtn.classList.remove('hidden');
-                    if (stopBtn) stopBtn.classList.add('hidden');
-                }).catch(() => {
-                    if (readerDiv) readerDiv.classList.add('hidden');
-                    if (startBtn) startBtn.classList.remove('hidden');
-                    if (stopBtn) stopBtn.classList.add('hidden');
-                });
-            } else {
-                if (readerDiv) readerDiv.classList.add('hidden');
-                if (startBtn) startBtn.classList.remove('hidden');
-                if (stopBtn) stopBtn.classList.add('hidden');
+                window.html5QrCode.stop().catch(() => {});
             }
             isProcessingAuditScan = false;
         }

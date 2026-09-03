@@ -32,9 +32,25 @@ class Audit extends Component
 
     public bool $is_auditing = false;
 
+    public string $activeTab = 'missing';
+
+    public string $searchFilter = '';
+
+    public bool $showCamera = false;
+
+    public bool $showNotesModal = false;
+
+    public ?ArchiveLocation $currentLocation = null;
+
     public function mount()
     {
         $this->authorize('changeLocation', Expedient::class);
+    }
+
+    public function selectLocationAndStart(int $id): void
+    {
+        $this->location_id = $id;
+        $this->startAudit();
     }
 
     public function startAudit()
@@ -44,13 +60,13 @@ class Audit extends Component
         ]);
         $this->is_auditing = true;
         $this->scanned_codes = Cache::get("active_audit_{$this->location_id}", []);
+        $this->currentLocation = ArchiveLocation::with('branch')->find($this->location_id);
 
         // Registrar auditoría activa del usuario para canalizar la pistola celular
-        $location = ArchiveLocation::find($this->location_id);
-        if (Auth::check() && $location) {
+        if (Auth::check() && $this->currentLocation) {
             Cache::put('active_user_audit_'.Auth::id(), [
                 'location_id' => $this->location_id,
-                'label' => $location->short_label,
+                'label' => $this->currentLocation->short_label,
             ], now()->addHours(2));
         }
     }
@@ -103,6 +119,15 @@ class Audit extends Component
         $this->current_scan = '';
     }
 
+    public function removeScan(string $code): void
+    {
+        $this->scanned_codes = array_values(array_filter($this->scanned_codes, fn ($c) => $c !== $code));
+        if ($this->location_id) {
+            Cache::put("active_audit_{$this->location_id}", $this->scanned_codes, now()->addHours(6));
+        }
+        $this->info("Escaneo removido: {$code}");
+    }
+
     public function resetAudit()
     {
         if ($this->location_id) {
@@ -111,7 +136,8 @@ class Audit extends Component
         if (Auth::check()) {
             Cache::forget('active_user_audit_'.Auth::id());
         }
-        $this->reset(['location_id', 'scanned_codes', 'is_auditing', 'current_scan', 'audit_notes', 'saved_audit']);
+        $this->reset(['location_id', 'scanned_codes', 'is_auditing', 'current_scan', 'audit_notes', 'saved_audit', 'currentLocation', 'searchFilter', 'showCamera', 'showNotesModal']);
+        $this->activeTab = 'missing';
     }
 
     public function saveAuditReport()
@@ -147,6 +173,7 @@ class Audit extends Component
         ]);
 
         $this->saved_audit = true;
+        $this->showNotesModal = false;
         $this->success("Acta de auditoría #{$audit->id} guardada exitosamente en el historial persistente.");
     }
 
@@ -171,7 +198,7 @@ class Audit extends Component
     private function getResults()
     {
         $expectedExpedients = $this->location_id
-            ? Expedient::with(['employee', 'currentLocation'])
+            ? Expedient::with(['employee.branch', 'currentLocation.branch'])
                 ->where('current_location_id', $this->location_id)
                 ->whereIn('current_status', ['available', 'returned', 'archived', 'in_storage', 'reserved'])
                 ->get()
@@ -183,11 +210,13 @@ class Audit extends Component
             'missing' => [],
         ];
 
-        if ($this->is_auditing && ! empty($this->scanned_codes)) {
-            $scannedExpedients = Expedient::with(['employee', 'currentLocation'])
-                ->whereIn('expedient_code', $this->scanned_codes)
-                ->get()
-                ->keyBy('expedient_code');
+        if ($this->is_auditing) {
+            $scannedExpedients = ! empty($this->scanned_codes)
+                ? Expedient::with(['employee.branch', 'currentLocation.branch'])
+                    ->whereIn('expedient_code', $this->scanned_codes)
+                    ->get()
+                    ->keyBy('expedient_code')
+                : collect();
 
             foreach ($this->scanned_codes as $code) {
                 if ($scannedExpedients->has($code)) {
@@ -221,14 +250,21 @@ class Audit extends Component
             : 0;
 
         $locationsQuery = ArchiveLocation::with('branch')
+            ->withCount('expedients')
             ->when($this->selectedBranch, fn ($q) => $q->where('branch_id', $this->selectedBranch))
             ->when($this->selectedType, fn ($q) => $q->where('location_type', $this->selectedType));
 
         $pastAudits = LocationAudit::with(['user', 'location'])
             ->when($this->location_id, fn ($q) => $q->where('archive_location_id', $this->location_id))
             ->latest()
-            ->take(5)
+            ->take(8)
             ->get();
+
+        $results = $this->getResults();
+        $correctCount = count($results['correct']);
+        $progressPercentage = $expectedCount > 0
+            ? min(100, (int) round(($correctCount / $expectedCount) * 100))
+            : 0;
 
         return view('livewire.expedients.audit', [
             'branches' => Branch::all(),
@@ -238,8 +274,9 @@ class Audit extends Component
                 ['id' => 'Almacén Central', 'name' => 'Almacén Central'],
             ],
             'locations' => $locationsQuery->get(),
-            'results' => $this->getResults(),
+            'results' => $results,
             'expectedCount' => $expectedCount,
+            'progressPercentage' => $progressPercentage,
             'pastAudits' => $pastAudits,
         ]);
     }
