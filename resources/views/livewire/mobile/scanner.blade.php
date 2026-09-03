@@ -3,6 +3,9 @@
         html5QrCode: null,
         isScanning: false,
         isPaused: false,
+        isProcessing: false,
+        lastDetectedCode: null,
+        lastDetectedTime: 0,
         cameraError: null,
         hasFlash: false,
         flashOn: false,
@@ -23,18 +26,18 @@
             window.addEventListener('scan-success', (e) => {
                 const data = e.detail[0] || e.detail;
                 this.triggerFeedback(true, data.sound, data.vibrate);
-                if (data.autoNext) {
-                    this.startCooldown(1400);
-                }
+                this.startCooldown(data.autoNext ? 1800 : 2500);
             });
 
             window.addEventListener('scan-error', (e) => {
                 const data = e.detail[0] || e.detail;
                 this.triggerFeedback(false, data.sound, data.vibrate);
-                this.startCooldown(2000);
+                this.startCooldown(2500);
             });
 
             window.addEventListener('resume-scanner', () => {
+                this.lastDetectedCode = null;
+                this.isProcessing = false;
                 this.resumeScanning();
             });
         },
@@ -52,29 +55,27 @@
                     await this.html5QrCode.stop().catch(() => {});
                 }
 
+                // ÚNICAMENTE formatos oficiales del archivo: QR Code y Code 128 (etiquetas de barra)
+                // Se excluye Code 39 y otros formatos sin checksum para evitar 100% falsos positivos con texturas/sombras
                 const formats = (typeof Html5QrcodeSupportedFormats !== 'undefined')
                     ? [
-                        Html5QrcodeSupportedFormats.CODE_128,
-                        Html5QrcodeSupportedFormats.CODE_39,
                         Html5QrcodeSupportedFormats.QR_CODE,
-                        Html5QrcodeSupportedFormats.EAN_13,
-                        Html5QrcodeSupportedFormats.UPC_A
+                        Html5QrcodeSupportedFormats.CODE_128
                     ]
                     : undefined;
 
                 this.html5QrCode = new Html5Qrcode('pwa-camera-viewport', formats ? { formatsToSupport: formats, verbose: false } : undefined);
 
                 const config = {
-                    fps: 22,
+                    fps: 15,
                     qrbox: (viewfinderWidth, viewfinderHeight) => {
-                        const w = Math.floor(viewfinderWidth * 0.90);
-                        const h = Math.floor(Math.min(viewfinderHeight * 0.65, 220));
-                        return { width: Math.max(w, 260), height: Math.max(h, 140) };
+                        const w = Math.floor(viewfinderWidth * 0.88);
+                        const h = Math.floor(Math.min(viewfinderHeight * 0.65, 200));
+                        return { width: Math.max(w, 240), height: Math.max(h, 130) };
                     },
                     aspectRatio: 1.333333,
                     videoConstraints: {
-                        facingMode: { ideal: 'environment' },
-                        focusMode: 'continuous'
+                        facingMode: { ideal: 'environment' }
                     }
                 };
 
@@ -139,17 +140,30 @@
                 } catch(e) {}
                 this.isPaused = false;
                 this.scanCooldown = false;
+                this.isProcessing = false;
             }
         },
 
         onCodeDetected(decodedText) {
-            if (this.scanCooldown || this.isPaused) return;
+            decodedText = (decodedText || '').trim();
 
-            // Pausar temporalmente mientras Laravel procesa
-            this.scanCooldown = true;
-            if (this.html5QrCode) {
-                try { this.html5QrCode.pause(true); } catch(e) {}
+            // 1. Descartar códigos muy cortos o vacíos
+            if (decodedText.length < 3) return;
+
+            // 2. Si está en enfriamiento, pausado o procesando en Laravel: ignorar
+            if (this.scanCooldown || this.isPaused || this.isProcessing) return;
+
+            // 3. Filtro anti-duplicados: si es el MISMO código escaneado hace menos de 4 segundos, ignorar
+            const now = Date.now();
+            if (decodedText === this.lastDetectedCode && (now - this.lastDetectedTime) < 4000) {
+                return;
             }
+
+            // Registrar lectura y bloquear lecturas repetidas
+            this.isProcessing = true;
+            this.lastDetectedCode = decodedText;
+            this.lastDetectedTime = now;
+            this.scanCooldown = true;
 
             // Enviar a Livewire
             $wire.processCode(decodedText);
@@ -177,7 +191,8 @@
                 if (this.cooldownPercent <= 0) {
                     clearInterval(timer);
                     this.cooldownPercent = 0;
-                    this.resumeScanning();
+                    this.scanCooldown = false;
+                    this.isProcessing = false;
                 }
             }, step);
         }
@@ -266,7 +281,7 @@
         {{-- Contenedor del Viewfinder --}}
         <div class="relative w-full h-[52vh] sm:h-[58vh] bg-black overflow-hidden flex items-center justify-center">
             
-            <div id="pwa-camera-viewport" class="w-full h-full object-cover"></div>
+            <div wire:ignore id="pwa-camera-viewport" class="w-full h-full object-cover"></div>
 
             {{-- Mensaje de Error si no hay cámara --}}
             <template x-if="cameraError">

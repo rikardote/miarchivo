@@ -65,11 +65,8 @@
 
                     const formats = (typeof Html5QrcodeSupportedFormats !== 'undefined')
                         ? [
-                            Html5QrcodeSupportedFormats.CODE_128,
-                            Html5QrcodeSupportedFormats.CODE_39,
                             Html5QrcodeSupportedFormats.QR_CODE,
-                            Html5QrcodeSupportedFormats.EAN_13,
-                            Html5QrcodeSupportedFormats.UPC_A,
+                            Html5QrcodeSupportedFormats.CODE_128
                         ]
                         : undefined;
 
@@ -132,7 +129,7 @@
 
             {{-- Viewfinder Panorámico de Cámara para Celular --}}
             <div x-show="cameraActive" x-cloak class="mb-3 rounded-2xl overflow-hidden bg-black relative border-2 border-primary shadow-xl animate-in zoom-in-95 duration-200 w-full">
-                <div id="global-camera-viewport" class="w-full min-h-[230px] max-h-[290px]"></div>
+                <div wire:ignore id="global-camera-viewport" class="w-full min-h-[230px] max-h-[290px]"></div>
                 
                 {{-- Línea láser guía para códigos de barras --}}
                 <div class="pointer-events-none absolute inset-x-4 top-1/2 -translate-y-1/2 h-[2px] bg-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.9)] animate-pulse"></div>
