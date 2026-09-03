@@ -83,20 +83,20 @@
                     </div>
                 </x-mary-card>
 
-                <x-mary-card title="Historial Operativo" class="premium-card border-none shadow-2xl p-4">
-                    <div class="space-y-8 mt-6">
+                <x-mary-card title="Historial Operativo" class="premium-card border-none shadow-2xl p-4 overflow-hidden">
+                    <div class="space-y-6 mt-4 max-h-[460px] overflow-y-auto pr-3">
                         @forelse($recentActivities as $activity)
-                            <div class="flex gap-5 group">
+                            <div class="flex gap-4 group">
                                 <div class="relative flex flex-col items-center">
-                                    <div class="w-10 h-10 rounded-2xl bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center z-10 border border-slate-100 dark:border-white/5 group-hover:bg-primary group-hover:text-white transition-premium shadow-sm">
+                                    <div class="w-9 h-9 rounded-2xl bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center z-10 border border-slate-100 dark:border-white/5 group-hover:bg-primary group-hover:text-white transition-premium shadow-sm">
                                         <x-mary-icon name="o-bolt" class="w-4 h-4" />
                                     </div>
-                                    <div class="absolute top-10 w-[2px] h-full bg-slate-100 dark:bg-slate-800/50 last:hidden"></div>
+                                    <div class="absolute top-9 w-[2px] h-full bg-slate-100 dark:bg-slate-800/50 last:hidden"></div>
                                 </div>
-                                <div class="pb-8">
+                                <div class="pb-6 flex-1">
                                     <p class="text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight group-hover:text-primary transition-colors">{{ $activity->description }}</p>
-                                    <div class="flex items-center gap-2 mt-2">
-                                        <div class="w-1 h-1 bg-slate-300 rounded-full"></div>
+                                    <div class="flex items-center gap-2 mt-1.5">
+                                        <div class="w-1.5 h-1.5 bg-[#C4A462] rounded-full"></div>
                                         <span class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{{ $activity->created_at->diffForHumans() }}</span>
                                     </div>
                                 </div>
@@ -114,25 +114,87 @@
             </div>
 
             <div class="space-y-6 sm:space-y-10">
-                <x-mary-card class="bg-slate-900 rounded-3xl p-6 text-white">
-                    <h4 class="text-xl font-bold mb-6">Atajos de Sistema</h4>
-                    <div class="grid grid-cols-1 gap-3">
+                <div class="premium-card p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-8 h-8 rounded-xl bg-[#0F1E36]/10 dark:bg-[#C4A462]/10 text-[#0F1E36] dark:text-[#C4A462] flex items-center justify-center">
+                            <x-mary-icon name="o-bolt" class="w-4 h-4" />
+                        </div>
+                        <div>
+                            <h4 class="text-base sm:text-lg font-black text-slate-900 dark:text-white tracking-tight leading-none">Atajos de Sistema</h4>
+                            <p class="text-[9px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest mt-1">Acciones Rápidas</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-2.5">
                         @canany(['loans.deliver', 'loans.return'])
-                            <x-mary-button label="Despacho (Planta Baja)" icon="o-truck" link="{{ route('loans.dispatch') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
-                            <x-mary-button label="Hoja de Surtido" icon="o-printer" link="{{ route('loans.picking-list') }}" external class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                            <a href="{{ route('loans.dispatch') }}" class="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-white/5 hover:border-[#0F1E36]/30 dark:hover:border-[#C4A462]/40 hover:bg-white dark:hover:bg-slate-800 transition-premium group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <x-mary-icon name="o-truck" class="w-4 h-4" />
+                                    </div>
+                                    <span class="text-xs font-black text-slate-800 dark:text-slate-100 group-hover:text-[#0F1E36] dark:group-hover:text-[#C4A462] transition-colors">Despacho (Planta Baja)</span>
+                                </div>
+                                <x-mary-icon name="o-chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F1E36] dark:group-hover:text-[#C4A462] group-hover:translate-x-0.5 transition-all" />
+                            </a>
+
+                            <a href="{{ route('loans.picking-list') }}" target="_blank" class="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-white/5 hover:border-[#0F1E36]/30 dark:hover:border-[#C4A462]/40 hover:bg-white dark:hover:bg-slate-800 transition-premium group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <x-mary-icon name="o-printer" class="w-4 h-4" />
+                                    </div>
+                                    <span class="text-xs font-black text-slate-800 dark:text-slate-100 group-hover:text-[#0F1E36] dark:group-hover:text-[#C4A462] transition-colors">Hoja de Surtido</span>
+                                </div>
+                                <x-mary-icon name="o-arrow-top-right-on-square" class="w-4 h-4 text-slate-400 group-hover:text-[#0F1E36] dark:group-hover:text-[#C4A462] transition-all" />
+                            </a>
                         @endcanany
+
                         @can('expedients.create')
-                            <x-mary-button label="Nuevo Expediente" icon="o-plus" link="{{ route('expedients.create') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                            <a href="{{ route('expedients.create') }}" class="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-white/5 hover:border-[#0F1E36]/30 dark:hover:border-[#C4A462]/40 hover:bg-white dark:hover:bg-slate-800 transition-premium group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <x-mary-icon name="o-plus" class="w-4 h-4" />
+                                    </div>
+                                    <span class="text-xs font-black text-slate-800 dark:text-slate-100 group-hover:text-[#0F1E36] dark:group-hover:text-[#C4A462] transition-colors">Nuevo Expediente</span>
+                                </div>
+                                <x-mary-icon name="o-chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F1E36] dark:group-hover:text-[#C4A462] group-hover:translate-x-0.5 transition-all" />
+                            </a>
                         @endcan
+
                         @can('loans.approve')
-                            <x-mary-button label="Solicitud Masiva" icon="o-rectangle-stack" link="{{ route('loans.bulk') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
-                            <x-mary-button label="Mesa de Control" icon="o-clipboard-document-check" link="{{ route('loans.index') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                            <a href="{{ route('loans.bulk') }}" class="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-white/5 hover:border-[#0F1E36]/30 dark:hover:border-[#C4A462]/40 hover:bg-white dark:hover:bg-slate-800 transition-premium group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <x-mary-icon name="o-rectangle-stack" class="w-4 h-4" />
+                                    </div>
+                                    <span class="text-xs font-black text-slate-800 dark:text-slate-100 group-hover:text-[#0F1E36] dark:group-hover:text-[#C4A462] transition-colors">Solicitud Masiva</span>
+                                </div>
+                                <x-mary-icon name="o-chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F1E36] dark:group-hover:text-[#C4A462] group-hover:translate-x-0.5 transition-all" />
+                            </a>
+
+                            <a href="{{ route('loans.index') }}" class="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-white/5 hover:border-[#0F1E36]/30 dark:hover:border-[#C4A462]/40 hover:bg-white dark:hover:bg-slate-800 transition-premium group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <x-mary-icon name="o-clipboard-document-check" class="w-4 h-4" />
+                                    </div>
+                                    <span class="text-xs font-black text-slate-800 dark:text-slate-100 group-hover:text-[#0F1E36] dark:group-hover:text-[#C4A462] transition-colors">Mesa de Control</span>
+                                </div>
+                                <x-mary-icon name="o-chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F1E36] dark:group-hover:text-[#C4A462] group-hover:translate-x-0.5 transition-all" />
+                            </a>
                         @endcan
+
                         @can('expedients.change-location')
-                            <x-mary-button label="Escáner Inteligente" icon="o-qr-code" link="{{ route('expedients.scanner') }}" class="btn-ghost w-full justify-start text-slate-300 hover:text-white rounded-xl py-4" />
+                            <a href="{{ route('expedients.scanner') }}" class="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-white/5 hover:border-[#0F1E36]/30 dark:hover:border-[#C4A462]/40 hover:bg-white dark:hover:bg-slate-800 transition-premium group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                        <x-mary-icon name="o-qr-code" class="w-4 h-4" />
+                                    </div>
+                                    <span class="text-xs font-black text-slate-800 dark:text-slate-100 group-hover:text-[#0F1E36] dark:group-hover:text-[#C4A462] transition-colors">Escáner Inteligente</span>
+                                </div>
+                                <x-mary-icon name="o-chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-[#0F1E36] dark:group-hover:text-[#C4A462] group-hover:translate-x-0.5 transition-all" />
+                            </a>
                         @endcan
                     </div>
-                </x-mary-card>
+                </div>
 
                 @if($overdueLoans->count() > 0)
                     <x-mary-card class="bg-rose-50 border border-rose-200 rounded-3xl p-6">
@@ -215,8 +277,8 @@
                 </x-mary-card>
             </div>
 
-            <x-mary-card title="Actividad Reciente" class="premium-card p-6">
-                <div class="space-y-6 mt-6">
+            <x-mary-card title="Actividad Reciente" class="premium-card p-6 overflow-hidden">
+                <div class="space-y-6 mt-6 max-h-[380px] overflow-y-auto pr-3">
                     @forelse($recentActivities as $activity)
                         <div class="flex gap-4">
                             <div class="w-2 h-2 rounded-full bg-primary mt-2"></div>

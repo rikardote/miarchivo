@@ -2,14 +2,15 @@
 
 namespace App\Livewire;
 
-use App\Models\Expedient;
-use App\Models\LoanRequest;
-use App\Models\Employee;
 use App\Enums\ExpedientStatus;
 use App\Enums\LoanStatus;
-use Livewire\Component;
-use Livewire\Attributes\On;
+use App\Models\Employee;
+use App\Models\Expedient;
+use App\Models\LoanRequest;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
+use Livewire\Component;
+use Spatie\Activitylog\Models\Activity;
 
 class Dashboard extends Component
 {
@@ -25,7 +26,7 @@ class Dashboard extends Component
     {
         $user = Auth::user();
         $isAdmin = $user->can('loans.approve');
-        $isOperator = $user->hasRole('operator') || (!$isAdmin && $user->can('loans.deliver'));
+        $isOperator = $user->hasRole('operator') || (! $isAdmin && $user->can('loans.deliver'));
         $isStaff = $isAdmin || $isOperator;
 
         if ($isStaff) {
@@ -46,20 +47,20 @@ class Dashboard extends Component
                     ->limit(5)
                     ->get(),
                 'totalEmployees' => Employee::count(),
-                'pendingTransfersCount' => Expedient::whereHas('employee', function($q) {
+                'pendingTransfersCount' => Expedient::whereHas('employee', function ($q) {
                     $q->where('employment_status', 'inactive');
-                })->whereHas('currentLocation.branch', function($q) {
+                })->whereHas('currentLocation.branch', function ($q) {
                     $q->where('code', '!=', 'CEN');
                 })->count(),
-                'statusStats' => collect(ExpedientStatus::cases())->map(fn($status) => [
+                'statusStats' => collect(ExpedientStatus::cases())->map(fn ($status) => [
                     'label' => $status->label(),
                     'count' => $statusCounts->get($status->value, 0),
-                    'color' => $status->color()
+                    'color' => $status->color(),
                 ]),
-                'recentActivities' => \Spatie\Activitylog\Models\Activity::with(['subject', 'causer'])->latest()->limit(8)->get()->map(function($activity) {
+                'recentActivities' => Activity::with(['subject', 'causer'])->latest()->limit(20)->get()->map(function ($activity) {
                     if (in_array($activity->description, ['created', 'updated', 'deleted'])) {
                         $rawType = str_replace('App\\Models\\', '', $activity->subject_type);
-                        $subjectType = match($rawType) {
+                        $subjectType = match ($rawType) {
                             'Expedient' => 'Expediente',
                             'LoanRequest' => 'Préstamo',
                             'User' => 'Usuario',
@@ -67,21 +68,22 @@ class Dashboard extends Component
                             'Employee' => 'Empleado',
                             default => $rawType
                         };
-                        
+
                         $subjectName = $activity->subject ? ($activity->subject->expedient_code ?? $activity->subject->full_name ?? $activity->subject->name ?? "#{$activity->subject_id}") : "#{$activity->subject_id}";
-                        
-                        $action = match($activity->description) {
+
+                        $action = match ($activity->description) {
                             'created' => 'creó',
                             'updated' => 'actualizó',
                             'deleted' => 'eliminó',
                             default => $activity->description
                         };
-                        
+
                         $activity->description = "Se {$action} el {$subjectType}: {$subjectName}";
                     }
+
                     return $activity;
                 }),
-                'isAdmin' => true
+                'isAdmin' => true,
             ];
         } else {
             $data = [
@@ -95,10 +97,10 @@ class Dashboard extends Component
                     ->where('status', LoanStatus::Delivered)
                     ->where('due_date', '<', now())
                     ->count(),
-                'recentActivities' => \Spatie\Activitylog\Models\Activity::with(['subject', 'causer'])->where('causer_id', $user->id)->latest()->limit(5)->get()->map(function($activity) {
+                'recentActivities' => Activity::with(['subject', 'causer'])->where('causer_id', $user->id)->latest()->limit(5)->get()->map(function ($activity) {
                     if (in_array($activity->description, ['created', 'updated', 'deleted'])) {
                         $rawType = str_replace('App\\Models\\', '', $activity->subject_type);
-                        $subjectType = match($rawType) {
+                        $subjectType = match ($rawType) {
                             'Expedient' => 'Expediente',
                             'LoanRequest' => 'Préstamo',
                             'User' => 'Usuario',
@@ -106,21 +108,22 @@ class Dashboard extends Component
                             'Employee' => 'Empleado',
                             default => $rawType
                         };
-                        
+
                         $subjectName = $activity->subject ? ($activity->subject->expedient_code ?? $activity->subject->full_name ?? $activity->subject->name ?? "#{$activity->subject_id}") : "#{$activity->subject_id}";
-                        
-                        $action = match($activity->description) {
+
+                        $action = match ($activity->description) {
                             'created' => 'creó',
                             'updated' => 'actualizó',
                             'deleted' => 'eliminó',
                             default => $activity->description
                         };
-                        
+
                         $activity->description = "Se {$action} el {$subjectType}: {$subjectName}";
                     }
+
                     return $activity;
                 }),
-                'isAdmin' => false
+                'isAdmin' => false,
             ];
         }
 

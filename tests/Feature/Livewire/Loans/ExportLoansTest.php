@@ -125,6 +125,33 @@ class ExportLoansTest extends TestCase
             ->assertSee('día(s) de atraso');
     }
 
+    public function test_it_filters_by_pending_tab_and_excludes_returned_loans(): void
+    {
+        $employee1 = Employee::factory()->create(['rfc' => 'PEND111111']);
+        $expedient1 = Expedient::factory()->create(['employee_id' => $employee1->id, 'expedient_code' => 'PEND111111-V1']);
+
+        LoanRequest::factory()->create([
+            'expedient_id' => $expedient1->id,
+            'requester_id' => $this->requester->id,
+            'status' => LoanStatus::Pending,
+        ]);
+
+        $employee2 = Employee::factory()->create(['rfc' => 'RET2222222']);
+        $expedient2 = Expedient::factory()->create(['employee_id' => $employee2->id, 'expedient_code' => 'RET2222222-V1']);
+
+        LoanRequest::factory()->create([
+            'expedient_id' => $expedient2->id,
+            'requester_id' => $this->requester->id,
+            'status' => LoanStatus::Returned,
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(Index::class)
+            ->call('setTab', 'pending')
+            ->assertSee('PEND111111-V1')
+            ->assertDontSee('RET2222222-V1');
+    }
+
     public function test_it_filters_by_specific_custodian()
     {
         $user2 = User::factory()->create(['name' => 'Otro Custodio']);

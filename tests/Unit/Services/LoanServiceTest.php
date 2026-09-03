@@ -4,11 +4,11 @@ namespace Tests\Unit\Services;
 
 use App\Enums\ExpedientStatus;
 use App\Enums\LoanStatus;
+use App\Enums\MovementType;
 use App\Models\Expedient;
 use App\Models\LoanRequest;
 use App\Models\User;
 use App\Services\LoanService;
-use App\Services\ExpedientService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
@@ -18,24 +18,26 @@ class LoanServiceTest extends TestCase
     use RefreshDatabase;
 
     protected LoanService $loanService;
+
     protected User $admin;
+
     protected User $user;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->loanService = app(LoanService::class);
         $this->admin = User::factory()->create();
         $this->user = User::factory()->create();
-        
+
         Auth::login($this->user);
     }
 
     public function test_it_can_request_a_loan_for_an_available_expedient()
     {
         $expedient = Expedient::factory()->create([
-            'current_status' => ExpedientStatus::Available
+            'current_status' => ExpedientStatus::Available,
         ]);
 
         $loan = $this->loanService->requestLoan($expedient, 'Test observations');
@@ -44,7 +46,7 @@ class LoanServiceTest extends TestCase
         $this->assertEquals($expedient->id, $loan->expedient_id);
         $this->assertEquals($this->user->id, $loan->requester_id);
         $this->assertEquals(LoanStatus::Pending, $loan->status);
-        
+
         $expedient->refresh();
         $this->assertEquals(ExpedientStatus::Requested, $expedient->current_status);
     }
@@ -52,7 +54,7 @@ class LoanServiceTest extends TestCase
     public function test_it_cannot_request_a_loan_for_an_unavailable_expedient()
     {
         $expedient = Expedient::factory()->create([
-            'current_status' => ExpedientStatus::Loaned
+            'current_status' => ExpedientStatus::Loaned,
         ]);
 
         $this->expectException(\Exception::class);
@@ -64,16 +66,21 @@ class LoanServiceTest extends TestCase
     public function test_an_admin_can_approve_a_loan()
     {
         $loan = LoanRequest::factory()->create(['status' => LoanStatus::Pending]);
-        
+
         Auth::login($this->admin);
         $this->loanService->approveLoan($loan);
 
         $loan->refresh();
         $this->assertEquals(LoanStatus::Approved, $loan->status);
         $this->assertEquals($this->admin->id, $loan->approved_by);
-        
+
         $loan->expedient->refresh();
         $this->assertEquals(ExpedientStatus::Reserved, $loan->expedient->current_status);
+
+        $this->assertDatabaseHas('expedient_movements', [
+            'expedient_id' => $loan->expedient_id,
+            'movement_type' => MovementType::StatusChanged,
+        ]);
     }
 
     public function test_an_operator_cannot_extract_a_pending_loan()
@@ -89,7 +96,7 @@ class LoanServiceTest extends TestCase
     public function test_an_operator_can_extract_an_approved_loan()
     {
         $loan = LoanRequest::factory()->create(['status' => LoanStatus::Approved]);
-        
+
         $this->loanService->extractLoan($loan);
 
         $loan->refresh();
@@ -101,7 +108,7 @@ class LoanServiceTest extends TestCase
     public function test_it_can_deliver_an_approved_loan()
     {
         $loan = LoanRequest::factory()->create(['status' => LoanStatus::Approved]);
-        
+
         Auth::login($this->admin);
         $this->loanService->deliverLoan($loan, '140 fojas útiles');
 
@@ -120,9 +127,9 @@ class LoanServiceTest extends TestCase
     {
         $loan = LoanRequest::factory()->create([
             'status' => LoanStatus::Delivered,
-            'delivered_at' => now()->subDays(2)
+            'delivered_at' => now()->subDays(2),
         ]);
-        
+
         Auth::login($this->admin);
         $this->loanService->returnLoan($loan, 'All good');
 

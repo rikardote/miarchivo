@@ -164,6 +164,8 @@ class Index extends Component
                 ->where('due_date', '<', now());
         } elseif ($this->tab === 'delivered') {
             $query->where('status', LoanStatus::Delivered);
+        } elseif ($this->tab === 'pending') {
+            $query->whereIn('status', [LoanStatus::Pending, LoanStatus::Approved, LoanStatus::Reserved]);
         } elseif ($this->status) {
             $query->where('status', $this->status);
         }
@@ -206,7 +208,7 @@ class Index extends Component
             'all' => LoanRequest::query()->where($baseUserScope)->count(),
             'delivered' => LoanRequest::query()->where($baseUserScope)->where('status', LoanStatus::Delivered)->count(),
             'overdue' => LoanRequest::query()->where($baseUserScope)->where('status', LoanStatus::Delivered)->whereNotNull('due_date')->where('due_date', '<', now())->count(),
-            'pending' => LoanRequest::query()->where($baseUserScope)->where('status', LoanStatus::Pending)->count(),
+            'pending' => LoanRequest::query()->where($baseUserScope)->whereIn('status', [LoanStatus::Pending, LoanStatus::Approved, LoanStatus::Reserved])->count(),
         ];
 
         $custodians = User::whereHas('loanRequests', function ($q) use ($baseUserScope) {

@@ -5,6 +5,11 @@ namespace App\Services;
 use App\Enums\ExpedientStatus;
 use App\Enums\LoanStatus;
 use App\Enums\MovementType;
+use App\Events\LoanApproved;
+use App\Events\LoanCancelled;
+use App\Events\LoanDelivered;
+use App\Events\LoanRequested;
+use App\Events\LoanReturned;
 use App\Models\Expedient;
 use App\Models\LoanRequest;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +47,7 @@ class LoanService
                 'Estado cambiado a Solicitado'
             );
 
-            \App\Events\LoanRequested::dispatch($loan);
+            LoanRequested::dispatch($loan);
 
             return $loan;
         });
@@ -63,11 +68,19 @@ class LoanService
                 'approved_by' => Auth::id(),
                 'approved_at' => now(),
             ]);
-            
-            
+
             $loan->expedient->update(['current_status' => ExpedientStatus::Reserved]);
 
-            \App\Events\LoanApproved::dispatch($loan);
+            $approverName = Auth::user()?->name ?? 'Jefatura de RH';
+            $this->expedientService->recordMovement(
+                $loan->expedient,
+                MovementType::StatusChanged,
+                $loan->expedient->current_location_id,
+                $loan->expedient->current_location_id,
+                "Solicitud de préstamo aprobada por {$approverName}. Expediente reservado y autorizado para extracción física."
+            );
+
+            LoanApproved::dispatch($loan);
         });
     }
 
@@ -141,8 +154,8 @@ class LoanService
                 'current_holder_id' => $loan->requester_id,
             ]);
 
-            $description = 'Iniciado préstamo a ' . ($loan->requester?->name ?? 'solicitante');
-            if (!empty($deliveryNotes)) {
+            $description = 'Iniciado préstamo a '.($loan->requester?->name ?? 'solicitante');
+            if (! empty($deliveryNotes)) {
                 $description .= " (Estado entrega: {$deliveryNotes})";
             }
 
@@ -154,7 +167,7 @@ class LoanService
                 $description
             );
 
-            \App\Events\LoanDelivered::dispatch($loan);
+            LoanDelivered::dispatch($loan);
         });
     }
 
@@ -187,10 +200,10 @@ class LoanService
                 MovementType::Returned,
                 $location,
                 $location,
-                'Devuelto por ' . $loan->requester->name . ' en Jefatura de RH' . ($returnNotes ? " - Notas: {$returnNotes}" : '')
+                'Devuelto por '.$loan->requester->name.' en Jefatura de RH'.($returnNotes ? " - Notas: {$returnNotes}" : '')
             );
 
-            \App\Events\LoanReturned::dispatch($loan);
+            LoanReturned::dispatch($loan);
         });
     }
 
@@ -252,7 +265,7 @@ class LoanService
                 'Préstamo cancelado.'
             );
 
-            \App\Events\LoanCancelled::dispatch($loan);
+            LoanCancelled::dispatch($loan);
         });
     }
 }

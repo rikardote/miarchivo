@@ -46,8 +46,21 @@
         
         /* Ajuste para modales anchos */
         .modal-wide .modal-box {
-            max-width: 1000px !important;
+            max-width: 680px !important;
             width: 95% !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+
+        @media (max-width: 640px) {
+            .modal-wide .modal-box {
+                width: calc(100vw - 1.25rem) !important;
+                max-width: calc(100vw - 1.25rem) !important;
+                max-height: 94vh !important;
+                padding: 1rem !important;
+                margin: 0 auto !important;
+                border-radius: 1.25rem !important;
+            }
         }
     </style>
 </head>
@@ -58,7 +71,7 @@
                 <img src="{{ asset('60issste.png') }}" alt="Logo" class="h-9 sm:h-12 w-auto object-contain" />
                 <div class="flex flex-col">
                     <div class="font-black text-xl sm:text-2xl tracking-tighter text-slate-900 dark:text-white leading-none">
-                        Archivo<span class="text-primary">.</span>
+                        Archivo<span class="text-[#C4A462]">.</span>
                     </div>
                     <div class="hidden sm:block text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 mt-1">ISSSTE BAJA CALIFORNIA</div>
                 </div>
@@ -66,9 +79,13 @@
         </x-slot:brand>
         <x-slot:actions>
             <div class="flex items-center gap-1.5 sm:gap-3">
-                <div class="p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl flex items-center transition-premium border border-transparent dark:border-white/5">
-                    <x-mary-theme-toggle darkTheme="dark" lightTheme="light" class="btn btn-ghost btn-sm btn-circle text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700" />
-                </div>
+                @canany(['loans.deliver', 'loans.return', 'expedients.change-location', 'loans.approve'])
+                    <div class="p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl flex items-center transition-premium border border-transparent dark:border-white/5">
+                        <button type="button" onclick="window.Livewire && Livewire.dispatch('open-global-scanner')" class="btn btn-ghost btn-sm btn-circle text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-primary cursor-pointer" title="Escáner Rápido (Ctrl+K)">
+                            <x-mary-icon name="o-qr-code" class="w-4 h-4" />
+                        </button>
+                    </div>
+                @endcanany
 
                 <div class="p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl flex items-center transition-premium border border-transparent dark:border-white/5">
                     <livewire:notifications-bell />
@@ -81,7 +98,7 @@
                         <div class="flex items-center gap-2 sm:gap-4">
                             <div class="hidden md:flex flex-col items-end">
                                 <span class="text-sm font-black text-slate-900 dark:text-white dark:text-slate-100 leading-none">{{ Auth::user()->name }}</span>
-                                <span class="text-[10px] text-primary font-bold uppercase tracking-widest mt-1.5 opacity-80">{{ Auth::user()->getRoleNames()->first() }}</span>
+                                <span class="text-[10px] text-[#C4A462] font-bold uppercase tracking-widest mt-1.5 opacity-90">{{ Auth::user()->getRoleNames()->first() }}</span>
                             </div>
                             <div class="relative group-hover:scale-110 transition-premium">
                                 <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center overflow-hidden border border-slate-200 dark:border-white/10 shadow-sm">
@@ -92,9 +109,18 @@
                         </div>
                     </x-slot:label>
                     
-                    <div class="p-2 min-w-[200px]">
+                    <div class="p-2 min-w-[220px] space-y-1">
                         <x-mary-menu-item title="Mi Perfil" icon="o-user" link="/profile" class="rounded-xl text-sm font-bold" />
-                        <x-mary-menu-separator class="my-2 opacity-50" />
+                        
+                        <div class="flex items-center justify-between px-3.5 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer">
+                            <span class="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2.5">
+                                <x-mary-icon name="o-moon" class="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                                <span>Modo Oscuro</span>
+                            </span>
+                            <x-mary-theme-toggle darkTheme="dark" lightTheme="light" class="btn btn-ghost btn-xs btn-circle text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700" />
+                        </div>
+
+                        <x-mary-menu-separator class="my-1.5 opacity-50" />
                         <form method="POST" action="{{ route('logout') }}" class="w-full">
                             @csrf
                             <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-error hover:bg-error/10 text-xs font-black uppercase tracking-wider transition-colors text-left cursor-pointer">
@@ -120,7 +146,7 @@
                 <x-mary-menu-item title="Dashboard" icon="o-chart-pie" link="{{ route('dashboard') }}" active="{{ request()->routeIs('dashboard') }}" class="rounded-3xl text-slate-600 dark:text-slate-300 dark:text-white/50 hover:text-primary dark:hover:text-white hover:bg-white dark:hover:bg-white/5 py-4 transition-premium font-black text-sm" />
 
 
-                @can('expedients.view')
+                @canany(['expedients.create', 'expedients.change-location'])
                 <x-mary-menu-sub title="Expedientes" icon="o-folder" open="{{ request()->routeIs('expedients.*') }}" class="text-slate-600 dark:text-white/70 font-black text-sm">
                     <x-mary-menu-item title="Buscador Central" icon="o-magnifying-glass" link="{{ route('expedients.index') }}" active="{{ request()->routeIs('expedients.index') }}" class="text-xs font-bold py-3" />
                     @can('expedients.change-location')
@@ -132,20 +158,26 @@
                         <x-mary-menu-item title="Captura Rápida" icon="o-bolt" link="{{ route('expedients.continuous-create') }}" active="{{ request()->routeIs('expedients.continuous-create') }}" class="text-xs font-bold py-3" />
                     @endcan
                 </x-mary-menu-sub>
-                @endcan
+                @endcanany
 
-                <x-mary-menu-sub title="Préstamos" icon="o-document-text" open="{{ request()->routeIs('loans.*') }}" class="text-slate-600 dark:text-white/70 font-black text-sm">
+                @canany(['loans.approve', 'loans.deliver', 'loans.return'])
+                    <x-mary-menu-sub title="Préstamos" icon="o-document-text" open="{{ request()->routeIs('loans.*') }}" class="text-slate-600 dark:text-white/70 font-black text-sm">
+                        @can('loans.create')
+                            <x-mary-menu-item title="Bandeja Personal" icon="o-inbox" link="{{ route('loans.index', ['mine' => 1]) }}" active="{{ request()->fullUrlIs(route('loans.index', ['mine' => 1])) }}" class="text-xs font-bold py-3" />
+                        @endcan
+                        @canany(['loans.deliver', 'loans.return'])
+                            <x-mary-menu-item title="Despacho (Planta Baja)" icon="o-truck" link="{{ route('loans.dispatch') }}" active="{{ request()->routeIs('loans.dispatch') }}" class="text-xs font-bold py-3" />
+                        @endcanany
+                        @can('loans.approve')
+                            <x-mary-menu-item title="Carga Masiva" icon="o-rectangle-stack" link="{{ route('loans.bulk') }}" active="{{ request()->routeIs('loans.bulk') }}" class="text-xs font-bold py-3" />
+                            <x-mary-menu-item title="Mesa de Control" icon="o-clipboard-document-check" link="{{ route('loans.index') }}" active="{{ request()->routeIs('loans.index') && !request()->has('mine') }}" class="text-xs font-bold py-3" />
+                        @endcan
+                    </x-mary-menu-sub>
+                @else
                     @can('loans.create')
-                        <x-mary-menu-item title="Bandeja Personal" icon="o-inbox" link="{{ route('loans.index', ['mine' => 1]) }}" active="{{ request()->fullUrlIs(route('loans.index', ['mine' => 1])) }}" class="text-xs font-bold py-3" />
+                        <x-mary-menu-item title="Préstamos" icon="o-document-text" link="{{ route('loans.index', ['mine' => 1]) }}" active="{{ request()->routeIs('loans.*') }}" class="rounded-3xl text-slate-600 dark:text-slate-300 dark:text-white/50 hover:text-primary dark:hover:text-white hover:bg-white dark:hover:bg-white/5 py-4 transition-premium font-black text-sm" />
                     @endcan
-                    @canany(['loans.deliver', 'loans.return'])
-                        <x-mary-menu-item title="Despacho (Planta Baja)" icon="o-truck" link="{{ route('loans.dispatch') }}" active="{{ request()->routeIs('loans.dispatch') }}" class="text-xs font-bold py-3" />
-                    @endcanany
-                    @can('loans.approve')
-                        <x-mary-menu-item title="Carga Masiva" icon="o-rectangle-stack" link="{{ route('loans.bulk') }}" active="{{ request()->routeIs('loans.bulk') }}" class="text-xs font-bold py-3" />
-                        <x-mary-menu-item title="Mesa de Control" icon="o-clipboard-document-check" link="{{ route('loans.index') }}" active="{{ request()->routeIs('loans.index') && !request()->has('mine') }}" class="text-xs font-bold py-3" />
-                    @endcan
-                </x-mary-menu-sub>
+                @endcanany
 
                 @canany(['employees.view', 'locations.view', 'users.view'])
                     <div class="px-6 py-4 mt-6 mb-2 text-[10px] font-black text-slate-300 dark:text-white/10 uppercase tracking-[0.4em] border-t border-slate-100 dark:border-white/5 pt-6">Sistema</div>
@@ -181,7 +213,7 @@
             @isset($header)
                 <header class="mb-6 sm:mb-8">
                     <div class="flex items-center gap-3 mb-1">
-                        <div class="h-1 w-6 bg-primary rounded-full"></div>
+                        <div class="h-1 w-6 bg-[#C4A462] rounded-full"></div>
                         <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Vista Actual</span>
                     </div>
                     <h1 class="text-2xl sm:text-4xl font-black text-slate-800 dark:text-slate-100 dark:text-white tracking-tight">{{ $header }}</h1>
@@ -195,6 +227,59 @@
     </x-mary-main>
 
     <x-mary-toast />
+
+    @canany(['loans.deliver', 'loans.return', 'expedients.change-location', 'loans.approve'])
+        <livewire:global-scanner-modal />
+
+        <script>
+            (function () {
+                let barcodeBuffer = '';
+                let lastKeyTime = Date.now();
+
+                window.addEventListener('keydown', function (e) {
+                    // Keyboard shortcuts: Ctrl+K or F2 opens quick scanner modal
+                    if ((e.ctrlKey && e.key.toLowerCase() === 'k') || e.key === 'F2') {
+                        e.preventDefault();
+                        if (window.Livewire) {
+                            Livewire.dispatch('open-global-scanner');
+                        }
+                        return;
+                    }
+
+                    // Don't intercept if user is actively typing in the quick scan input
+                    const activeElem = document.activeElement;
+                    if (activeElem && activeElem.id === 'global-quick-scan-input') {
+                        return;
+                    }
+
+                    const currentTime = Date.now();
+                    const timeDiff = currentTime - lastKeyTime;
+                    lastKeyTime = currentTime;
+
+                    if (e.key === 'Enter') {
+                        if (barcodeBuffer.length >= 3) {
+                            const code = barcodeBuffer.trim();
+                            barcodeBuffer = '';
+                            if (window.Livewire) {
+                                e.preventDefault();
+                                Livewire.dispatch('open-global-scanner', { code: code });
+                            }
+                        } else {
+                            barcodeBuffer = '';
+                        }
+                    } else if (e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                        // Hardware scanners send characters in bursts < 60ms apart
+                        if (timeDiff > 70) {
+                            barcodeBuffer = e.key;
+                        } else {
+                            barcodeBuffer += e.key;
+                        }
+                    }
+                });
+            })();
+        </script>
+    @endcanany
+
     @stack('scripts')
 </body>
 </html>

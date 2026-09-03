@@ -37,7 +37,7 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-950 min-h-screen flex flex-col selection:bg-[#13322B] selection:text-white">
+<body class="font-sans antialiased text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-950 min-h-screen flex flex-col selection:bg-[#0F1E36] selection:text-white">
     
     <!-- Header flotante con fecha y toggle de tema -->
     <header class="w-full p-4 sm:p-6 lg:p-10 flex items-center justify-between sm:justify-end gap-3 absolute top-0 z-30">
@@ -63,11 +63,11 @@
         </div>
         
         <!-- Left Side: Hero Institucional -->
-        <div class="w-full md:w-5/12 lg:w-1/2 bg-[#13322B] p-8 sm:p-12 lg:p-20 flex flex-col justify-between relative overflow-hidden min-h-[380px] md:min-h-screen">
+        <div class="w-full md:w-5/12 lg:w-1/2 bg-[#0F1E36] p-8 sm:p-12 lg:p-20 flex flex-col justify-between relative overflow-hidden min-h-[380px] md:min-h-screen">
             <!-- Destellos decorativos -->
             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-white opacity-5 mix-blend-overlay"></div>
             <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-[#C4A462] opacity-15 blur-3xl"></div>
-            <div class="absolute top-1/2 left-1/3 w-64 h-64 rounded-full bg-emerald-500/10 blur-2xl"></div>
+            <div class="absolute top-1/2 left-1/3 w-64 h-64 rounded-full bg-blue-500/10 blur-2xl"></div>
 
             <!-- Logo Superior Izquierdo -->
             <div class="relative z-20 hidden sm:block">
@@ -80,7 +80,7 @@
                     Sistema de<br>
                     <span class="text-[#C4A462]">Gestión de Archivo</span>
                 </h1>
-                <p class="text-base sm:text-lg text-emerald-100/90 leading-relaxed font-medium">
+                <p class="text-base sm:text-lg text-slate-200/90 leading-relaxed font-medium">
                     Control centralizado, trazabilidad física y digital de expedientes de personal para la Representación Estatal Baja California.
                 </p>
             </div>
@@ -99,7 +99,7 @@
                 <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 sm:p-10 shadow-2xl shadow-slate-900/5 dark:shadow-none border border-slate-200/80 dark:border-white/5">
                     
                     <div class="mb-8">
-                        <div class="inline-block p-3 rounded-2xl bg-[#13322B]/10 dark:bg-[#C4A462]/10 text-[#13322B] dark:text-[#C4A462] mb-4">
+                        <div class="inline-block p-3 rounded-2xl bg-[#0F1E36]/10 dark:bg-[#C4A462]/10 text-[#0F1E36] dark:text-[#C4A462] mb-4">
                             <x-mary-icon name="o-lock-closed" class="w-6 h-6" />
                         </div>
                         <h2 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">Iniciar Sesión</h2>
@@ -152,7 +152,7 @@
                                     Contraseña
                                 </label>
                                 @if (Route::has('password.request'))
-                                    <a href="{{ route('password.request') }}" class="text-xs font-bold text-[#13322B] dark:text-[#C4A462] hover:underline">
+                                    <a href="{{ route('password.request') }}" class="text-xs font-bold text-[#0F1E36] dark:text-[#C4A462] hover:underline">
                                         ¿Olvidaste tu contraseña?
                                     </a>
                                 @endif
@@ -199,7 +199,7 @@
                                     id="remember_me" 
                                     type="checkbox" 
                                     name="remember"
-                                    class="w-4 h-4 rounded-lg border-slate-300 dark:border-slate-700 text-[#13322B] focus:ring-[#C4A462] focus:ring-offset-0 cursor-pointer" 
+                                    class="w-4 h-4 rounded-lg border-slate-300 dark:border-slate-700 text-[#0F1E36] focus:ring-[#C4A462] focus:ring-offset-0 cursor-pointer" 
                                 />
                                 <span class="ms-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                                     Mantener sesión iniciada
@@ -211,7 +211,7 @@
                         <div class="pt-3">
                             <button 
                                 type="submit" 
-                                class="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl shadow-xl shadow-[#13322B]/20 dark:shadow-none text-xs font-black uppercase tracking-widest text-white bg-[#13322B] hover:bg-[#0c221d] active:scale-[0.99] focus:outline-none focus:ring-4 focus:ring-[#13322B]/20 transition-all cursor-pointer">
+                                class="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl shadow-xl shadow-[#0F1E36]/20 dark:shadow-none text-xs font-black uppercase tracking-widest text-white bg-[#0F1E36] hover:bg-[#091322] active:scale-[0.99] focus:outline-none focus:ring-4 focus:ring-[#0F1E36]/20 transition-all cursor-pointer">
                                 <span>Ingresar al Sistema</span>
                                 <x-mary-icon name="o-arrow-right" class="w-4 h-4" />
                             </button>

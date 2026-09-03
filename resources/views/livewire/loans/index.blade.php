@@ -16,13 +16,13 @@
     <div class="flex flex-wrap items-center gap-2 mb-6">
         <button wire:click="setTab('all')" class="px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 {{ $tab === 'all' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 border border-slate-200/60 dark:border-slate-800' }}">
             <x-mary-icon name="o-queue-list" class="w-4 h-4" />
-            <span>Todos</span>
+            <span>Historial Completo</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] {{ $tab === 'all' ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">{{ $counts['all'] }}</span>
         </button>
 
         <button wire:click="setTab('delivered')" class="px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 {{ $tab === 'delivered' ? 'bg-primary text-white shadow-lg shadow-primary/25' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 border border-slate-200/60 dark:border-slate-800' }}">
             <x-mary-icon name="o-shield-check" class="w-4 h-4" />
-            <span>En Custodia Activa</span>
+            <span>Prestados / Por Devolver</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] {{ $tab === 'delivered' ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">{{ $counts['delivered'] }}</span>
         </button>
 
@@ -34,7 +34,7 @@
 
         <button wire:click="setTab('pending')" class="px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 {{ $tab === 'pending' ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/25' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-100 border border-slate-200/60 dark:border-slate-800' }}">
             <x-mary-icon name="o-clock" class="w-4 h-4" />
-            <span>Por Entregar</span>
+            <span>Solicitudes Pendientes</span>
             <span class="px-2 py-0.5 rounded-full text-[10px] {{ $tab === 'pending' ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300' }}">{{ $counts['pending'] }}</span>
         </button>
     </div>

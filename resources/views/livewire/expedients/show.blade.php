@@ -189,10 +189,60 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         
-        <!-- Columna Principal: Trazabilidad y Préstamos (2 columnas) -->
+        <!-- Columna Principal: Historial de Préstamos y Trazabilidad (2 columnas) -->
         <div class="lg:col-span-2 space-y-6 sm:space-y-8">
             
-            <!-- Historial de Movimientos Físicos -->
+            <!-- Historial de Préstamos y Solicitudes (Prioridad Principal) -->
+            <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 overflow-hidden">
+                <div class="p-2 sm:p-4">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">Historial de Préstamos</h3>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Registro de solicitudes institucionales y custodias</p>
+                        </div>
+                        <span class="badge badge-neutral badge-sm font-mono text-[10px]">{{ $expedient->loanRequests->count() }} solicitudes</span>
+                    </div>
+
+                    <div class="space-y-3 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
+                        @forelse($expedient->loanRequests as $loan)
+                            <div class="p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-black uppercase text-slate-800 dark:text-slate-100">
+                                            {{ $loan->requester->name ?? 'Usuario no disponible' }}
+                                        </span>
+                                        <span class="badge badge-sm font-bold uppercase text-[9px] {{ $loan->status->value === 'delivered' ? 'badge-warning' : ($loan->status->value === 'returned' ? 'badge-success' : 'badge-ghost') }}">
+                                            {{ $loan->status->label() }}
+                                        </span>
+                                    </div>
+                                    <div class="flex flex-wrap items-center gap-x-3 text-[10px] font-bold text-slate-400 mt-1">
+                                        <span>Solicitado: {{ $loan->requested_at?->format('d/m/Y H:i') ?? 'N/A' }}</span>
+                                        @if($loan->delivered_at)
+                                            <span>• Entregado: {{ $loan->delivered_at->format('d/m/Y') }}</span>
+                                        @endif
+                                        @if($loan->returned_at)
+                                            <span>• Devuelto: {{ $loan->returned_at->format('d/m/Y') }}</span>
+                                        @endif
+                                    </div>
+                                    @if($loan->observations)
+                                        <p class="text-xs text-slate-500 mt-1 italic">"{{ $loan->observations }}"</p>
+                                    @endif
+                                </div>
+                                @can('loans.view')
+                                    <x-mary-button label="Ver Préstamo" icon="o-arrow-top-right-on-square" link="{{ route('loans.show', $loan) }}" class="btn-ghost btn-xs font-bold uppercase shrink-0" />
+                                @endcan
+                            </div>
+                        @empty
+                            <div class="text-center py-10 text-slate-400">
+                                <x-mary-icon name="o-document-text" class="w-12 h-12 mx-auto mb-2 opacity-40" />
+                                <p class="text-xs font-bold">No hay solicitudes de préstamo registradas para este expediente.</p>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </x-mary-card>
+
+            <!-- Trazabilidad de Movimientos Físicos -->
             <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 overflow-hidden">
                 <div class="p-2 sm:p-4">
                     <div class="flex items-center justify-between mb-6">
@@ -203,7 +253,7 @@
                         <span class="badge badge-neutral badge-sm font-mono text-[10px]">{{ $expedient->movements->count() }} eventos</span>
                     </div>
 
-                    <div class="space-y-4 max-h-[420px] overflow-y-auto pr-2">
+                    <div class="space-y-4 max-h-[420px] overflow-y-auto pr-2 custom-scrollbar">
                         @forelse($expedient->movements as $movement)
                             <div class="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-white/5">
                                 <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
@@ -237,53 +287,6 @@
                     </div>
                 </div>
             </x-mary-card>
-
-            <!-- Historial de Préstamos y Solicitudes -->
-            @if($expedient->loanRequests->isNotEmpty())
-                <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 overflow-hidden">
-                    <div class="p-2 sm:p-4">
-                        <div class="flex items-center justify-between mb-6">
-                            <div>
-                                <h3 class="text-lg sm:text-xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">Historial de Préstamos</h3>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Registro de solicitudes institucionales</p>
-                            </div>
-                            <span class="badge badge-neutral badge-sm font-mono text-[10px]">{{ $expedient->loanRequests->count() }} solicitudes</span>
-                        </div>
-
-                        <div class="space-y-3">
-                            @foreach($expedient->loanRequests as $loan)
-                                <div class="p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-slate-800/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                    <div>
-                                        <div class="flex items-center gap-2">
-                                            <span class="text-xs font-black uppercase text-slate-800 dark:text-slate-100">
-                                                {{ $loan->requester->name ?? 'Usuario no disponible' }}
-                                            </span>
-                                            <span class="badge badge-sm font-bold uppercase text-[9px] {{ $loan->status->value === 'delivered' ? 'badge-warning' : ($loan->status->value === 'returned' ? 'badge-success' : 'badge-ghost') }}">
-                                                {{ $loan->status->label() }}
-                                            </span>
-                                        </div>
-                                        <div class="flex flex-wrap items-center gap-x-3 text-[10px] font-bold text-slate-400 mt-1">
-                                            <span>Solicitado: {{ $loan->requested_at?->format('d/m/Y H:i') ?? 'N/A' }}</span>
-                                            @if($loan->delivered_at)
-                                                <span>• Entregado: {{ $loan->delivered_at->format('d/m/Y') }}</span>
-                                            @endif
-                                            @if($loan->returned_at)
-                                                <span>• Devuelto: {{ $loan->returned_at->format('d/m/Y') }}</span>
-                                            @endif
-                                        </div>
-                                        @if($loan->observations)
-                                            <p class="text-xs text-slate-500 mt-1 italic">"{{ $loan->observations }}"</p>
-                                        @endif
-                                    </div>
-                                    @can('loans.view')
-                                        <x-mary-button label="Ver Préstamo" icon="o-arrow-top-right-on-square" link="{{ route('loans.show', $loan) }}" class="btn-ghost btn-xs font-bold uppercase shrink-0" />
-                                    @endcan
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </x-mary-card>
-            @endif
         </div>
 
         <!-- Sidebar Lateral: Identificación Física y Metadatos (1 columna) -->
@@ -294,7 +297,6 @@
                     <div class="p-4">
                         <div class="flex items-center justify-between mb-4">
                             <h3 class="text-xs font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest">Identificación Física</h3>
-                            <span class="badge badge-primary badge-sm text-[9px] font-black uppercase">Code128 / QR</span>
                         </div>
                         
                         <div class="my-4 bg-white p-4 rounded-3xl inline-block mx-auto border-4 border-slate-50 shadow-inner">
