@@ -147,6 +147,7 @@
                     <x-mary-menu-item title="Buscador Central" icon="o-magnifying-glass" link="{{ route('expedients.index') }}" active="{{ request()->routeIs('expedients.index') }}" class="text-xs font-bold py-3" />
                     @can('expedients.change-location')
                         <x-mary-menu-item title="Escáner Inteligente" icon="o-qr-code" link="{{ route('expedients.scanner') }}" active="{{ request()->routeIs('expedients.scanner') }}" class="text-xs font-bold py-3" />
+                        <x-mary-menu-item title="Escáner Móvil (PWA)" icon="o-device-phone-mobile" link="{{ route('mobile.scanner') }}" active="{{ request()->routeIs('mobile.scanner') }}" class="text-xs font-bold py-3 text-[#C4A462]" />
                         <x-mary-menu-item title="Auditoría de Control" icon="o-check-badge" link="{{ route('expedients.audit') }}" active="{{ request()->routeIs('expedients.audit') }}" class="text-xs font-bold py-3" />
                     @endcan
                     @can('expedients.create')

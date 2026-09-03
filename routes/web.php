@@ -30,6 +30,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Dedicated Mobile PWA Scanner
+    Route::get('/scanner', \App\Livewire\Mobile\Scanner::class)->name('mobile.scanner');
+
     // Expedients
     Route::get('/expedients/scanner', Scanner::class)->name('expedients.scanner');
     Route::get('/expedients/audit', Audit::class)->name('expedients.audit');

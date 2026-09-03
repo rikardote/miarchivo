@@ -1,0 +1,19 @@
+{
+  "name": "MiArchivo - Escáner Móvil",
+  "short_name": "Escáner",
+  "description": "Lector QR y código de barras móvil en red local para el sistema de archivo",
+  "start_url": "/scanner",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0F1E36",
+  "theme_color": "#0F1E36",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/60issste.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
