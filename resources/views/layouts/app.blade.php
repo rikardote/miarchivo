@@ -67,18 +67,18 @@
 <body class="font-sans antialiased min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
     <x-mary-nav sticky class="glass border-b border-slate-200 dark:border-white/10 z-[60] px-3 sm:px-6 !h-16 sm:!h-20">
         <x-slot:brand>
-            <div class="flex items-center gap-2 sm:gap-3 group cursor-pointer">
-                <img src="{{ asset('60issste.png') }}" alt="Logo" class="h-9 sm:h-12 w-auto object-contain" />
-                <div class="flex flex-col">
+            <div class="flex items-center gap-2 sm:gap-3 group cursor-pointer shrink-0">
+                <img src="{{ asset('60issste.png') }}" alt="Logo" class="h-8 sm:h-12 w-auto object-contain" />
+                <div class="hidden sm:flex flex-col">
                     <div class="font-black text-xl sm:text-2xl tracking-tighter text-slate-900 dark:text-white leading-none">
                         Archivo<span class="text-[#C4A462]">.</span>
                     </div>
-                    <div class="hidden sm:block text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 mt-1">ISSSTE BAJA CALIFORNIA</div>
+                    <div class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 mt-1">ISSSTE BAJA CALIFORNIA</div>
                 </div>
             </div>
         </x-slot:brand>
         <x-slot:actions>
-            <div class="flex items-center gap-1 sm:gap-2">
+            <div class="flex items-center gap-1 sm:gap-2 shrink-0 flex-nowrap">
                 @canany(['loans.deliver', 'loans.return', 'expedients.change-location', 'loans.approve'])
                     <button type="button" onclick="window.Livewire && Livewire.dispatch('open-global-scanner')" class="btn btn-ghost btn-circle btn-sm sm:btn-md !h-9 !w-9 sm:!h-10 sm:!w-10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary cursor-pointer transition-colors" title="Escáner Rápido (Ctrl+K)">
                         <x-mary-icon name="o-qr-code" class="w-5 h-5" />
