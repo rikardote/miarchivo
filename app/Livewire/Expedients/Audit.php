@@ -24,6 +24,8 @@ class Audit extends Component
 
     public ?string $selectedCabinet = null;
 
+    public ?int $selectedCabinetBlock = 0;
+
     public string $locationSearch = '';
 
     public array $scanned_codes = [];
@@ -267,11 +269,29 @@ class Audit extends Component
             ->orderBy('cabinet')
             ->pluck('cabinet');
 
+        // Agrupar gabinetes en bloques de 5 en 5 (ej. G-01 — G-05)
+        $cabinetBlocks = [];
+        foreach ($cabinets->chunk(5) as $index => $chunk) {
+            $first = $chunk->first();
+            $last = $chunk->last();
+            $cabinetBlocks[$index] = [
+                'index' => $index,
+                'label' => $first === $last ? $first : "{$first} — {$last}",
+                'cabinets' => $chunk->values()->all(),
+            ];
+        }
+
+        $activeCabinetFilter = null;
+        if (! is_null($this->selectedCabinetBlock) && isset($cabinetBlocks[$this->selectedCabinetBlock]) && empty($this->locationSearch)) {
+            $activeCabinetFilter = $cabinetBlocks[$this->selectedCabinetBlock]['cabinets'];
+        }
+
         $locationsQuery = ArchiveLocation::with('branch')
             ->withCount('expedients')
             ->when($this->selectedBranch, fn ($q) => $q->where('branch_id', $this->selectedBranch))
             ->when($this->selectedType, fn ($q) => $q->where('location_type', $this->selectedType))
             ->when($this->selectedCabinet, fn ($q) => $q->where('cabinet', $this->selectedCabinet))
+            ->when(! $this->selectedCabinet && ! empty($activeCabinetFilter), fn ($q) => $q->whereIn('cabinet', $activeCabinetFilter))
             ->when($this->locationSearch, function ($q) {
                 $term = '%'.$this->locationSearch.'%';
                 $q->where(function ($sub) use ($term) {
@@ -307,6 +327,7 @@ class Audit extends Component
                 ['id' => 'Almacén Central', 'name' => 'Almacén Central'],
             ],
             'cabinets' => $cabinets,
+            'cabinetBlocks' => $cabinetBlocks,
             'locations' => $locationsList,
             'groupedLocations' => $groupedLocations,
             'results' => $results,
