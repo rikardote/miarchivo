@@ -78,22 +78,18 @@
             </div>
         </x-slot:brand>
         <x-slot:actions>
-            <div class="flex items-center gap-1.5 sm:gap-3">
+            <div class="flex items-center gap-1 sm:gap-2">
                 @canany(['loans.deliver', 'loans.return', 'expedients.change-location', 'loans.approve'])
-                    <div class="p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl flex items-center transition-premium border border-transparent dark:border-white/5">
-                        <button type="button" onclick="window.Livewire && Livewire.dispatch('open-global-scanner')" class="btn btn-ghost btn-sm btn-circle text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-primary cursor-pointer" title="Escáner Rápido (Ctrl+K)">
-                            <x-mary-icon name="o-qr-code" class="w-4 h-4" />
-                        </button>
-                    </div>
+                    <button type="button" onclick="window.Livewire && Livewire.dispatch('open-global-scanner')" class="btn btn-ghost btn-circle btn-sm sm:btn-md !h-9 !w-9 sm:!h-10 sm:!w-10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary cursor-pointer transition-colors" title="Escáner Rápido (Ctrl+K)">
+                        <x-mary-icon name="o-qr-code" class="w-5 h-5" />
+                    </button>
                 @endcanany
 
-                <div class="p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl flex items-center transition-premium border border-transparent dark:border-white/5">
-                    <livewire:notifications-bell />
-                </div>
+                <livewire:notifications-bell />
                 
-                <div class="h-6 sm:h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1 sm:mx-2"></div>
+                <div class="hidden sm:block h-6 sm:h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1"></div>
 
-                <x-mary-dropdown right class="btn-ghost !h-12 sm:!h-14 px-2 sm:px-3 rounded-2xl hover:bg-white dark:hover:bg-white/5 transition-premium border border-transparent hover:border-slate-100 dark:hover:border-white/5">
+                <x-mary-dropdown right class="btn-ghost !h-10 sm:!h-14 px-1 sm:px-3 rounded-2xl hover:bg-white dark:hover:bg-white/5 transition-premium border border-transparent hover:border-slate-100 dark:hover:border-white/5">
                     <x-slot:label>
                         <div class="flex items-center gap-2 sm:gap-4">
                             <div class="hidden md:flex flex-col items-end">

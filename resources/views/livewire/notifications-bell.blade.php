@@ -1,10 +1,10 @@
 <div wire:poll.60s class="relative z-[100]">
-    <x-mary-dropdown right class="btn-ghost rounded-xl">
+    <x-mary-dropdown right class="btn-ghost btn-circle btn-sm sm:btn-md !h-9 !w-9 sm:!h-10 sm:!w-10">
         <x-slot:label>
-            <div class="relative inline-block mr-2" wire:click="markAsRead">
-                <x-mary-icon name="o-bell" class="w-6 h-6 cursor-pointer text-slate-500 dark:text-slate-400 dark:text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-white transition-premium" />
+            <div class="relative flex items-center justify-center" wire:click="markAsRead">
+                <x-mary-icon name="o-bell" class="w-5 h-5 cursor-pointer text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-white transition-colors" />
                 @if($this->unreadCount > 0)
-                    <span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-black px-1.5 rounded-full border-2 border-white dark:border-slate-900 min-w-[18px] h-[18px] flex items-center justify-center shadow-lg">
+                    <span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-black px-1 rounded-full border-2 border-white dark:border-slate-900 min-w-[16px] h-[16px] flex items-center justify-center shadow-md">
                         {{ $this->unreadCount }}
                     </span>
                 @endif
