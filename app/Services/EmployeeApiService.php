@@ -58,11 +58,7 @@ class EmployeeApiService
     /**
      * Sync a single employee from API data.
      */
-    protected ?int $mexBranchId = null;
-
-    protected ?int $cenBranchId = null;
-
-    public function syncEmployee(array $apiData): ?Employee
+    public function syncEmployee(array $apiData, bool $onlyIfMissing = false, ?string $forceStatus = null): ?Employee
     {
         $rawRfc = $apiData['id_legal'] ?? $apiData['rfc'] ?? null;
         if (empty($rawRfc)) {
@@ -77,10 +73,6 @@ class EmployeeApiService
         $employeeNumber = ! empty($apiData['id_empleado']) ? mb_strtoupper(trim((string) $apiData['id_empleado']), 'UTF-8') : (! empty($apiData['employee_number']) ? mb_strtoupper(trim((string) $apiData['employee_number']), 'UTF-8') : null);
         $externalApiId = ! empty($apiData['id']) ? (int) $apiData['id'] : (! empty($apiData['external_api_id']) ? (int) $apiData['external_api_id'] : null);
 
-        // Determine status from API (map 'ACTIVO' to 'active', otherwise 'inactive')
-        $apiStatus = strtoupper($apiData['estado_empleado'] ?? $apiData['estatus'] ?? $apiData['employment_status'] ?? 'ACTIVO');
-        $status = (str_contains($apiStatus, 'ACTIVO')) ? 'active' : 'inactive';
-
         // Fast indexed lookup
         $employee = Employee::withTrashed()->where('rfc', $cleanRfc)->first();
 
@@ -92,9 +84,18 @@ class EmployeeApiService
             $employee = Employee::withTrashed()->where('external_api_id', $externalApiId)->first();
         }
 
+        // If employee already exists and only missing ones should be added, skip
+        if ($employee && $onlyIfMissing) {
+            return null;
+        }
+
         if ($employee && $employee->trashed()) {
             $employee->restore();
         }
+
+        // Determine status from API (map 'ACTIVO' to 'active', otherwise 'inactive')
+        $apiStatus = strtoupper($apiData['estado_empleado'] ?? $apiData['estatus'] ?? $apiData['employment_status'] ?? 'ACTIVO');
+        $status = $forceStatus ?? ((str_contains($apiStatus, 'ACTIVO')) ? 'active' : 'inactive');
 
         $data = [
             'rfc' => $cleanRfc,
@@ -121,22 +122,21 @@ class EmployeeApiService
         return $employee;
     }
 
+    protected ?int $cenBranchId = null;
+
+    protected ?int $mexBranchId = null;
+
     /**
      * Helper to guess the branch for NEW employees only.
      */
     protected function determineBranch(array $apiData, string $status): ?int
     {
-        if ($this->mexBranchId === null) {
-            $this->mexBranchId = Branch::where('code', 'MEX')->value('id');
-            $this->cenBranchId = Branch::where('code', 'CEN')->value('id');
-        }
-
-        // If employee is inactive (baja), they go to RH ALMANCEN (CEN)
+        // If employee is inactive (baja), they go to RH ALMACEN (CEN)
         if ($status === 'inactive') {
-            return $this->cenBranchId;
+            return $this->cenBranchId ??= Branch::where('code', 'CEN')->value('id');
         }
 
         // Active employees go to RH DELEGACION ESTATAL (MEX)
-        return $this->mexBranchId;
+        return $this->mexBranchId ??= Branch::where('code', 'MEX')->value('id');
     }
 }

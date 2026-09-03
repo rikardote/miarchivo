@@ -21,6 +21,8 @@ class ExpedientMovement extends Model
         'movement_type' => MovementType::class,
     ];
 
+    protected $with = ['user'];
+
     // This model is immutable — no updates or deletes
     public static function booted(): void
     {

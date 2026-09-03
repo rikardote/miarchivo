@@ -137,10 +137,10 @@ class ContinuousCreateTest extends TestCase
         $component = $this->openSession($this->location);
 
         // El visor muestra al primero pendiente en rango (DIAZ por orden alfabético).
-        $component->assertSee('DIAZ LOPEZ ALEJANDRO')
-            ->assertDontSee('GOMEZ MARTINEZ ALEJANDRO')
-            ->assertDontSee('HERNANDEZ LOPEZ ROSA')
-            ->assertDontSee('DOMINGUEZ PEREZ CARLOS');
+        $component->assertSee('DIAZ LOPEZ, ALEJANDRO')
+            ->assertDontSee('GOMEZ MARTINEZ, ALEJANDRO')
+            ->assertDontSee('HERNANDEZ LOPEZ, ROSA')
+            ->assertDontSee('DOMINGUEZ PEREZ, CARLOS');
     }
 
     public function test_it_creates_the_expediente_and_readies_the_label_for_printing()
@@ -149,7 +149,7 @@ class ContinuousCreateTest extends TestCase
 
         $component = $this->openSession($this->location);
 
-        $component->assertSee('GOMEZ MARTINEZ ALEJANDRO')
+        $component->assertSee('GOMEZ MARTINEZ, ALEJANDRO')
             ->call('createAndPrint')
             ->assertHasNoErrors()
             ->assertSet('readyToPrint', true);
@@ -175,7 +175,7 @@ class ContinuousCreateTest extends TestCase
             ->call('confirmNext')
             ->assertSet('readyToPrint', false)
             ->assertSet('lastCreatedExpedientId', null)
-            ->assertSee('GOMEZ MARTINEZ ALEJANDRO');
+            ->assertSee('GOMEZ MARTINEZ, ALEJANDRO');
 
         // El siguiente empleado aún NO se ha creado: queda listo para el alta.
         $this->assertDatabaseMissing('expedients', ['employee_id' => $second->id]);
@@ -188,17 +188,17 @@ class ContinuousCreateTest extends TestCase
 
         $component = $this->openSession($this->location);
 
-        $component->assertSee('DIAZ LOPEZ ALEJANDRO')
+        $component->assertSee('DIAZ LOPEZ, ALEJANDRO')
             ->call('skipCurrent')
             ->assertSet('readyToPrint', false)
-            ->assertSee('GOMEZ MARTINEZ ALEJANDRO');
+            ->assertSee('GOMEZ MARTINEZ, ALEJANDRO');
 
         $this->assertDatabaseMissing('expedients', ['employee_id' => $first->id]);
         $this->assertTrue(in_array($first->id, $component->get('skippedIds')));
 
         $component->call('restoreSkipped', $first->id)
             ->assertSet('currentEmployeeId', $first->id)
-            ->assertSee('DIAZ LOPEZ ALEJANDRO')
+            ->assertSee('DIAZ LOPEZ, ALEJANDRO')
             ->call('createAndPrint')
             ->assertSet('readyToPrint', true);
 
@@ -223,5 +223,40 @@ class ContinuousCreateTest extends TestCase
             ->assertSet('readyToPrint', false);
 
         $this->assertEquals(1, Expedient::where('employee_id', $employee->id)->count());
+    }
+
+    public function test_skip_creates_persistent_census_skip_record_and_resolves_upon_creation()
+    {
+        $employee = $this->createEmployee('Alejandro', 'Diaz Lopez', 'DILA850215');
+
+        $component = $this->openSession($this->location);
+
+        $component->call('openSkipModal')
+            ->assertSet('showSkipModal', true)
+            ->set('skipReason', 'Expediente en préstamo o trámite externo')
+            ->call('confirmSkip')
+            ->assertSet('showSkipModal', false);
+
+        $this->assertDatabaseHas('census_skips', [
+            'employee_id' => $employee->id,
+            'archive_location_id' => $this->location->id,
+            'user_id' => $this->admin->id,
+            'reason' => 'Expediente en préstamo o trámite externo',
+            'status' => 'deferred',
+        ]);
+
+        // Nueva sesión: verifica que el empleado sigue excluido de la cola principal y listado como aplazado
+        $newSession = $this->openSession($this->location);
+        $this->assertNull($newSession->get('currentEmployee'));
+        $newSession->assertSee('Aplazamientos Registrados en este Cajón')
+            ->call('restoreSkipped', $employee->id)
+            ->assertSee($employee->full_name)
+            ->call('createAndPrint')
+            ->assertSet('readyToPrint', true);
+
+        $this->assertDatabaseHas('census_skips', [
+            'employee_id' => $employee->id,
+            'status' => 'resolved',
+        ]);
     }
 }

@@ -3,11 +3,13 @@
 namespace App\Livewire\Expedients;
 
 use App\Models\ArchiveLocation;
+use App\Models\CensusSkip;
 use App\Models\Employee;
 use App\Models\Expedient;
 use App\Services\ExpedientService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Mary\Traits\Toast;
@@ -41,6 +43,13 @@ class ContinuousCreate extends Component
 
     /** Empleados aplazados (sin carpeta física a la vista en este lote). */
     public array $skippedIds = [];
+
+    /** Control del modal y motivo de aplazamiento persistente. */
+    public bool $showSkipModal = false;
+
+    public string $skipReason = 'Carpeta física no localizada en lote';
+
+    public string $customSkipReason = '';
 
     public function mount(): void
     {
@@ -102,14 +111,27 @@ class ContinuousCreate extends Component
 
     /**
      * Cola de empleados sin expediente, acotada al rango alfabético del cajón
-     * elegido y excluyendo los aplazados en esta sesión.
+     * elegido y excluyendo los aplazados en esta sesión o previamente en BD.
      */
     protected function pendingQuery(): Builder
     {
+        $persistedSkippedIds = $this->location_id
+            ? CensusSkip::where('archive_location_id', $this->location_id)
+                ->where('status', 'deferred')
+                ->pluck('employee_id')
+                ->all()
+            : [];
+
+        $allSkipped = array_unique(array_merge($this->skippedIds, $persistedSkippedIds));
+
+        if ($this->currentEmployeeId) {
+            $allSkipped = array_diff($allSkipped, [$this->currentEmployeeId]);
+        }
+
         $query = Employee::query()
             ->with('branch')
             ->whereDoesntHave('expedients')
-            ->whereNotIn('id', $this->skippedIds)
+            ->whereNotIn('id', $allSkipped)
             ->orderBy('last_name')
             ->orderBy('first_name');
 
@@ -222,6 +244,20 @@ class ContinuousCreate extends Component
         $this->currentEmployeeId = $employee->id;
         $this->lastCreatedExpedientId = $expedient->id;
         $this->readyToPrint = true;
+
+        // Resuelve automáticamente cualquier aplazamiento previo para este empleado
+        CensusSkip::where('employee_id', $employee->id)
+            ->where('status', 'deferred')
+            ->update([
+                'status' => 'resolved',
+                'resolved_at' => now(),
+            ]);
+
+        $this->skippedIds = array_values(array_filter(
+            $this->skippedIds,
+            fn ($id) => (int) $id !== $employee->id
+        ));
+
         $this->success("Expediente {$expedient->expedient_code} creado.");
     }
 
@@ -236,15 +272,47 @@ class ContinuousCreate extends Component
         unset($this->currentEmployee);
     }
 
+    public function openSkipModal(): void
+    {
+        $this->skipReason = 'Carpeta física no localizada en lote';
+        $this->customSkipReason = '';
+        $this->showSkipModal = true;
+    }
+
+    public function confirmSkip(): void
+    {
+        $reason = $this->skipReason === 'Otro motivo'
+            ? ($this->customSkipReason ?: 'Otro motivo no especificado')
+            : $this->skipReason;
+
+        $this->skipCurrent($reason);
+        $this->showSkipModal = false;
+    }
+
     /**
-     * Aplaza al empleado visible (no se crea nada) para atenderlo al final.
+     * Aplaza al empleado visible (no se crea nada) y persiste el registro en BD.
      */
-    public function skipCurrent(): void
+    public function skipCurrent(?string $reason = null): void
     {
         $employee = $this->currentEmployee;
 
-        if ($employee) {
+        if ($employee && $this->location_id) {
+            $effectiveReason = $reason ?: 'Carpeta física no localizada en lote';
             $this->skippedIds[] = $employee->id;
+
+            CensusSkip::updateOrCreate(
+                [
+                    'employee_id' => $employee->id,
+                    'archive_location_id' => $this->location_id,
+                    'status' => 'deferred',
+                ],
+                [
+                    'user_id' => Auth::id() ?? 1,
+                    'reason' => $effectiveReason,
+                ]
+            );
+
+            $this->warning("{$employee->full_name} quedó registrado como aplazado.");
         }
 
         $this->lastCreatedExpedientId = null;
@@ -305,6 +373,14 @@ class ContinuousCreate extends Component
                 });
         }
 
+        $deferredSkips = $this->location_id
+            ? CensusSkip::with(['employee', 'user'])
+                ->where('archive_location_id', $this->location_id)
+                ->where('status', 'deferred')
+                ->latest()
+                ->get()
+            : collect();
+
         return view('livewire.expedients.continuous-create', [
             'cabinets' => $cabinets,
             'drawers' => $drawers,
@@ -312,6 +388,7 @@ class ContinuousCreate extends Component
             'currentEmployee' => $this->currentEmployee,
             'pendingInRange' => $this->pendingCount(),
             'createdInRange' => $this->createdInRangeCount(),
+            'deferredSkips' => $deferredSkips,
             'skippedEmployees' => $this->skippedIds
                 ? Employee::whereIn('id', $this->skippedIds)->orderBy('last_name')->orderBy('first_name')->get()
                 : collect(),

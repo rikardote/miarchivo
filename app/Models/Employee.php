@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Support\LogOptions;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class Employee extends Model
 {
-    use SoftDeletes, LogsActivity, HasFactory;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
         'external_api_id',
@@ -88,7 +88,17 @@ class Employee extends Model
 
     public function getFullNameAttribute(): string
     {
-        return "{$this->first_name} {$this->last_name}";
+        return $this->last_name ? "{$this->last_name}, {$this->first_name}" : (string) $this->first_name;
+    }
+
+    public function getArchiveNameAttribute(): string
+    {
+        return $this->last_name ? "{$this->last_name}, {$this->first_name}" : (string) $this->first_name;
+    }
+
+    public function getNaturalNameAttribute(): string
+    {
+        return trim("{$this->first_name} {$this->last_name}");
     }
 
     // Scopes
@@ -102,9 +112,9 @@ class Employee extends Model
     {
         return $query->where(function ($q) use ($search) {
             $q->where('rfc', 'like', "%{$search}%")
-              ->orWhere('first_name', 'like', "%{$search}%")
-              ->orWhere('last_name', 'like', "%{$search}%")
-              ->orWhere('employee_number', 'like', "%{$search}%");
+                ->orWhere('first_name', 'like', "%{$search}%")
+                ->orWhere('last_name', 'like', "%{$search}%")
+                ->orWhere('employee_number', 'like', "%{$search}%");
         });
     }
 }

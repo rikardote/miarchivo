@@ -2,11 +2,12 @@
 
 namespace Tests\Feature\Livewire\Expedients;
 
+use App\Livewire\Expedients\Create;
 use App\Models\ArchiveLocation;
 use App\Models\Branch;
 use App\Models\Employee;
 use App\Models\User;
-use App\Livewire\Expedients\Create;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -16,12 +17,13 @@ class CreateExpedientTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected ArchiveLocation $location;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+        $this->seed(RolePermissionSeeder::class);
         $this->admin = User::factory()->create();
         $this->admin->assignRole('admin');
 
@@ -51,7 +53,7 @@ class CreateExpedientTest extends TestCase
             ->set('manual_employee_number', 'emp-99001')
             ->call('saveManualEmployee')
             ->assertHasNoErrors()
-            ->assertSet('searchEmployee', 'ALEJANDRO GOMEZ MARTINEZ')
+            ->assertSet('searchEmployee', 'GOMEZ MARTINEZ, ALEJANDRO')
             ->set('selectedCabinet', 'A-01')
             ->set('location_id', $this->location->id)
             ->call('save')

@@ -69,7 +69,7 @@
                                 <div class="flex items-start justify-between gap-4 mb-6">
                                     <div>
                                         <p class="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Carpeta física en mano · Verifica antes de crear</p>
-                                        <h4 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight leading-tight">{{ $currentEmployee->last_name }} {{ $currentEmployee->first_name }}</h4>
+                                        <h4 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight leading-tight">{{ $currentEmployee->full_name }}</h4>
                                     </div>
                                     @if ($currentEmployee->employment_status !== 'active')
                                         <span class="text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-600 px-3 py-1.5 rounded-xl border border-rose-500/20 shrink-0">Baja</span>
@@ -102,9 +102,9 @@
                                     <x-mary-button
                                         label="Aplazar (carpeta no está en este lote)"
                                         icon="o-arrow-uturn-left"
-                                        wire:click="skipCurrent"
-                                        spinner="skipCurrent"
-                                        class="btn-ghost rounded-2xl h-14 font-black uppercase text-xs tracking-widest"
+                                        wire:click="openSkipModal"
+                                        spinner="openSkipModal"
+                                        class="btn-ghost rounded-2xl h-14 font-black uppercase text-xs tracking-widest text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10"
                                     />
                                 </div>
                             </div>
@@ -161,23 +161,37 @@
                         </div>
                     @endif
 
-                    <!-- Aplazados en esta sesión -->
-                    @if ($skippedEmployees->isNotEmpty() && ! $readyToPrint)
-                        <div class="mt-6">
-                            <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Aplazados en esta sesión ({{ $skippedEmployees->count() }})</p>
-                            <div class="space-y-2">
-                                @foreach ($skippedEmployees as $employee)
-                                    <div wire:key="skipped-{{ $employee->id }}" class="flex items-center justify-between gap-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl px-4 py-3">
+                    <!-- Aplazamientos del Censo (Trazabilidad P1) -->
+                    @if ($deferredSkips->isNotEmpty() && ! $readyToPrint)
+                        <div class="mt-8 pt-6 border-t border-slate-100 dark:border-white/5">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <p class="text-[11px] font-black uppercase tracking-wider text-amber-600">Aplazamientos Registrados en este Cajón ({{ $deferredSkips->count() }})</p>
+                                    <p class="text-[10px] text-slate-400 font-bold">Carpetas físicas no localizadas que no detienen el censo</p>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                @foreach ($deferredSkips as $skip)
+                                    <div wire:key="skip-{{ $skip->id }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-amber-50/50 dark:bg-amber-500/5 border border-amber-200/40 rounded-2xl p-4">
                                         <div class="min-w-0">
-                                            <p class="text-sm font-black text-slate-800 dark:text-slate-100 truncate uppercase">{{ $employee->last_name }} {{ $employee->first_name }}</p>
-                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ $employee->rfc }}</p>
+                                            <div class="flex items-center gap-2">
+                                                <p class="text-sm font-black text-slate-800 dark:text-slate-100 uppercase">{{ $skip->employee->last_name }} {{ $skip->employee->first_name }}</p>
+                                                <span class="badge badge-warning badge-sm text-[9px] font-black uppercase">Aplazado</span>
+                                            </div>
+                                            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[10px] font-bold text-slate-400">
+                                                <span>RFC: {{ $skip->employee->rfc }}</span>
+                                                <span>•</span>
+                                                <span class="text-amber-700 dark:text-amber-400">Motivo: {{ $skip->reason }}</span>
+                                                <span>•</span>
+                                                <span>Por: {{ $skip->user->name ?? 'Sistema' }} ({{ $skip->created_at->format('d/m/Y H:i') }})</span>
+                                            </div>
                                         </div>
                                         <x-mary-button
-                                            label="Reincorporar"
+                                            label="Censar Ahora"
                                             icon="o-arrow-uturn-right"
-                                            wire:click="restoreSkipped({{ $employee->id }})"
+                                            wire:click="restoreSkipped({{ $skip->employee_id }})"
                                             spinner="restoreSkipped"
-                                            class="btn-ghost btn-sm rounded-xl font-black uppercase text-[10px] tracking-wider shrink-0"
+                                            class="btn-warning btn-sm rounded-xl font-black uppercase text-[10px] tracking-wider shrink-0 shadow-sm"
                                         />
                                     </div>
                                 @endforeach
@@ -192,4 +206,56 @@
             </div>
         </x-mary-card>
     </div>
+
+    <!-- Modal de Confirmación de Aplazamiento -->
+    <x-mary-modal wire:model="showSkipModal" class="p-6">
+        <div class="flex items-center gap-4 mb-6 border-b border-slate-100 pb-4">
+            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center font-black">
+                <x-mary-icon name="o-clock" class="w-6 h-6" />
+            </div>
+            <div>
+                <h3 class="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">Aplazar Registro de Censo</h3>
+                <p class="text-[10px] font-black text-amber-600 uppercase tracking-wider">Trazabilidad de incidencia física</p>
+            </div>
+        </div>
+
+        @if($currentEmployee)
+            <p class="text-xs font-bold text-slate-600 dark:text-slate-300 mb-4">
+                El empleado <strong class="text-slate-900 dark:text-white uppercase">{{ $currentEmployee->full_name }}</strong> será omitido de la cola inmediata y quedará registrado como pendiente en este cajón.
+            </p>
+        @endif
+
+        <div class="space-y-4">
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Motivo del aplazamiento:</label>
+            <div class="space-y-2">
+                <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-50">
+                    <input type="radio" wire:model.live="skipReason" value="Carpeta física no localizada en lote" class="radio radio-primary radio-sm" />
+                    <span class="text-xs font-bold text-slate-700">Carpeta física no localizada en lote</span>
+                </label>
+                <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-50">
+                    <input type="radio" wire:model.live="skipReason" value="Expediente en préstamo o trámite externo" class="radio radio-primary radio-sm" />
+                    <span class="text-xs font-bold text-slate-700">Expediente en préstamo o trámite externo</span>
+                </label>
+                <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-50">
+                    <input type="radio" wire:model.live="skipReason" value="Inconsistencia en documentos o RFC" class="radio radio-primary radio-sm" />
+                    <span class="text-xs font-bold text-slate-700">Inconsistencia en documentos o RFC</span>
+                </label>
+                <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 cursor-pointer hover:bg-slate-50">
+                    <input type="radio" wire:model.live="skipReason" value="Otro motivo" class="radio radio-primary radio-sm" />
+                    <span class="text-xs font-bold text-slate-700">Otro motivo</span>
+                </label>
+            </div>
+
+            @if($skipReason === 'Otro motivo')
+                <x-mary-input label="Especifique el motivo" placeholder="Detalles de la anomalía..." wire:model="customSkipReason" class="input-sm mt-2" />
+            @endif
+        </div>
+
+        <x-slot:actions>
+            <div class="flex gap-3 justify-end pt-4 w-full">
+                <x-mary-button label="Cancelar" wire:click="$toggle('showSkipModal')" class="btn-ghost rounded-xl px-4" />
+                <x-mary-button label="Confirmar Aplazamiento" wire:click="confirmSkip" class="btn-warning rounded-xl px-6 font-bold uppercase text-xs tracking-wider" spinner="confirmSkip" />
+            </div>
+        </x-slot:actions>
+    </x-mary-modal>
 </div>

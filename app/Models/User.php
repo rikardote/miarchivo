@@ -37,4 +37,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(LoanRequest::class, 'requester_id');
     }
+
+    public function heldExpedients(): HasMany
+    {
+        return $this->hasMany(Expedient::class, 'current_holder_id');
+    }
 }

@@ -2,25 +2,31 @@
 
 namespace App\Livewire\Expedients;
 
-use App\Models\Expedient;
 use App\Enums\ExpedientStatus;
+use App\Enums\MovementType;
+use App\Models\ArchiveLocation;
+use App\Models\Branch;
+use App\Models\Expedient;
+use App\Models\ExpedientMovement;
+use Illuminate\Database\Eloquent\Builder;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Url;
-use Illuminate\Database\Eloquent\Builder;
-
 use Mary\Traits\Toast;
 
 class Index extends Component
 {
-    use WithPagination, Toast;
+    use Toast, WithPagination;
 
     #[Url]
     public string $search = '';
 
     public array $selected = [];
+
     public bool $bulkMoveModal = false;
+
     public ?int $targetLocationId = null;
+
     public bool $showGlossary = false;
 
     #[Url]
@@ -49,7 +55,6 @@ class Index extends Component
         $this->resetPage();
     }
 
-
     public function clearFilters()
     {
         $this->reset(['search', 'status', 'branch_id', 'selected']);
@@ -60,6 +65,7 @@ class Index extends Component
     {
         if (empty($this->selected)) {
             $this->error('Seleccione al menos un expediente.');
+
             return;
         }
         $this->bulkMoveModal = true;
@@ -68,21 +74,21 @@ class Index extends Component
     public function executeBulkMove()
     {
         $this->validate([
-            'targetLocationId' => 'required|exists:archive_locations,id'
+            'targetLocationId' => 'required|exists:archive_locations,id',
         ]);
 
         $count = count($this->selected);
         Expedient::whereIn('id', $this->selected)->update([
-            'current_location_id' => $this->targetLocationId
+            'current_location_id' => $this->targetLocationId,
         ]);
 
         // Registrar movimiento en el historial para cada uno
         foreach ($this->selected as $id) {
-            \App\Models\ExpedientMovement::create([
+            ExpedientMovement::create([
                 'expedient_id' => $id,
                 'user_id' => auth()->id(),
-                'movement_type' => \App\Enums\MovementType::Relocated,
-                'notes' => 'Movimiento masivo de ubicación.'
+                'movement_type' => MovementType::Relocated,
+                'notes' => 'Movimiento masivo de ubicación.',
             ]);
         }
 
@@ -97,6 +103,11 @@ class Index extends Component
 
         if ($column === 'expedient' || $column === 'expedient_code') {
             $query->orderBy('expedients.expedient_code', $direction);
+        } elseif ($column === 'employee.last_name' || $column === 'employee' || $column === 'employee.name') {
+            $query->join('employees as sort_emp', 'expedients.employee_id', '=', 'sort_emp.id')
+                ->orderBy('sort_emp.last_name', $direction)
+                ->orderBy('sort_emp.first_name', $direction)
+                ->select('expedients.*');
         } elseif ($column === 'employee.branch.name') {
             $query->join('employees as branch_emp', 'expedients.employee_id', '=', 'branch_emp.id')
                 ->leftJoin('branches as emp_branches', 'branch_emp.branch_id', '=', 'emp_branches.id')
@@ -119,18 +130,18 @@ class Index extends Component
         $isAdmin = auth()->user()->can('expedients.create');
         $searchTerm = trim($this->search);
 
-        if (!$isAdmin && mb_strlen($searchTerm) < 2) {
+        if (! $isAdmin && mb_strlen($searchTerm) < 2) {
             $expedients = Expedient::query()->whereRaw('1 = 0')->paginate(10);
         } else {
             $query = Expedient::query()
                 ->with(['employee.branch', 'currentLocation'])
                 ->when($this->search, fn (Builder $q) => $q->search($this->search))
                 ->when($this->status, fn (Builder $q) => $q->where('current_status', $this->status))
-                ->when($this->filter === 'pending_transfer', function($q) {
-                    $q->whereHas('employee', fn($e) => $e->where('employment_status', 'inactive'))
-                      ->whereHas('currentLocation.branch', fn($b) => $b->where('code', 'MEX'));
+                ->when($this->filter === 'pending_transfer', function ($q) {
+                    $q->whereHas('employee', fn ($e) => $e->where('employment_status', 'inactive'))
+                        ->whereHas('currentLocation.branch', fn ($b) => $b->where('code', 'MEX'));
                 })
-                ->when($this->branch_id, fn (Builder $q) => $q->whereHas('employee', fn($e) => $e->where('branch_id', $this->branch_id)));
+                ->when($this->branch_id, fn (Builder $q) => $q->whereHas('employee', fn ($e) => $e->where('branch_id', $this->branch_id)));
 
             $this->applySorting($query);
             $expedients = $query->paginate(10);
@@ -139,12 +150,12 @@ class Index extends Component
         return view('livewire.expedients.index', [
             'expedients' => $expedients,
             'isAdmin' => $isAdmin,
-            'statuses' => collect(ExpedientStatus::cases())->map(fn($status) => [
+            'statuses' => collect(ExpedientStatus::cases())->map(fn ($status) => [
                 'name' => $status->label(),
                 'value' => $status->value,
             ]),
-            'branches' => \App\Models\Branch::all(),
-            'locations' => \App\Models\ArchiveLocation::with('branch')->get(),
+            'branches' => Branch::all(),
+            'locations' => ArchiveLocation::with('branch')->get(),
         ]);
     }
 }

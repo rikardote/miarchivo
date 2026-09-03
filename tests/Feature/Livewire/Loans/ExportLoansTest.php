@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\Expedient;
 use App\Models\LoanRequest;
 use App\Models\User;
+use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -17,12 +18,13 @@ class ExportLoansTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected User $requester;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+        $this->seed(RolePermissionSeeder::class);
 
         $this->admin = User::factory()->create();
         $this->admin->assignRole('admin');
@@ -87,5 +89,69 @@ class ExportLoansTest extends TestCase
             ->test(Index::class)
             ->set('sortBy', ['column' => 'expedient.expedient_code', 'direction' => 'desc'])
             ->assertStatus(200);
+    }
+
+    public function test_it_filters_by_overdue_and_delivered_tabs()
+    {
+        $employee1 = Employee::factory()->create(['rfc' => 'OVER123456']);
+        $expedient1 = Expedient::factory()->create(['employee_id' => $employee1->id, 'expedient_code' => 'OVER123456-V1']);
+
+        // Overdue loan: delivered 10 days ago, due 5 days ago
+        LoanRequest::factory()->create([
+            'expedient_id' => $expedient1->id,
+            'requester_id' => $this->requester->id,
+            'status' => LoanStatus::Delivered,
+            'delivered_at' => now()->subDays(10),
+            'due_date' => now()->subDays(5),
+        ]);
+
+        $employee2 = Employee::factory()->create(['rfc' => 'ACTIVE12345']);
+        $expedient2 = Expedient::factory()->create(['employee_id' => $employee2->id, 'expedient_code' => 'ACTIVE12345-V1']);
+
+        // Active non-overdue loan: due in 5 days
+        LoanRequest::factory()->create([
+            'expedient_id' => $expedient2->id,
+            'requester_id' => $this->requester->id,
+            'status' => LoanStatus::Delivered,
+            'delivered_at' => now()->subDays(2),
+            'due_date' => now()->addDays(5),
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(Index::class)
+            ->call('setTab', 'overdue')
+            ->assertSee('OVER123456-V1')
+            ->assertDontSee('ACTIVE12345-V1')
+            ->assertSee('día(s) de atraso');
+    }
+
+    public function test_it_filters_by_specific_custodian()
+    {
+        $user2 = User::factory()->create(['name' => 'Otro Custodio']);
+        $user2->assignRole('user');
+
+        $emp1 = Employee::factory()->create(['rfc' => 'CUST111111']);
+        $exp1 = Expedient::factory()->create(['employee_id' => $emp1->id, 'expedient_code' => 'CUST111111-V1']);
+
+        LoanRequest::factory()->create([
+            'expedient_id' => $exp1->id,
+            'requester_id' => $this->requester->id,
+            'status' => LoanStatus::Delivered,
+        ]);
+
+        $emp2 = Employee::factory()->create(['rfc' => 'CUST222222']);
+        $exp2 = Expedient::factory()->create(['employee_id' => $emp2->id, 'expedient_code' => 'CUST222222-V1']);
+
+        LoanRequest::factory()->create([
+            'expedient_id' => $exp2->id,
+            'requester_id' => $user2->id,
+            'status' => LoanStatus::Delivered,
+        ]);
+
+        Livewire::actingAs($this->admin)
+            ->test(Index::class)
+            ->set('selectedUserId', $user2->id)
+            ->assertSee('CUST222222-V1')
+            ->assertDontSee('CUST111111-V1');
     }
 }

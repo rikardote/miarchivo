@@ -17,9 +17,10 @@
 
         <div class="rounded-xl overflow-hidden border border-slate-200">
             <x-mary-table :headers="[
-                ['key' => 'name', 'label' => 'Nombre', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4 pl-6'],
-                ['key' => 'email', 'label' => 'Correo Electrónico', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
-                ['key' => 'roles', 'label' => 'Roles / Nivel Acceso', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 dark:text-slate-400 py-4'],
+                ['key' => 'name', 'label' => 'Nombre', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4 pl-6'],
+                ['key' => 'email', 'label' => 'Correo Electrónico', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4'],
+                ['key' => 'roles', 'label' => 'Roles / Nivel Acceso', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4'],
+                ['key' => 'custody', 'label' => 'Custodia de Carpetas', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4'],
                 ['key' => 'actions', 'label' => '', 'class' => 'w-1 py-4 pr-6']
             ]" :rows="$users" :sort-by="$sortBy" with-pagination class="table-premium">
 
@@ -40,6 +41,17 @@
                             </div>
                         @endforeach
                     </div>
+                @endscope
+
+                @scope('cell_custody', $user)
+                    @if($user->held_expedients_count > 0)
+                        <button wire:click="showCustody({{ $user->id }})" class="badge badge-primary gap-1.5 py-2.5 px-3 text-[10px] font-black uppercase tracking-wider shadow-sm hover:scale-105 transition-all cursor-pointer">
+                            <x-mary-icon name="o-folder-open" class="w-3.5 h-3.5" />
+                            {{ $user->held_expedients_count }} {{ $user->held_expedients_count === 1 ? 'carpeta' : 'carpetas' }}
+                        </button>
+                    @else
+                        <span class="badge badge-ghost text-[9px] font-bold text-slate-400">0 en posesión</span>
+                    @endif
                 @endscope
 
                 @scope('cell_actions', $user)
@@ -91,6 +103,87 @@
                 </x-slot:actions>
             </x-mary-form>
         </div>
+    </x-mary-modal>
+
+    <!-- Modal de Expedientes en Custodia por Usuario -->
+    <x-mary-modal wire:model="custodyModal" class="p-6 sm:p-8 modal-wide">
+        @if($custodyUser)
+            <div class="space-y-6">
+                <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-black text-lg shadow-lg shadow-primary/20">
+                            {{ strtoupper(substr($custodyUser->name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-primary">Expedientes en Posesión</span>
+                                <span class="badge badge-neutral badge-sm font-mono text-[10px]">{{ count($custodyLoans) }} en préstamo</span>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">{{ $custodyUser->name }}</h3>
+                            <p class="text-xs text-slate-400 font-medium">{{ $custodyUser->email }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                    @forelse($custodyLoans as $loan)
+                        @php
+                            $isOverdue = $loan->due_date && $loan->due_date->isPast();
+                            $daysDiff = $loan->due_date ? abs((int) now()->diffInDays($loan->due_date, false)) : null;
+                        @endphp
+                        <div class="p-4 rounded-2xl border {{ $isOverdue ? 'border-rose-200 bg-rose-50/50 dark:border-rose-900/30 dark:bg-rose-950/20' : 'border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30' }} flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="font-mono font-black text-xs px-2 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                                        {{ $loan->expedient->expedient_code }}
+                                    </span>
+                                    <span class="badge badge-neutral badge-sm font-mono text-[9px] uppercase">
+                                        Tomo {{ $loan->expedient->volume_number }}
+                                    </span>
+                                    @if($isOverdue)
+                                        <span class="badge badge-error badge-sm font-black uppercase text-[9px]">
+                                            ¡Vencido hace {{ $daysDiff }} día(s)!
+                                        </span>
+                                    @elseif($daysDiff !== null)
+                                        <span class="badge badge-success badge-sm font-bold uppercase text-[9px]">
+                                            Resta(n) {{ $daysDiff }} día(s)
+                                        </span>
+                                    @endif
+                                </div>
+                                <p class="text-sm font-black text-slate-900 dark:text-slate-100 uppercase">
+                                    {{ $loan->expedient->employee->last_name }}, {{ $loan->expedient->employee->first_name }}
+                                </p>
+                                <div class="flex flex-wrap items-center gap-x-3 text-[10px] font-bold text-slate-400">
+                                    <span>RFC: <strong class="text-slate-600 dark:text-slate-300">{{ $loan->expedient->employee->rfc }}</strong></span>
+                                    @if($loan->delivered_at)
+                                        <span>• Entregado: {{ $loan->delivered_at->format('d/m/Y') }}</span>
+                                    @endif
+                                    @if($loan->due_date)
+                                        <span>• Vencimiento: <strong class="{{ $isOverdue ? 'text-rose-600 dark:text-rose-400' : 'text-slate-600 dark:text-slate-300' }}">{{ $loan->due_date->format('d/m/Y') }}</strong></span>
+                                    @endif
+                                </div>
+                                @if($loan->observations)
+                                    <p class="text-xs italic text-slate-500 mt-1">"{{ $loan->observations }}"</p>
+                                @endif
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <x-mary-button label="Ver Carpeta" icon="o-eye" link="{{ route('expedients.show', $loan->expedient) }}" class="btn-ghost btn-xs font-bold uppercase" />
+                                <x-mary-button label="Gestionar" icon="o-arrow-path" link="{{ route('loans.manage', $loan) }}" class="btn-primary btn-xs font-bold uppercase" />
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-8 text-slate-400">
+                            <x-mary-icon name="o-check-circle" class="w-10 h-10 mx-auto mb-2 text-emerald-500 opacity-60" />
+                            <p class="text-xs font-bold">Este usuario no tiene ningún expediente físico en su poder en este momento.</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                <div class="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <x-mary-button label="Cerrar" @click="$wire.custodyModal = false" class="btn-ghost rounded-xl px-6" />
+                </div>
+            </div>
+        @endif
     </x-mary-modal>
 
     @if(session('success'))

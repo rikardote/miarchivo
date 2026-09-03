@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Manual Metodológico de Implementación y Operación - Archivo ISSSTE</title>
+    <style>
+        @page {
+            size: letter;
+            margin: 2.5cm 2cm 2.5cm 2cm;
+
+            @bottom-right {
+                content: counter(page);
+            }
+        }
+
+        body {
+            font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #2D3748;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header-table {
+            width: 100%;
+            border-bottom: 3px solid #13322B;
+            padding-bottom: 12px;
+            margin-bottom: 25px;
+        }
+
+        .header-title {
+            color: #13322B;
+            font-size: 20pt;
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            color: #C4A462;
+            font-size: 12pt;
+            font-weight: 700;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-meta {
+            font-size: 9pt;
+            color: #718096;
+            text-align: right;
+            line-height: 1.4;
+        }
+
+        h1 {
+            color: #13322B;
+            font-size: 15pt;
+            font-weight: 800;
+            border-bottom: 1.5px solid #E2E8F0;
+            padding-bottom: 5px;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            color: #234E43;
+            font-size: 12.5pt;
+            font-weight: 700;
+            margin-top: 18px;
+            margin-bottom: 8px;
+        }
+
+        h3 {
+            color: #4A5568;
+            font-size: 11pt;
+            font-weight: 700;
+            margin-top: 14px;
+            margin-bottom: 6px;
+        }
+
+        p,
+        li {
+            text-align: justify;
+            margin-bottom: 8px;
+        }
+
+        ul,
+        ol {
+            margin-top: 4px;
+            margin-bottom: 12px;
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .callout {
+            background-color: #F7FAFC;
+            border-left: 4px solid #13322B;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .callout-gold {
+            background-color: #FEFCF6;
+            border-left: 4px solid #C4A462;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .callout-blue {
+            background-color: #F0F7FF;
+            border-left: 4px solid #2B6CB0;
+            padding: 14px 18px;
+            margin: 18px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .callout-title {
+            font-weight: 800;
+            font-size: 10pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            color: #13322B;
+        }
+
+        .callout-gold .callout-title {
+            color: #8C6D23;
+        }
+
+        .callout-blue .callout-title {
+            color: #2B6CB0;
+        }
+
+        table.data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 20px 0;
+            font-size: 10pt;
+        }
+
+        table.data-table th {
+            background-color: #13322B;
+            color: #FFFFFF;
+            font-weight: 700;
+            text-align: left;
+            padding: 8px 12px;
+            border: 1px solid #13322B;
+            text-transform: uppercase;
+            font-size: 9pt;
+            letter-spacing: 0.5px;
+        }
+
+        table.data-table td {
+            padding: 8px 12px;
+            border: 1px solid #CBD5E0;
+            vertical-align: top;
+        }
+
+        table.data-table tr:nth-child(even) {
+            background-color: #F8FAFC;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 8.5pt;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-green {
+            background-color: #DEF7EC;
+            color: #03543F;
+        }
+
+        .badge-red {
+            background-color: #FDE8E8;
+            color: #9B1C1C;
+        }
+
+        .badge-yellow {
+            background-color: #FEF08A;
+            color: #713F12;
+        }
+
+        .badge-gray {
+            background-color: #EDF2F7;
+            color: #4A5568;
+            font-family: Consolas, monospace;
+        }
+
+        .flow-container {
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            page-break-inside: avoid;
+        }
+
+        .flow-step {
+            display: table;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .flow-number {
+            display: table-cell;
+            width: 35px;
+            font-weight: 800;
+            font-size: 14pt;
+            color: #C4A462;
+            vertical-align: top;
+        }
+
+        .flow-content {
+            display: table-cell;
+            vertical-align: top;
+        }
+
+        .doc-toolbar {
+            background: #13322B;
+            color: #FFFFFF;
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(19, 50, 43, 0.15);
+        }
+
+        .btn-print {
+            background: #C4A462;
+            color: #13322B;
+            font-weight: 800;
+            font-size: 10pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-print:hover {
+            background: #D9BE82;
+            transform: translateY(-1px);
+        }
+
+        .distribution-box {
+            background-color: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            padding: 8px 14px;
+            margin-bottom: 20px;
+            font-size: 9pt;
+            color: #4A5568;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media print {
+            .doc-toolbar {
+                display: none !important;
+            }
+            body {
+                padding: 0;
+                color: #000000;
+            }
+            .header-table {
+                border-bottom: 2px solid #13322B;
+            }
+            .data-table th {
+                background-color: #13322B !important;
+                color: #FFFFFF !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .badge-green { background-color: #DEF7EC !important; color: #03543F !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .badge-red { background-color: #FDE8E8 !important; color: #9B1C1C !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .callout-blue, .callout-gold, .callout {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                page-break-inside: avoid;
+            }
+            h1 {
+                page-break-before: auto;
+                page-break-after: avoid;
+            }
+            table, .flow-container {
+                page-break-inside: avoid;
+            }
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 10px;
+            border-top: 1px solid #E2E8F0;
+            font-size: 8.5pt;
+            color: #718096;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="doc-toolbar">
+        <div>
+            <strong style="font-size: 11pt; letter-spacing: 0.5px;">DOCUMENTO INSTITUCIONAL DE PRESENTACIÓN Y ENTREGA</strong>
+            <div style="font-size: 9pt; color: #E2E8F0; margin-top: 2px;">Listo para exposición en pantalla o impresión / guardado como PDF para los asistentes</div>
+        </div>
+        <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Guardar en PDF</button>
+    </div>
+
+    <table class="header-table">
+        <tr>
+            <td style="vertical-align: middle;">
+                <div class="header-title">Manual Metodológico de Implementación</div>
+                <div class="header-subtitle">Sistema Integral de Gestión de Archivo</div>
+            </td>
+            <td class="header-meta" style="vertical-align: middle;">
+                <strong>ISSSTE BAJA CALIFORNIA</strong><br>
+                Subdelegación de Administración<br>
+                Departamento de Recursos Humanos<br>
+                <strong>Carpeta Técnica de Entrega</strong> · 2026
+            </td>
+        </tr>
+    </table>
+
+    <div class="distribution-box">
+        <div><strong>Propósito del Ejemplar:</strong> Presentación Ejecutiva y Material de Referencia Operativa para Autoridades y Personal de Archivo.</div>
+        <div><strong>Control Documental:</strong> ISSSTE-BC-ARCH-2026-v1.0</div>
+    </div>
+
+    <h1>1. Introducción y Enfoque Estratégico</h1>
+
+    <h3>1.1 El Dilema Clave: ¿Ajustar el Archivo al Sistema o el Sistema al Archivo?</h3>
+    <p>
+        Uno de los errores más comunes en la digitalización de archivos físicos es intentar ordenar y reclasificar todas
+        las carpetas en papel antes de registrarlas en el sistema. En la práctica institucional, ese enfoque colapsa la
+        operación diaria, genera extravíos temporales y agota el esfuerzo del personal sin mostrar avances tangibles a
+        corto plazo.
+    </p>
+
+    <div class="callout-gold">
+        <div class="callout-title">Principio Rector Institucional</div>
+        <em>"No muevas el archivo para encajarlo en el software; modela el software para que refleje la realidad física
+            de tus gavetas, y utiliza el software para gobernar el orden."</em>
+    </div>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 25%;">Enfoque</th>
+                <th style="width: 55%;">Impacto y Consecuencias Reales</th>
+                <th style="width: 20%; text-align: center;">Veredicto</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Ajustar el Archivo al Sistema</strong><br><small style="color:#718096;">Mover y reclasificar
+                        todo en papel antes de capturar</small></td>
+                <td>Riesgo crítico. Provoca pérdida temporal de carpetas activas, estrés severo en el personal y meses
+                    de trabajo a ciegas sin resultados visibles para las autoridades.</td>
+                <td style="text-align: center;"><span class="badge badge-red">No Recomendado</span></td>
+            </tr>
+            <tr>
+                <td><strong>Ajustar el Sistema al Archivo</strong><br><small style="color:#718096;">Metodología
+                        Bottom-Up por cajón cerrado</small></td>
+                <td>Riesgo mínimo. El sistema asimila la distribución actual de los archiveros (rangos alfabéticos y
+                    directivos), asignando códigos de barras inmediatos y blindando la custodia desde el día uno.</td>
+                <td style="text-align: center;"><span class="badge badge-green">Recomendado</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="callout-blue">
+        <div class="callout-title"
+            style="font-size: 11pt; border-bottom: 1.5px solid #CBD5E0; padding-bottom: 6px; margin-bottom: 10px;">
+            1.2 Análisis Metodológico de Custodia Física: ¿Clasificación Alfabética Rígida, Caos Organizado o Modelo Híbrido Inteligente?
+        </div>
+
+        <p style="margin-bottom: 10px;">
+            Durante la puesta en marcha de la plataforma institucional y el diseño de la distribución en sala, se presenta una decisión operativa fundamental: <strong>¿Debe cada cajón restringirse a un rango alfabético cerrado (ej. Cajón 1: A–C, Cajón 2: D–F), o es conveniente adoptar un modelo de asignación dinámica por cajón conforme exista disponibilidad física?</strong>
+        </p>
+        <p style="margin-bottom: 12px;">
+            A efecto de brindar certeza a las autoridades y homologar el criterio de trabajo entre el personal de Recursos Humanos y Archivo, se presenta el análisis comparativo entre los modelos tradicionales y la <strong>Propuesta Institucional Híbrida</strong> recomendada para este organismo:
+        </p>
+
+        <!-- Tabla comparativa de extremos -->
+        <table class="data-table" style="background-color: #FFFFFF; margin-top: 5px; margin-bottom: 16px;">
+            <thead>
+                <tr>
+                    <th style="width: 22%;">Criterio</th>
+                    <th style="width: 39%;">Extremo 1: Alfabético Rígido por Cajón</th>
+                    <th style="width: 39%;">Extremo 2: Caos Organizado Puro (Sin Letras)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Distribución de Espacio</strong></td>
+                    <td><strong>Incipiente y desbalanceado.</strong> Letras comunes (G, M, R) revientan cajones; letras
+                        poco frecuentes (K, U, W, X, Z) desperdician hasta un 60% del volumen del mueble.</td>
+                    <td><strong>Óptima al 100%.</strong> Cada cajón se llena al tope físico sin importar el apellido.
+                        Cero espacio muerto en la sala.</td>
+                </tr>
+                <tr>
+                    <td><strong>Nuevos Ingresos y Altas</strong></td>
+                    <td><strong>Efecto dominó tortuoso.</strong> Para meter una carpeta nueva en un cajón lleno, el
+                        operador debe recorrer a mano 40 o 50 carpetas hacia los cajones siguientes.</td>
+                    <td><strong>Inmediato.</strong> La carpeta se guarda en el primer cajón con hueco físico; el sistema
+                        la vincula en un segundo.</td>
+                </tr>
+                <tr>
+                    <td><strong>Dependencia del Sistema</strong></td>
+                    <td><strong>Baja.</strong> Si no hay luz o red, el archivo se puede consultar a mano siguiendo el
+                        abecedario.</td>
+                    <td><strong>Absoluta (100%).</strong> Si el sistema se apaga, nadie sabe dónde está un expediente
+                        porque no existe orden visual en las gavetas.</td>
+                </tr>
+                <tr>
+                    <td><strong>Curva de Resistencia del Personal</strong></td>
+                    <td><strong>Nula.</strong> Es el método tradicional en papel de toda la vida.</td>
+                    <td><strong>Muy Alta.</strong> Genera desconfianza y sensación de "desorden" en el personal
+                        acostumbrado al papel.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- DESARROLLO A FONDO DE LA PROPUESTA HÍBRIDA -->
+        <div
+            style="background-color: #FFFFFF; border: 2px solid #2B6CB0; border-radius: 8px; padding: 16px 20px; margin-top: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+            <div
+                style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid #E2E8F0; padding-bottom: 8px; margin-bottom: 12px;">
+                <span
+                    style="font-size: 11pt; font-weight: 800; color: #2B6CB0; text-transform: uppercase; letter-spacing: 0.5px;">
+                    ⭐ La Solución Institucional: Modelo Híbrido "Alfabético Flexible por Gaveta"
+                </span>
+                <span class="badge badge-green" style="font-size: 9pt;">Altamente Recomendado</span>
+            </div>
+
+            <p style="margin-bottom: 10px; color: #2D3748;">
+                El <strong>Modelo Híbrido</strong> resuelve el conflicto entre espacio y seguridad operativa asignando
+                el abecedario a nivel <strong>Mueble/Gaveta Completa</strong> en lugar de encasillarlo a nivel de cajón
+                individual:
+            </p>
+
+            <div
+                style="background-color: #F8FAFC; border: 1px solid #CBD5E0; border-radius: 6px; padding: 12px; margin-bottom: 14px;">
+                <strong
+                    style="color: #13322B; font-size: 9.5pt; text-transform: uppercase; display: block; margin-bottom: 6px;">
+                    ¿Cómo se estructura físicamente en la sala?
+                </strong>
+                <ul style="margin: 0; padding-left: 20px; font-size: 10pt; color: #4A5568;">
+                    <li><strong>Gaveta G-01 (Mueble Completo de 4 cajones):</strong> Ampara el bloque alfabético amplio
+                        de la <strong>A a la D</strong>.</li>
+                    <li><strong>Gaveta G-02:</strong> Ampara el bloque de la <strong>E a la L</strong>.</li>
+                    <li><strong>Gaveta G-03:</strong> Ampara el bloque de la <strong>M a la Q</strong>.</li>
+                    <li><strong>Gaveta G-04:</strong> Ampara el bloque de la <strong>R a la Z</strong>.</li>
+                </ul>
+            </div>
+
+            <h4
+                style="color: #2B6CB0; font-size: 10.5pt; font-weight: 700; margin: 12px 0 6px 0; text-transform: uppercase;">
+                Las 4 Grandes Ventajas:
+            </h4>
+
+            <ol style="margin-top: 4px; margin-bottom: 12px; padding-left: 22px; font-size: 10pt; color: #2D3748;">
+                <li style="margin-bottom: 8px;">
+                    <strong>Elimina el "Efecto Dominó" del Reacomodo Manual:</strong><br>
+                    Si el Cajón 1 (donde están los apellidos con <em>A</em>) se llena, las nuevas carpetas que ingresen
+                    de la letra <em>A</em> o <em>B</em> se pueden colocar en el Cajón 2 o 3 de la misma gaveta.
+                    <strong>El sistema sabe con precisión milimétrica en cuál de los 4 cajones quedó guardada cada
+                        carpeta</strong> (ej. <em>"Gaveta G-01, Cajón 3"</em>), evitando tener que empujar y mover
+                    carpetas físicamente entre muebles.
+                </li>
+                <li style="margin-bottom: 8px;">
+                    <strong>Tranquilidad Operativa ante Contingencias (No quedas a ciegas):</strong><br>
+                    Si un día se interrumpe el suministro eléctrico o la red local, el personal no queda paralizado:
+                    sabe con certeza que cualquier expediente con apellido <em>"García"</em> se encuentra forzosamente
+                    dentro de los 4 cajones de la <strong>Gaveta G-02</strong>. No hay que revisar todo el archivo.
+                </li>
+                <li style="margin-bottom: 8px;">
+                    <strong>Flexibilidad Total en el Software:</strong><br>
+                    El sistema ya está programado para permitir que una gaveta tenga rangos amplios por mueble o rangos
+                    por cajón sin tocar una sola línea de código. En el catálogo de archiveros (`/locations`) basta con
+                    nombrar los cajones acorde al esquema elegido.
+                </li>
+                <li style="margin-bottom: 4px;">
+                    <strong>Fácil Adopción para el Personal:</strong><br>
+                    Para los archivistas veteranos, pasar de un orden de papel a un "caos ciego" causa rechazo
+                    inmediato. El modelo híbrido respeta su lógica visual tradicional de ubicación por archivero
+                    mientras les brinda la velocidad y exactitud del código de barras.
+                </li>
+            </ol>
+
+            <div
+                style="background-color: #FEFCF6; border-left: 3px solid #C4A462; padding: 8px 12px; margin-top: 10px; font-size: 9.5pt; color: #8C6D23;">
+                <strong>Conclusión Institucional:</strong>
+                <em>"El modelo híbrido no obliga al archivo a sufrir un desorden ciego ni condena al personal al reacomodo manual permanente de expedientes. Representa el equilibrio técnico idóneo entre certeza documental, aprovechamiento del espacio y modernización digital."</em>
+            </div>
+        </div>
+    </div>
+
+    <h1>2. Preparativos Previos (Checklist Operativo)</h1>
+    <p>Antes de iniciar formalmente las jornadas de captura en la sala de archivo, el área debe verificar los siguientes
+        cuatro elementos:</p>
+
+    <ul>
+        <li><strong>Estación de Trabajo:</strong> Computadora de escritorio o laptop conectada a la red local
+            institucional con navegador moderno (Google Chrome o Microsoft Edge).</li>
+        <li><strong>Impresora Térmica de Etiquetas:</strong> Calibrada con rollos de etiquetas autoadhesivas estándar de
+            archivo, verificando que la impresión de códigos de barras sea nítida y legible.</li>
+        <li><strong>Lectores Ópticos:</strong> Lector USB tipo pistola para la mesa de trabajo o teléfono móvil
+            inteligente con la cámara habilitada (el sistema integra escáner autónomo sin internet).</li>
+        <li><strong>Catálogo Inicial de Archiveros:</strong> Registrar en el menú <span class="badge badge-gray">Sistema
+                → Archiveros</span> las gavetas y cajones exactamente como se encuentran rotulados hoy en día (ejemplo:
+            Gaveta <code>G-01</code>, Cajones <code>1</code> a <code>4</code> con sus rangos <code>A - C</code>,
+            <code>D - G</code>, etc.).</li>
+    </ul>
+
+    <h1>3. Metodología en Tres Fases de Adopción</h1>
+
+    <div class="flow-container">
+        <div class="flow-step">
+            <div class="flow-number">1</div>
+            <div class="flow-content">
+                <strong>Fase 1: Censo y Etiquetado Masivo ("Cajón por Cajón")</strong><br>
+                Digitalización estricta gaveta por gaveta con el módulo de <em>Alta Continua</em>. Cada cajón concluido
+                queda 100% blindado sin alterar su orden tradicional.
+            </div>
+        </div>
+        <div class="flow-step">
+            <div class="flow-number">2</div>
+            <div class="flow-content">
+                <strong>Fase 2: Circuito Estricto de Préstamos (Tolerancia Cero)</strong><br>
+                A partir del inicio del proyecto, ningún expediente sale de Recursos Humanos sin registro digital
+                previo, aprovechando los préstamos para etiquetar carpetas rezagadas.
+            </div>
+        </div>
+        <div class="flow-step" style="margin-bottom: 0;">
+            <div class="flow-number">3</div>
+            <div class="flow-content">
+                <strong>Fase 3: Auditorías de Control y Reubicación Dinámica</strong><br>
+                Mantenimiento preventivo periódico con escáner inteligente para verificar que el contenido físico de los
+                cajones coincida con la base de datos.
+            </div>
+        </div>
+    </div>
+
+    <h1>4. Fase 1: Procedimiento de Alta Continua</h1>
+    <p>Este módulo fue creado para capturar a gran velocidad sin necesidad de navegar entre pantallas:</p>
+
+    <ol>
+        <li>
+            <strong>Selección de Sesión:</strong> En el menú lateral, ingresar a <span
+                class="badge badge-gray">Expedientes → Alta Continua (WIP)</span>. Seleccionar el archivero (ej.
+            <code>G-01</code>) y el cajón correspondiente (ej. <code>Cajón 1 — [ Rango: A - C ]</code>). El sistema
+            mostrará la cantidad de empleados pendientes y censados.
+        </li>
+        <li>
+            <strong>Extracción Física:</strong> El operador toma la primera carpeta física del cajón. En pantalla
+            aparecerá automáticamente el primer empleado pendiente en orden alfabético.
+        </li>
+        <li>
+            <strong>Cotejo y Creación:</strong> Se confirma que los datos en pantalla (RFC, número de empleado, puesto)
+            coincidan con la carpeta en mano y se presiona <strong>"Crear Expediente y Etiqueta"</strong>.
+        </li>
+        <li>
+            <strong>Impresión y Pegado:</strong> Se presiona el botón <strong>"Imprimir Etiqueta"</strong>. La impresora
+            emite la etiqueta con código de barras institucional. Se adhiere al lomo de la carpeta y se regresa al
+            cajón.
+        </li>
+        <li>
+            <strong>Avance Inmediato:</strong> Se presiona <strong>"Confirmar y Siguiente"</strong> y el sistema
+            presenta automáticamente el siguiente expediente.
+        </li>
+    </ol>
+
+    <div class="callout">
+        <div class="callout-title">Protocolo para Excepciones Durante el Censo</div>
+        <ul>
+            <li><strong>Si el empleado en pantalla no tiene carpeta en ese cajón:</strong> Presionar el botón
+                <strong>"Aplazar (carpeta no está en este lote)"</strong>. El empleado pasa a la bandeja inferior de
+                espera y el flujo continúa sin trabarse.</li>
+            <li><strong>Si aparece una carpeta que pertenece a otra letra:</strong> Se aparta físicamente en una bandeja
+                de "Pendientes de Reubicación" para ingresarla cuando se trabaje su cajón correspondiente.</li>
+            <li><strong>Doble verificación de seguridad:</strong> Si un empleado ya tenía expediente previo, el sistema
+                bloquea automáticamente la creación para evitar duplicidades.</li>
+        </ul>
+    </div>
+
+    <h1>5. Fase 2: Circuito de Préstamos y Custodia</h1>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Etapa</th>
+                <th style="width: 25%;">Responsable</th>
+                <th style="width: 55%;">Acción Operativa</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>1. Solicitud</strong></td>
+                <td>Usuario Solicitante / RH</td>
+                <td>Se registra la petición en el sistema especificando el motivo oficial del préstamo.</td>
+            </tr>
+            <tr>
+                <td><strong>2. Aprobación</strong></td>
+                <td>Encargado de Archivo (RH)</td>
+                <td>Valida la solicitud en la Mesa de Control. Al autorizar, se genera la orden de extracción para el
+                    operador.</td>
+            </tr>
+            <tr>
+                <td><strong>3. Extracción</strong></td>
+                <td>Operador (Planta Baja)</td>
+                <td>Localiza la carpeta en la gaveta y escanea el código de barras en la pantalla de Despacho. El estado
+                    cambia en tiempo real a "Extraído".</td>
+            </tr>
+            <tr>
+                <td><strong>4. Entrega</strong></td>
+                <td>Encargado de Archivo</td>
+                <td>Registra la nota de inspección física (número de fojas y estado de carátula) y entrega la carpeta
+                    física al solicitante.</td>
+            </tr>
+            <tr>
+                <td><strong>5. Devolución</strong></td>
+                <td>Operador / Encargado</td>
+                <td>Al recibir la carpeta devuelta, se escanea su código y se registra el estado físico en que se
+                    recibe. Se coloca en su gaveta y se confirma el re-archivado.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h1>6. Fase 3: Auditorías y Reubicación Dinámica</h1>
+    <p>Conforme los expedientes circulan por trámites administrativos, no es necesario volver a reorganizar el archivo a
+        mano:</p>
+    <ul>
+        <li><strong>Reubicación Dinámica:</strong> Si un expediente devuelto ya no cabe en su cajón original, el
+            operador accede a <span class="badge badge-gray">Expedientes → Escáner Inteligente</span>, escanea el código
+            y le asigna una nueva gaveta. La base de datos y la bitácora histórica quedan actualizadas de inmediato.
+        </li>
+        <li><strong>Auditoría Preventiva:</strong> En <span class="badge badge-gray">Expedientes → Auditoría</span>, el
+            supervisor puede seleccionar un cajón y pistolear consecutivamente todos los expedientes presentes. El
+            sistema marcará en verde los correctos, alertará si falta alguno prestado y detectará carpetas mal ubicadas.
+        </li>
+    </ul>
+
+    <h1>7. Plan de Trabajo Recomendado (Primeras Dos Semanas)</h1>
+
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Período</th>
+                <th style="width: 40%;">Objetivo Principal</th>
+                <th style="width: 40%;">Meta Tangible</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Semana 1 (Días 1-2)</strong></td>
+                <td>Configuración del catálogo de ubicaciones físicas y calibración de impresoras térmicas.</td>
+                <td>Catálogo completo de archiveros cargado en el sistema.</td>
+            </tr>
+            <tr>
+                <td><strong>Semana 1 (Días 3-5)</strong></td>
+                <td>Prueba piloto de Alta Continua con la Gaveta G-01 y capacitación del personal de ventanilla.</td>
+                <td>Primer cajón 100% etiquetado y personal familiarizado con el escáner.</td>
+            </tr>
+            <tr>
+                <td><strong>Semana 2 en adelante</strong></td>
+                <td>Cierre de préstamos manuales e inicio del censo progresivo diario.</td>
+                <td>Cero salidas informales sin folio digital y avance de 1 a 2 cajones censados por día.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        ISSSTE Baja California — Plataforma Integral de Gestión y Control Documental de Archivo (2026)
+    </div>
+
+</body>
+
+</html>

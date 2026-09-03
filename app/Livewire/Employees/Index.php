@@ -197,8 +197,12 @@ class Index extends Component
             $employees = Employee::query()
                 ->with(['branch', 'expedients'])
                 ->when($this->onlyWithExpedient, fn (Builder $q) => $q->whereHas('expedients'))
-                ->orderBy($this->sortBy['column'], $this->sortBy['direction'])
-                ->when($this->sortBy['column'] === 'last_name', fn (Builder $q) => $q->orderBy('first_name', 'asc'))
+                ->when(in_array($this->sortBy['column'], ['name', 'last_name']), function ($q) {
+                    $q->orderBy('last_name', $this->sortBy['direction'])
+                        ->orderBy('first_name', $this->sortBy['direction']);
+                }, function ($q) {
+                    $q->orderBy($this->sortBy['column'], $this->sortBy['direction']);
+                })
                 ->paginate(15)
                 ->through(fn ($emp) => $emp->setAttribute('source', 'local'));
         }
