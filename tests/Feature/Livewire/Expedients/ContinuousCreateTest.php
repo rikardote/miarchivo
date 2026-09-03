@@ -124,7 +124,7 @@ class ContinuousCreateTest extends TestCase
 
     public function test_queue_only_lists_pending_employees_matching_drawer_range()
     {
-        $pendingInRange = $this->createEmployee('Alejandro', 'Diaz Lopez', 'DILA850215');
+        $this->createEmployee('Alejandro', 'Diaz Lopez', 'DILA850215');
         $this->createEmployee('Alejandro', 'Gomez Martinez', 'GOMA850215');
         $outsideRange = $this->createEmployee('Rosa', 'Hernandez Lopez', 'HELR850215');
         $withExpediente = $this->createEmployee('Carlos', 'Dominguez Perez', 'DOPC850215');
@@ -136,11 +136,36 @@ class ContinuousCreateTest extends TestCase
 
         $component = $this->openSession($this->location);
 
-        // El visor muestra al primero pendiente en rango (DIAZ por orden alfabético).
+        // El visor muestra al primero pendiente en rango (DIAZ por orden alfabético)
+        // y debajo la vista previa del siguiente en la cola (GOMEZ).
         $component->assertSee('DIAZ LOPEZ, ALEJANDRO')
-            ->assertDontSee('GOMEZ MARTINEZ, ALEJANDRO')
+            ->assertSee('GOMEZ MARTINEZ, ALEJANDRO')
             ->assertDontSee('HERNANDEZ LOPEZ, ROSA')
             ->assertDontSee('DOMINGUEZ PEREZ, CARLOS');
+    }
+
+    public function test_visor_shows_next_pending_employee_below_the_current_one()
+    {
+        $current = $this->createEmployee('Alejandro', 'Diaz Lopez', 'DILA850215');
+        $next = $this->createEmployee('Alejandro', 'Gomez Martinez', 'GOMA850215');
+
+        $component = $this->openSession($this->location);
+
+        // El visor principal muestra al primero; el segundo aparece como "Siguiente en la cola".
+        $component->assertSee('DIAZ LOPEZ, ALEJANDRO')
+            ->assertSee('Siguiente en la cola')
+            ->assertSee('GOMEZ MARTINEZ, ALEJANDRO')
+            ->assertSee($next->rfc);
+    }
+
+    public function test_next_preview_disappears_when_only_one_employee_remains()
+    {
+        $this->createEmployee('Alejandro', 'Diaz Lopez', 'DILA850215');
+
+        $component = $this->openSession($this->location);
+
+        $component->assertSee('DIAZ LOPEZ, ALEJANDRO')
+            ->assertDontSee('Siguiente en la cola');
     }
 
     public function test_it_creates_the_expediente_and_readies_the_label_for_printing()

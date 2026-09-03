@@ -107,6 +107,19 @@
                                         class="btn-ghost rounded-2xl h-14 font-black uppercase text-xs tracking-widest text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10"
                                     />
                                 </div>
+
+                                @if ($nextEmployee)
+                                    <div class="mt-6 pt-4 border-t border-dashed border-slate-200 dark:border-white/10 flex items-center justify-between gap-4">
+                                        <div class="flex items-center gap-3 min-w-0">
+                                            <x-mary-icon name="o-arrow-down" class="w-4 h-4 text-slate-300 dark:text-slate-600 shrink-0" />
+                                            <div class="min-w-0">
+                                                <p class="text-[9px] font-black uppercase tracking-[0.25em] text-slate-300 dark:text-slate-600 mb-0.5">Siguiente en la cola</p>
+                                                <p class="text-sm font-black text-slate-500 dark:text-slate-400 uppercase truncate">{{ $nextEmployee->full_name }}</p>
+                                            </div>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-slate-300 dark:text-slate-600 shrink-0 hidden sm:inline">{{ $nextEmployee->rfc }}</span>
+                                    </div>
+                                @endif
                             </div>
                         @else
                             <!-- Cajón atendido -->

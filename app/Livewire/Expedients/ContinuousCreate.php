@@ -110,6 +110,29 @@ class ContinuousCreate extends Component
     }
 
     /**
+     * Empleado que sigue en la cola (el que se mostrará al avanzar), usado
+     * como vista previa discreta debajo del visor principal.
+     */
+    public function getNextEmployeeProperty(): ?Employee
+    {
+        if (! $this->location_id || ! $this->currentEmployee) {
+            return null;
+        }
+
+        $orderedIds = (clone $this->pendingQuery())->pluck('id')->all();
+
+        $position = array_search($this->currentEmployee->id, $orderedIds);
+
+        if ($position === false) {
+            return null;
+        }
+
+        $nextId = $orderedIds[$position + 1] ?? null;
+
+        return $nextId ? Employee::with('branch')->find($nextId) : null;
+    }
+
+    /**
      * Cola de empleados sin expediente, acotada al rango alfabético del cajón
      * elegido y excluyendo los aplazados en esta sesión o previamente en BD.
      */
@@ -386,6 +409,7 @@ class ContinuousCreate extends Component
             'drawers' => $drawers,
             'selectedLocation' => $this->location_id ? ArchiveLocation::find($this->location_id) : null,
             'currentEmployee' => $this->currentEmployee,
+            'nextEmployee' => $this->nextEmployee,
             'pendingInRange' => $this->pendingCount(),
             'createdInRange' => $this->createdInRangeCount(),
             'deferredSkips' => $deferredSkips,
