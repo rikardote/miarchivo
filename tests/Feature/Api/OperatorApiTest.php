@@ -10,6 +10,7 @@ use App\Models\Employee;
 use App\Models\Expedient;
 use App\Models\LoanRequest;
 use App\Models\User;
+use App\Services\LoanService;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -165,6 +166,51 @@ class OperatorApiTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonFragment(['id' => $loan->id]);
+    }
+
+    public function test_operator_list_of_approved_loans_includes_approver_without_lazy_loading(): void
+    {
+        Sanctum::actingAs($this->operator);
+
+        $employee = Employee::create([
+            'employee_number' => 'EMP011',
+            'rfc' => 'SANC910404DD4',
+            'first_name' => 'ANA',
+            'last_name' => 'SANCHEZ',
+            'employment_status' => 'active',
+        ]);
+
+        $expedient = Expedient::create([
+            'employee_id' => $employee->id,
+            'expedient_code' => 'SANC910404DD4-V1',
+            'volume_number' => 1,
+            'current_status' => ExpedientStatus::Reserved,
+            'current_location_id' => $this->location1->id,
+            'is_active' => true,
+        ]);
+
+        $approver = User::factory()->create(['name' => 'Jefa RH']);
+        $approver->assignRole('admin');
+
+        $loan = LoanRequest::create([
+            'expedient_id' => $expedient->id,
+            'requester_id' => $this->regularUser->id,
+            'approved_by' => $approver->id,
+            'status' => LoanStatus::Approved,
+            'requested_at' => now(),
+            'approved_at' => now(),
+        ]);
+
+        $response = $this->getJson('/api/v1/operator/dispatch/to-extract');
+
+        $response->assertStatus(200)
+            ->assertJsonFragment([
+                'id' => $loan->id,
+                'approver' => [
+                    'id' => $approver->id,
+                    'name' => 'Jefa RH',
+                ],
+            ]);
     }
 
     public function test_operator_can_extract_expedient(): void
@@ -389,5 +435,63 @@ class OperatorApiTest extends TestCase
             ->assertJsonFragment(['message' => 'Sesión cerrada exitosamente.']);
 
         $this->assertCount(0, $this->operator->fresh()->tokens);
+    }
+
+    public function test_login_endpoint_is_rate_limited_after_five_attempts(): void
+    {
+        for ($i = 0; $i < 5; $i++) {
+            $this->postJson('/api/v1/auth/login', [
+                'email' => 'operador@empresa.com',
+                'password' => 'wrong-password',
+            ])->assertStatus(422);
+        }
+
+        $this->postJson('/api/v1/auth/login', [
+            'email' => 'operador@empresa.com',
+            'password' => 'wrong-password',
+        ])->assertStatus(429);
+    }
+
+    public function test_extract_failure_returns_generic_message_without_leaking_internals(): void
+    {
+        Sanctum::actingAs($this->operator);
+
+        $employee = Employee::create([
+            'employee_number' => 'EMP021',
+            'rfc' => 'VEGA990505HH5',
+            'first_name' => 'LUIS',
+            'last_name' => 'VEGA',
+            'employment_status' => 'active',
+        ]);
+
+        $expedient = Expedient::create([
+            'employee_id' => $employee->id,
+            'expedient_code' => 'VEGA990505HH5-V1',
+            'volume_number' => 1,
+            'current_status' => ExpedientStatus::Reserved,
+            'current_location_id' => $this->location1->id,
+            'is_active' => true,
+        ]);
+
+        $loan = LoanRequest::create([
+            'expedient_id' => $expedient->id,
+            'requester_id' => $this->regularUser->id,
+            'status' => LoanStatus::Approved,
+            'requested_at' => now(),
+            'approved_at' => now(),
+        ]);
+
+        $this->mock(LoanService::class)
+            ->shouldReceive('extractLoan')
+            ->once()
+            ->andThrow(new \RuntimeException('SQLSTATE[HY000]: tabla no existe'));
+
+        $response = $this->postJson('/api/v1/operator/dispatch/extract', [
+            'loan_id' => $loan->id,
+        ]);
+
+        $response->assertStatus(500)
+            ->assertJsonPath('message', 'Ocurrió un error inesperado al extraer el expediente. Inténtelo de nuevo o contacte al administrador.')
+            ->assertJsonMissing(['message' => 'tabla no existe']);
     }
 }

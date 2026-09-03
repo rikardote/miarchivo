@@ -17,6 +17,7 @@ use App\Services\LoanService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Log;
 
 class DispatchController extends Controller
 {
@@ -27,7 +28,7 @@ class DispatchController extends Controller
         $locationId = $request->input('location_id');
 
         $query = LoanRequest::query()
-            ->with(['expedient.employee', 'expedient.currentLocation.branch', 'requester']);
+            ->with(['expedient.employee', 'expedient.currentLocation.branch', 'requester', 'approver']);
 
         if ($status === 'all') {
             $query->whereIn('status', [LoanStatus::Pending, LoanStatus::Approved]);
@@ -59,7 +60,7 @@ class DispatchController extends Controller
         $loan = null;
 
         if ($request->filled('loan_id')) {
-            $loan = LoanRequest::with(['expedient.employee', 'expedient.currentLocation', 'requester'])->find($request->loan_id);
+            $loan = LoanRequest::with(['expedient.employee', 'expedient.currentLocation', 'requester', 'approver'])->find($request->loan_id);
         } elseif ($request->filled('code')) {
             $code = trim($request->code);
             $expedient = Expedient::where('expedient_code', $code)
@@ -102,15 +103,20 @@ class DispatchController extends Controller
 
         try {
             $loanService->extractLoan($loan);
-            $loan->load(['expedient.employee', 'expedient.currentLocation', 'requester']);
+            $loan->load(['expedient.employee', 'expedient.currentLocation', 'requester', 'approver']);
 
             return response()->json([
                 'message' => "Expediente {$loan->expedient->expedient_code} extraído y enviado a Recursos Humanos.",
                 'loan' => new LoanRequestResource($loan),
             ]);
         } catch (\Exception $e) {
+            Log::error('Error al extraer expediente desde API', [
+                'loan_id' => $loan?->id,
+                'exception' => $e,
+            ]);
+
             return response()->json([
-                'message' => 'Error al extraer expediente: '.$e->getMessage(),
+                'message' => 'Ocurrió un error inesperado al extraer el expediente. Inténtelo de nuevo o contacte al administrador.',
             ], 500);
         }
     }
@@ -178,7 +184,7 @@ class DispatchController extends Controller
         $query = LoanRequest::query()
             ->where('status', LoanStatus::Returned)
             ->whereHas('expedient', fn ($q) => $q->where('current_status', ExpedientStatus::Returned))
-            ->with(['expedient.employee', 'expedient.currentLocation.branch', 'requester']);
+            ->with(['expedient.employee', 'expedient.currentLocation.branch', 'requester', 'approver']);
 
         if (! empty($search)) {
             $query->where(function ($sub) use ($search) {
@@ -255,8 +261,13 @@ class DispatchController extends Controller
                 'message' => "El expediente {$expedient->expedient_code} no se puede re-archivar porque su estado actual es {$expedient->current_status->label()}.",
             ], 422);
         } catch (\Exception $e) {
+            Log::error('Error al procesar re-archivo desde API', [
+                'expedient_id' => $expedient->id,
+                'exception' => $e,
+            ]);
+
             return response()->json([
-                'message' => 'Error al procesar re-archivo: '.$e->getMessage(),
+                'message' => 'Ocurrió un error inesperado al procesar el re-archivo. Inténtelo de nuevo o contacte al administrador.',
             ], 500);
         }
     }
