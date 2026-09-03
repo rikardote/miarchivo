@@ -22,6 +22,10 @@ class Audit extends Component
 
     public ?string $selectedType = null;
 
+    public ?string $selectedCabinet = null;
+
+    public string $locationSearch = '';
+
     public array $scanned_codes = [];
 
     public string $current_scan = '';
@@ -41,6 +45,11 @@ class Audit extends Component
     public bool $showNotesModal = false;
 
     public ?ArchiveLocation $currentLocation = null;
+
+    public function selectCabinet(?string $cabinet): void
+    {
+        $this->selectedCabinet = $this->selectedCabinet === $cabinet ? null : $cabinet;
+    }
 
     public function mount()
     {
@@ -249,10 +258,31 @@ class Audit extends Component
             ? Expedient::where('current_location_id', $this->location_id)->count()
             : 0;
 
+        $cabinets = ArchiveLocation::query()
+            ->when($this->selectedBranch, fn ($q) => $q->where('branch_id', $this->selectedBranch))
+            ->when($this->selectedType, fn ($q) => $q->where('location_type', $this->selectedType))
+            ->whereNotNull('cabinet')
+            ->where('cabinet', '!=', '')
+            ->distinct()
+            ->orderBy('cabinet')
+            ->pluck('cabinet');
+
         $locationsQuery = ArchiveLocation::with('branch')
             ->withCount('expedients')
             ->when($this->selectedBranch, fn ($q) => $q->where('branch_id', $this->selectedBranch))
-            ->when($this->selectedType, fn ($q) => $q->where('location_type', $this->selectedType));
+            ->when($this->selectedType, fn ($q) => $q->where('location_type', $this->selectedType))
+            ->when($this->selectedCabinet, fn ($q) => $q->where('cabinet', $this->selectedCabinet))
+            ->when($this->locationSearch, function ($q) {
+                $term = '%'.$this->locationSearch.'%';
+                $q->where(function ($sub) use ($term) {
+                    $sub->where('cabinet', 'like', $term)
+                        ->orWhere('drawer', 'like', $term)
+                        ->orWhere('archive_name', 'like', $term)
+                        ->orWhere('alpha_range', 'like', $term);
+                });
+            })
+            ->orderBy('cabinet')
+            ->orderBy('drawer');
 
         $pastAudits = LocationAudit::with(['user', 'location'])
             ->when($this->location_id, fn ($q) => $q->where('archive_location_id', $this->location_id))
@@ -266,6 +296,9 @@ class Audit extends Component
             ? min(100, (int) round(($correctCount / $expectedCount) * 100))
             : 0;
 
+        $locationsList = $locationsQuery->get();
+        $groupedLocations = $locationsList->groupBy(fn ($loc) => $loc->cabinet ?: ($loc->archive_name ?: 'Sin Gabinete'));
+
         return view('livewire.expedients.audit', [
             'branches' => Branch::all(),
             'types' => [
@@ -273,7 +306,9 @@ class Audit extends Component
                 ['id' => 'Archivo Activo', 'name' => 'Archivo Activo'],
                 ['id' => 'Almacén Central', 'name' => 'Almacén Central'],
             ],
-            'locations' => $locationsQuery->get(),
+            'cabinets' => $cabinets,
+            'locations' => $locationsList,
+            'groupedLocations' => $groupedLocations,
             'results' => $results,
             'expectedCount' => $expectedCount,
             'progressPercentage' => $progressPercentage,

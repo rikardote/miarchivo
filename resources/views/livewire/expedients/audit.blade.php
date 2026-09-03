@@ -45,16 +45,17 @@
         {{-- VISTA DE SELECCIÓN Y CONFIGURACIÓN (CUANDO NO ESTÁ AUDITANDO) --}}
         {{-- ========================================================= --}}
         <div class="space-y-8">
-            {{-- Barra de Filtros Rápidos --}}
+            {{-- Barra de Filtros en Cascada y Buscador --}}
             <div class="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-white/5 shadow-sm space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                        <h2 class="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">1. Selecciona la Gaveta o Ubicación a Auditar</h2>
-                        <p class="text-xs text-slate-500">Filtra por sede o tipo para localizar rápidamente el archivero</p>
+                        <h2 class="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">1. Localiza el Archivero o Gabinete Físico</h2>
+                        <p class="text-xs text-slate-500">Filtra por sede o selecciona un gabinete para ver únicamente sus gavetas</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {{-- Filtros: Sede, Tipo y Buscador de Texto --}}
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
                         <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Sede / Delegación</label>
                         <select wire:model.live="selectedBranch" class="select select-sm w-full rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-white/10 font-bold text-xs">
@@ -75,65 +76,103 @@
                         </select>
                     </div>
 
-                    <div class="flex items-end">
-                        <div class="w-full text-right sm:text-left text-xs font-bold text-slate-400 px-1 py-2">
-                            <span>Mostrando <strong>{{ count($locations) }}</strong> gavetas disponibles</span>
+                    <div>
+                        <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Búsqueda Rápida</label>
+                        <div class="relative">
+                            <input 
+                                type="text" 
+                                wire:model.live="locationSearch" 
+                                placeholder="Escribe letra (ej: D-G), cajón o gabinete..." 
+                                class="input input-sm w-full rounded-xl bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-white/10 text-xs font-bold pl-8"
+                            />
+                            <x-mary-icon name="o-magnifying-glass" class="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400 pointer-events-none" />
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- Grid Visual de Gavetas Disponibles --}}
-            <div class="space-y-3">
-                <h3 class="text-xs font-black uppercase tracking-widest text-slate-400">Gavetas y Archiveros Físicos</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    @forelse($locations as $loc)
-                        <div class="group relative p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-white/5 shadow-sm hover:shadow-md hover:border-[#C4A462]/50 transition-all flex flex-col justify-between">
-                            <div class="space-y-2">
-                                <div class="flex items-start justify-between gap-2">
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
-                                        <x-mary-icon name="o-archive-box" class="w-3 h-3 text-[#C4A462]" />
-                                        {{ $loc->cabinet ?: 'Archivero' }}
-                                    </span>
-                                    @if($loc->drawer)
-                                        <span class="text-[10px] font-black uppercase text-slate-400">Cajón {{ $loc->drawer }}</span>
-                                    @endif
-                                </div>
-
-                                <div>
-                                    <h4 class="font-black text-sm text-slate-900 dark:text-white group-hover:text-primary transition-colors line-clamp-1">
-                                        {{ $loc->archive_name }}
-                                    </h4>
-                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">{{ $loc->branch?->name }}</p>
-                                </div>
-
-                                @if($loc->alpha_range)
-                                    <div class="inline-block px-2.5 py-1 rounded-xl bg-[#0F1E36]/5 dark:bg-white/5 border border-[#0F1E36]/10 dark:border-white/10 text-xs font-black text-slate-800 dark:text-[#C4A462]">
-                                        Rango: {{ $loc->alpha_range }}
-                                    </div>
-                                @endif
-                            </div>
-
-                            <div class="pt-4 mt-3 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
-                                <span class="text-[11px] font-bold text-slate-500">
-                                    <strong>{{ $loc->expedients_count ?? 0 }}</strong> expedientes
-                                </span>
+                {{-- Píldoras de Selección de Gabinete / Módulo (Filtro Previo) --}}
+                @if(count($cabinets) > 0)
+                    <div class="pt-3 border-t border-slate-100 dark:border-white/5 space-y-2">
+                        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">Filtrar por Gabinete Específico:</span>
+                        <div class="flex items-center gap-2 overflow-x-auto py-1">
+                            <button 
+                                type="button" 
+                                wire:click="$set('selectedCabinet', null)" 
+                                class="px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all {{ is_null($selectedCabinet) ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}">
+                                Todos ({{ count($locations) }})
+                            </button>
+                            @foreach($cabinets as $cab)
                                 <button 
                                     type="button" 
-                                    wire:click="selectLocationAndStart({{ $loc->id }})" 
-                                    class="btn btn-xs btn-primary rounded-lg font-black uppercase tracking-wider text-[10px] gap-1 shadow-sm">
-                                    <span>Auditar</span>
-                                    <x-mary-icon name="o-chevron-right" class="w-3 h-3" />
+                                    wire:click="selectCabinet('{{ $cab }}')" 
+                                    class="px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 {{ $selectedCabinet === $cab ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}">
+                                    <x-mary-icon name="o-archive-box" class="w-3.5 h-3.5" />
+                                    <span>{{ $cab }}</span>
                                 </button>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+            {{-- Agrupación Visual de Gavetas por Gabinete --}}
+            <div class="space-y-6">
+                @forelse($groupedLocations as $cabinetName => $drawers)
+                    <div class="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-white/5 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-white/5">
+                            <div class="flex items-center gap-2">
+                                <div class="p-1.5 rounded-lg bg-primary/10 text-primary">
+                                    <x-mary-icon name="o-archive-box" class="w-4 h-4" />
+                                </div>
+                                <h3 class="font-black text-sm text-slate-900 dark:text-white uppercase tracking-wider">
+                                    {{ $cabinetName }}
+                                </h3>
+                                <span class="text-xs text-slate-400 font-bold">• {{ count($drawers) }} cajones</span>
                             </div>
+                            <span class="text-xs font-bold text-slate-500">
+                                <strong>{{ $drawers->sum('expedients_count') }}</strong> expedientes en total
+                            </span>
                         </div>
-                    @empty
-                        <div class="col-span-full py-12 text-center text-slate-400 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-white/10">
-                            <x-mary-icon name="o-archive-box-x-mark" class="w-10 h-10 mx-auto mb-2 text-slate-300" />
-                            <p class="text-xs font-bold">No se encontraron gavetas con los filtros seleccionados.</p>
+
+                        {{-- Cuadrícula de Cajones de este Gabinete --}}
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                            @foreach($drawers as $loc)
+                                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/60 dark:border-white/5 hover:border-[#C4A462]/50 hover:shadow-sm transition-all flex flex-col justify-between group">
+                                    <div class="space-y-1.5">
+                                        <div class="flex items-center justify-between">
+                                            <span class="font-black text-xs text-slate-900 dark:text-white">
+                                                {{ $loc->drawer ? "Cajón {$loc->drawer}" : $loc->cabinet }}
+                                            </span>
+                                            @if($loc->alpha_range)
+                                                <span class="px-2 py-0.5 rounded-md bg-[#0F1E36]/5 dark:bg-white/10 text-[10px] font-black text-[#0F1E36] dark:text-[#C4A462]">
+                                                    {{ $loc->alpha_range }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <p class="text-[11px] text-slate-500 line-clamp-1">{{ $loc->archive_name }}</p>
+                                    </div>
+
+                                    <div class="pt-3 mt-2 border-t border-slate-200/40 dark:border-white/5 flex items-center justify-between">
+                                        <span class="text-[10px] font-bold text-slate-400">
+                                            📁 {{ $loc->expedients_count ?? 0 }} exp
+                                        </span>
+                                        <button 
+                                            type="button" 
+                                            wire:click="selectLocationAndStart({{ $loc->id }})" 
+                                            class="btn btn-xs btn-primary rounded-lg font-black uppercase text-[10px] px-2.5 shadow-sm">
+                                            Auditar ➔
+                                        </button>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
-                    @endforelse
-                </div>
+                    </div>
+                @empty
+                    <div class="py-12 text-center text-slate-400 bg-white dark:bg-slate-900 rounded-3xl border border-dashed border-slate-200 dark:border-white/10">
+                        <x-mary-icon name="o-archive-box-x-mark" class="w-10 h-10 mx-auto mb-2 text-slate-300" />
+                        <p class="text-xs font-bold">No se encontraron gavetas o archiveros con los filtros actuales.</p>
+                    </div>
+                @endforelse
             </div>
 
             {{-- Historial Reciente de Actas --}}
