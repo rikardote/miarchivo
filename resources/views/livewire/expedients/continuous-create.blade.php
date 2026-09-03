@@ -69,7 +69,7 @@
                                 <div class="flex items-start justify-between gap-4 mb-6">
                                     <div>
                                         <p class="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-2">Carpeta física en mano · Verifica antes de crear</p>
-                                        <h4 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight leading-tight">{{ $currentEmployee->full_name }}</h4>
+                                        <h4 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight leading-tight">{{ $currentEmployee->last_name }} {{ $currentEmployee->first_name }}</h4>
                                     </div>
                                     @if ($currentEmployee->employment_status !== 'active')
                                         <span class="text-[10px] font-black uppercase tracking-wider bg-rose-500/10 text-rose-600 px-3 py-1.5 rounded-xl border border-rose-500/20 shrink-0">Baja</span>
@@ -169,7 +169,7 @@
                                 @foreach ($skippedEmployees as $employee)
                                     <div wire:key="skipped-{{ $employee->id }}" class="flex items-center justify-between gap-4 bg-slate-50 dark:bg-slate-800/40 rounded-2xl px-4 py-3">
                                         <div class="min-w-0">
-                                            <p class="text-sm font-black text-slate-800 dark:text-slate-100 truncate uppercase">{{ $employee->full_name }}</p>
+                                            <p class="text-sm font-black text-slate-800 dark:text-slate-100 truncate uppercase">{{ $employee->last_name }} {{ $employee->first_name }}</p>
                                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ $employee->rfc }}</p>
                                         </div>
                                         <x-mary-button

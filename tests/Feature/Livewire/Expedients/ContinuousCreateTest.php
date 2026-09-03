@@ -137,10 +137,10 @@ class ContinuousCreateTest extends TestCase
         $component = $this->openSession($this->location);
 
         // El visor muestra al primero pendiente en rango (DIAZ por orden alfabético).
-        $component->assertSee('ALEJANDRO DIAZ LOPEZ')
-            ->assertDontSee('ALEJANDRO GOMEZ MARTINEZ')
-            ->assertDontSee('ROSA HERNANDEZ LOPEZ')
-            ->assertDontSee('CARLOS DOMINGUEZ PEREZ');
+        $component->assertSee('DIAZ LOPEZ ALEJANDRO')
+            ->assertDontSee('GOMEZ MARTINEZ ALEJANDRO')
+            ->assertDontSee('HERNANDEZ LOPEZ ROSA')
+            ->assertDontSee('DOMINGUEZ PEREZ CARLOS');
     }
 
     public function test_it_creates_the_expediente_and_readies_the_label_for_printing()
@@ -149,7 +149,7 @@ class ContinuousCreateTest extends TestCase
 
         $component = $this->openSession($this->location);
 
-        $component->assertSee('ALEJANDRO GOMEZ MARTINEZ')
+        $component->assertSee('GOMEZ MARTINEZ ALEJANDRO')
             ->call('createAndPrint')
             ->assertHasNoErrors()
             ->assertSet('readyToPrint', true);
@@ -175,7 +175,7 @@ class ContinuousCreateTest extends TestCase
             ->call('confirmNext')
             ->assertSet('readyToPrint', false)
             ->assertSet('lastCreatedExpedientId', null)
-            ->assertSee('ALEJANDRO GOMEZ MARTINEZ');
+            ->assertSee('GOMEZ MARTINEZ ALEJANDRO');
 
         // El siguiente empleado aún NO se ha creado: queda listo para el alta.
         $this->assertDatabaseMissing('expedients', ['employee_id' => $second->id]);
@@ -188,17 +188,17 @@ class ContinuousCreateTest extends TestCase
 
         $component = $this->openSession($this->location);
 
-        $component->assertSee('ALEJANDRO DIAZ LOPEZ')
+        $component->assertSee('DIAZ LOPEZ ALEJANDRO')
             ->call('skipCurrent')
             ->assertSet('readyToPrint', false)
-            ->assertSee('ALEJANDRO GOMEZ MARTINEZ');
+            ->assertSee('GOMEZ MARTINEZ ALEJANDRO');
 
         $this->assertDatabaseMissing('expedients', ['employee_id' => $first->id]);
         $this->assertTrue(in_array($first->id, $component->get('skippedIds')));
 
         $component->call('restoreSkipped', $first->id)
             ->assertSet('currentEmployeeId', $first->id)
-            ->assertSee('ALEJANDRO DIAZ LOPEZ')
+            ->assertSee('DIAZ LOPEZ ALEJANDRO')
             ->call('createAndPrint')
             ->assertSet('readyToPrint', true);
 
