@@ -1,4 +1,11 @@
-<div>
+<div wire:poll.1000ms="checkRemoteGunScans" x-data="{
+    init() {
+        window.addEventListener('desktop-remote-gun-beep', () => {
+            if (window.playAudioTone) window.playAudioTone('success');
+            if (navigator.vibrate) navigator.vibrate(60);
+        });
+    }
+}">
     <x-mary-modal wire:model="isOpen" class="modal-wide backdrop-blur-md" box-class="max-w-xl w-full" persistent>
         
         {{-- Modal Header con Indicador de Rol --}}
@@ -33,9 +40,15 @@
                     </p>
                 </div>
             </div>
-            <button type="button" wire:click="closeScanner" class="btn btn-ghost btn-circle btn-sm text-slate-400 hover:text-rose-500">
-                <x-mary-icon name="o-x-mark" class="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
+            <div class="flex items-center gap-2">
+                <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black" title="Tu celular con /scanner transmite lecturas directamente a esta pantalla">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Pistola Móvil: {{ $workstationPin }}</span>
+                </div>
+                <button type="button" wire:click="closeScanner" class="btn btn-ghost btn-circle btn-sm text-slate-400 hover:text-rose-500">
+                    <x-mary-icon name="o-x-mark" class="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+            </div>
         </div>
 
         {{-- Mobile Camera & Barcode Gun Alpine Controller --}}

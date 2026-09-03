@@ -157,4 +157,23 @@ class MobileScannerTest extends TestCase
             ->call('setScannerMode', 'inquiry')
             ->assertSet('scannerMode', 'inquiry');
     }
+
+    public function test_mobile_scanner_acts_as_wireless_barcode_gun_for_desktop(): void
+    {
+        $this->actingAs($this->encargado);
+
+        // 1. Escanear con el teléfono móvil en /scanner
+        Livewire::test(Scanner::class)
+            ->call('processCode', 'EXP-2024-9901')
+            ->assertDispatched('scan-success');
+
+        // 2. La computadora de escritorio que tiene GlobalScannerModal escucha y recibe la lectura automáticamente
+        Livewire::test(\App\Livewire\GlobalScannerModal::class)
+            ->assertSet('isOpen', false)
+            ->call('checkRemoteGunScans')
+            ->assertSet('isOpen', true)
+            ->assertSet('scannedCode', 'EXP-2024-9901')
+            ->assertSet('expedientId', $this->expedient->id)
+            ->assertDispatched('desktop-remote-gun-beep');
+    }
 }

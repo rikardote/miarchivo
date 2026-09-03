@@ -9,6 +9,7 @@ use App\Models\Expedient;
 use App\Services\ExpedientService;
 use App\Services\LoanService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Mary\Traits\Toast;
@@ -34,6 +35,42 @@ class GlobalScannerModal extends Component
     public ?int $targetLocationId = null;
 
     public bool $showRelocateForm = false;
+
+    public bool $remoteGunActive = true;
+
+    public ?string $workstationPin = null;
+
+    public function mount(): void
+    {
+        $userId = Auth::id() ?? 1;
+        $this->workstationPin = str_pad((string) (($userId * 73 + 1204) % 10000), 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Escucha periódica (Polling ligero cada 1s) para recibir códigos transmitidos desde el celular.
+     */
+    public function checkRemoteGunScans(): void
+    {
+        if (! $this->remoteGunActive || ! Auth::check()) {
+            return;
+        }
+
+        $userId = Auth::id();
+        $userKey = "scanner_gun_user_{$userId}";
+        $pinKey = "scanner_gun_pin_{$this->workstationPin}";
+
+        $code = Cache::pull($userKey) ?? Cache::pull($pinKey);
+
+        if ($code) {
+            $code = trim($code);
+            $this->resetState();
+            $this->isOpen = true;
+            $this->scannedCode = $code;
+            $this->searchExpedient();
+
+            $this->dispatch('desktop-remote-gun-beep', ['code' => $code]);
+        }
+    }
 
     #[On('open-global-scanner')]
     public function openScanner(?string $code = null): void

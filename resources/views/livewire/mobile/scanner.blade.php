@@ -245,6 +245,26 @@
         </div>
     </header>
 
+    {{-- BARRA DE ENLACE COMO PISTOLA INALÁMBRICA PARA PC --}}
+    <div class="bg-emerald-950/80 border-b border-emerald-500/20 px-3 py-1 flex items-center justify-between text-[10px]">
+        <div class="flex items-center gap-1.5 text-emerald-300 font-bold">
+            <span class="w-2 h-2 rounded-full {{ $transmitToDesktop ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500' }}"></span>
+            <span>
+                @if($transmitToDesktop)
+                    📡 Modo Pistola: Transmitiendo a tu PC (PIN: {{ $pairingPin }})
+                @else
+                    📱 Modo Solo Móvil (Sin transmitir a PC)
+                @endif
+            </span>
+        </div>
+        <button 
+            type="button" 
+            wire:click="$toggle('transmitToDesktop')" 
+            class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded transition-colors {{ $transmitToDesktop ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30' : 'bg-slate-800 text-slate-400' }}">
+            {{ $transmitToDesktop ? 'Activo' : 'Pausado' }}
+        </button>
+    </div>
+
     {{-- SELECTOR DE MODO DE ESCANEO --}}
     <nav class="bg-slate-900/90 border-b border-white/5 px-3 py-1.5 flex items-center justify-between gap-1.5 text-xs">
         <button 

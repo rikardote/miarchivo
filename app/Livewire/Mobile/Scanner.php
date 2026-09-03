@@ -11,6 +11,7 @@ use App\Services\LoanService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Mary\Traits\Toast;
@@ -26,6 +27,12 @@ class Scanner extends Component
     public ?Expedient $currentExpedient = null;
     public ?LoanRequest $activeLoan = null;
     public ?LoanRequest $pendingLoan = null;
+
+    /**
+     * Transmitir a la PC de escritorio como pistola de código de barras virtual inalámbrica
+     */
+    public bool $transmitToDesktop = true;
+    public ?string $pairingPin = null;
 
     /**
      * Modos de escaneo:
@@ -53,6 +60,8 @@ class Scanner extends Component
 
     public function mount(): void
     {
+        $userId = Auth::id() ?? 1;
+        $this->pairingPin = request()->query('pin') ?? str_pad((string) (($userId * 73 + 1204) % 10000), 4, '0', STR_PAD_LEFT);
         $this->locations = ArchiveLocation::where('is_active', true)->orderBy('archive_name')->get();
     }
 
@@ -89,6 +98,17 @@ class Scanner extends Component
         $this->scannedCode = $code;
         $this->lastScannedCode = $code;
         $this->scansCount++;
+
+        // Transmitir inmediatamente a la PC de escritorio como pistola remota si está activado
+        if ($this->transmitToDesktop) {
+            $userId = Auth::id();
+            if ($userId) {
+                Cache::put("scanner_gun_user_{$userId}", $code, now()->addSeconds(20));
+            }
+            if ($this->pairingPin) {
+                Cache::put("scanner_gun_pin_{$this->pairingPin}", $code, now()->addSeconds(20));
+            }
+        }
 
         // Buscar por código exacto de expediente o por RFC / No. Empleado
         $expedient = Expedient::with(['employee', 'currentLocation', 'loans.requester'])
