@@ -50,7 +50,8 @@ class GlobalScannerModal extends Component
     }
 
     /**
-     * Escucha periódica (Polling ligero cada 1s) para recibir códigos transmitidos desde el celular.
+     * Escucha periódica (Polling ligero cada 1s) para recibir códigos transmitidos desde el celular del mismo usuario.
+     * Enlace estricto 1 a 1: cada celular solo se comunica con la PC de su propio usuario.
      */
     public function checkRemoteGunScans(): void
     {
@@ -58,29 +59,6 @@ class GlobalScannerModal extends Component
             return;
         }
 
-        // 1. Verificar si hay un escaneo reciente emitido desde el celular en el mostrador
-        $latest = Cache::get('scanner_gun_latest');
-        if ($latest && is_array($latest) && isset($latest['time']) && $latest['time'] > ($this->lastReceivedTimestamp ?? 0)) {
-            $this->lastReceivedTimestamp = $latest['time'];
-            $code = trim($latest['code']);
-            $sender = $latest['user_name'] ?? 'Celular';
-
-            $this->resetState();
-            $this->isOpen = true;
-            $this->scannedCode = $code;
-            $this->searchExpedient();
-
-            $this->successMessage = "Recibido de {$sender}: {$code}";
-
-            $this->dispatch('desktop-remote-gun-beep', [
-                'code' => $code,
-                'sender' => $sender,
-            ]);
-
-            return;
-        }
-
-        // 2. Verificar por canal directo de usuario o PIN específico
         $userId = Auth::id();
         $userKey = "scanner_gun_user_{$userId}";
         $pinKey = "scanner_gun_pin_{$this->workstationPin}";

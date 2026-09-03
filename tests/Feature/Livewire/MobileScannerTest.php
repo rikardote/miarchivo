@@ -4,6 +4,7 @@ namespace Tests\Feature\Livewire;
 
 use App\Enums\ExpedientStatus;
 use App\Enums\LoanStatus;
+use App\Livewire\GlobalScannerModal;
 use App\Livewire\Mobile\Scanner;
 use App\Models\ArchiveLocation;
 use App\Models\Branch;
@@ -21,9 +22,13 @@ class MobileScannerTest extends TestCase
     use RefreshDatabase;
 
     protected User $operator;
+
     protected User $encargado;
+
     protected User $requester;
+
     protected ArchiveLocation $location;
+
     protected Expedient $expedient;
 
     protected function setUp(): void
@@ -168,12 +173,30 @@ class MobileScannerTest extends TestCase
             ->assertDispatched('scan-success');
 
         // 2. La computadora de escritorio que tiene GlobalScannerModal escucha y recibe la lectura automáticamente
-        Livewire::test(\App\Livewire\GlobalScannerModal::class)
+        Livewire::test(GlobalScannerModal::class)
             ->assertSet('isOpen', false)
             ->call('checkRemoteGunScans')
             ->assertSet('isOpen', true)
             ->assertSet('scannedCode', 'EXP-2024-9901')
             ->assertSet('expedientId', $this->expedient->id)
             ->assertDispatched('desktop-remote-gun-beep');
+    }
+
+    public function test_operator_in_autonomous_mode_does_not_affect_desktop(): void
+    {
+        // Operador en el almacén con su celular
+        $this->actingAs($this->operator);
+
+        Livewire::test(Scanner::class)
+            ->assertSet('transmitToDesktop', false) // Por defecto es autónomo
+            ->call('processCode', 'EXP-2024-9901');
+
+        // Encargado en la PC de mostrador
+        $this->actingAs($this->encargado);
+
+        Livewire::test(GlobalScannerModal::class)
+            ->assertSet('isOpen', false)
+            ->call('checkRemoteGunScans')
+            ->assertSet('isOpen', false); // Cero interferencias: la PC no se abre
     }
 }

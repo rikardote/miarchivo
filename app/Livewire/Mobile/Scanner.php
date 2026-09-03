@@ -22,16 +22,22 @@ class Scanner extends Component
     use Toast;
 
     public string $scannedCode = '';
+
     public ?string $lastScannedCode = null;
+
     public ?int $expedientId = null;
+
     public ?Expedient $currentExpedient = null;
+
     public ?LoanRequest $activeLoan = null;
+
     public ?LoanRequest $pendingLoan = null;
 
     /**
      * Transmitir a la PC de escritorio como pistola de código de barras virtual inalámbrica
      */
     public bool $transmitToDesktop = true;
+
     public ?string $pairingPin = null;
 
     /**
@@ -43,17 +49,25 @@ class Scanner extends Component
     public string $scannerMode = 'interactive';
 
     public ?string $statusMessage = null;
+
     public ?string $statusType = null; // 'success', 'error', 'info', 'warning'
+
     public int $scansCount = 0;
+
     public int $autoReturnsCount = 0;
+
     public bool $soundEnabled = true;
+
     public bool $vibrateEnabled = true;
 
     /** @var array<int, array{code: string, name: string, status: string, time: string, message: string, success: bool}> */
     public array $scanHistory = [];
 
     public ?int $targetLocationId = null;
+
     public string $returnNotes = '';
+
+    public bool $showRelocateForm = false;
 
     /** @var Collection<int, ArchiveLocation> */
     public Collection $locations;
@@ -63,6 +77,10 @@ class Scanner extends Component
         $userId = Auth::id() ?? 1;
         $this->pairingPin = request()->query('pin') ?? str_pad((string) (($userId * 73 + 1204) % 10000), 4, '0', STR_PAD_LEFT);
         $this->locations = ArchiveLocation::where('is_active', true)->orderBy('archive_name')->get();
+
+        // Operador: por defecto 100% autónomo en móvil para trabajar en pasillos/gavetas
+        // Encargado: por defecto modo pistola para reflejar en su PC de mostrador
+        $this->transmitToDesktop = ! $this->isOperator;
     }
 
     public function getIsOperatorProperty(): bool
@@ -99,19 +117,10 @@ class Scanner extends Component
         $this->lastScannedCode = $code;
         $this->scansCount++;
 
-        // Transmitir inmediatamente a la PC de escritorio como pistola remota si está activado
+        // Transmitir a la PC de escritorio ÚNICAMENTE si está activado "Modo Pistola"
+        // y ÚNICAMENTE al canal personal del usuario (1 a 1) para evitar interferir con otras computadoras.
         if ($this->transmitToDesktop) {
             $userId = Auth::id();
-            $userName = Auth::user()?->name ?? 'Celular';
-            $now = microtime(true);
-
-            Cache::put('scanner_gun_latest', [
-                'code' => $code,
-                'user_id' => $userId,
-                'user_name' => $userName,
-                'time' => $now,
-            ], now()->addSeconds(30));
-
             if ($userId) {
                 Cache::put("scanner_gun_user_{$userId}", $code, now()->addSeconds(30));
             }

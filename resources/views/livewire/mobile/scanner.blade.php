@@ -246,22 +246,30 @@
     </header>
 
     {{-- BARRA DE ENLACE COMO PISTOLA INALÁMBRICA PARA PC --}}
-    <div class="bg-emerald-950/80 border-b border-emerald-500/20 px-3 py-1 flex items-center justify-between text-[10px]">
-        <div class="flex items-center gap-1.5 text-emerald-300 font-bold">
+    <div class="border-b px-3 py-1.5 flex items-center justify-between text-[10px] {{ $transmitToDesktop ? 'bg-emerald-950/90 border-emerald-500/30 text-emerald-300' : 'bg-slate-950 border-white/5 text-slate-400' }}">
+        <div class="flex items-center gap-1.5 font-bold">
             <span class="w-2 h-2 rounded-full {{ $transmitToDesktop ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500' }}"></span>
             <span>
                 @if($transmitToDesktop)
-                    📡 Modo Pistola: Transmitiendo a tu PC (PIN: {{ $pairingPin }})
+                    @if($this->isEncargado)
+                        🖥️ Pistola Mostrador: Transmitiendo a tu PC
+                    @else
+                        🖥️ Pistola Almacén: Transmitiendo a tu PC
+                    @endif
                 @else
-                    📱 Modo Solo Móvil (Sin transmitir a PC)
+                    @if($this->isOperator)
+                        🗄️ Operador: Autónomo en Celular (Sin afectar PC)
+                    @else
+                        📱 Modo Móvil Autónomo (Sin afectar PC)
+                    @endif
                 @endif
             </span>
         </div>
         <button 
             type="button" 
             wire:click="$toggle('transmitToDesktop')" 
-            class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded transition-colors {{ $transmitToDesktop ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30' : 'bg-slate-800 text-slate-400' }}">
-            {{ $transmitToDesktop ? 'Activo' : 'Pausado' }}
+            class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded transition-colors {{ $transmitToDesktop ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30' : 'bg-slate-800 text-slate-300 hover:text-white' }}">
+            {{ $transmitToDesktop ? 'Pistola PC' : 'Solo Celular' }}
         </button>
     </div>
 
@@ -479,6 +487,33 @@
                                 <x-mary-icon name="o-archive-box" class="w-4 h-4" />
                                 <span>🗄️ Confirmar Guardado en Gaveta Oficial</span>
                             </button>
+                        @endif
+
+                        {{-- Flujo de Operador: Reubicar a otra gaveta/caja --}}
+                        @if($this->isOperator && Auth::user()->can('expedients.change-location'))
+                            <div class="pt-1">
+                                <button 
+                                    type="button" 
+                                    wire:click="$toggle('showRelocateForm')" 
+                                    class="btn btn-ghost btn-xs w-full text-sky-400 font-bold flex items-center justify-center gap-1 border border-sky-500/20">
+                                    <x-mary-icon name="o-arrows-right-left" class="w-3.5 h-3.5" />
+                                    <span>{{ $showRelocateForm ? 'Cancelar Reubicación' : 'Mover a otra gaveta / caja' }}</span>
+                                </button>
+
+                                @if($showRelocateForm)
+                                    <div class="mt-2 p-2.5 rounded-xl bg-slate-900 border border-sky-500/30 space-y-2 animate-in fade-in duration-150">
+                                        <label class="text-[9px] font-black uppercase tracking-wider text-sky-400 block">Nueva Ubicación Oficial:</label>
+                                        <select wire:model="targetLocationId" class="select select-xs w-full rounded-lg bg-slate-950 text-white border-slate-700">
+                                            @foreach($locations as $loc)
+                                                <option value="{{ $loc->id }}">{{ $loc->full_label }}</option>
+                                            @endforeach
+                                        </select>
+                                        <button type="button" wire:click="quickRelocate" class="btn btn-xs btn-info w-full font-black text-[10px] uppercase">
+                                            Confirmar Reubicación
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
                         @endif
 
                         {{-- Flujo de Entrega si hay préstamo autorizado --}}
