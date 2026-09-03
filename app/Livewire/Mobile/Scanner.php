@@ -102,11 +102,21 @@ class Scanner extends Component
         // Transmitir inmediatamente a la PC de escritorio como pistola remota si está activado
         if ($this->transmitToDesktop) {
             $userId = Auth::id();
+            $userName = Auth::user()?->name ?? 'Celular';
+            $now = microtime(true);
+
+            Cache::put('scanner_gun_latest', [
+                'code' => $code,
+                'user_id' => $userId,
+                'user_name' => $userName,
+                'time' => $now,
+            ], now()->addSeconds(30));
+
             if ($userId) {
-                Cache::put("scanner_gun_user_{$userId}", $code, now()->addSeconds(20));
+                Cache::put("scanner_gun_user_{$userId}", $code, now()->addSeconds(30));
             }
             if ($this->pairingPin) {
-                Cache::put("scanner_gun_pin_{$this->pairingPin}", $code, now()->addSeconds(20));
+                Cache::put("scanner_gun_pin_{$this->pairingPin}", $code, now()->addSeconds(30));
             }
         }
 
