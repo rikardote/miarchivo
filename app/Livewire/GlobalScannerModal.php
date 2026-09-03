@@ -60,6 +60,13 @@ class GlobalScannerModal extends Component
         }
 
         $userId = Auth::id();
+
+        // Si el usuario está realizando una auditoría activa en este momento, no abrir el modal global;
+        // permitir que el componente de Auditoría procese el código directamente.
+        if (Cache::has("active_user_audit_{$userId}")) {
+            return;
+        }
+
         $userKey = "scanner_gun_user_{$userId}";
         $pinKey = "scanner_gun_pin_{$this->workstationPin}";
 

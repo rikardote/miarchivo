@@ -250,7 +250,9 @@
         <div class="flex items-center gap-1.5 font-bold">
             <span class="w-2 h-2 rounded-full {{ $transmitToDesktop ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500' }}"></span>
             <span>
-                @if($transmitToDesktop)
+                @if($this->activeAudit && $transmitToDesktop)
+                    📋 Transmitiendo a Auditoría: {{ $this->activeAudit['label'] }}
+                @elseif($transmitToDesktop)
                     @if($this->isEncargado)
                         🖥️ Pistola Mostrador: Transmitiendo a tu PC
                     @else

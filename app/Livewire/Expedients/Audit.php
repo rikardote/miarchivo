@@ -44,6 +44,34 @@ class Audit extends Component
         ]);
         $this->is_auditing = true;
         $this->scanned_codes = Cache::get("active_audit_{$this->location_id}", []);
+
+        // Registrar auditoría activa del usuario para canalizar la pistola celular
+        $location = ArchiveLocation::find($this->location_id);
+        if (Auth::check() && $location) {
+            Cache::put('active_user_audit_'.Auth::id(), [
+                'location_id' => $this->location_id,
+                'label' => $location->short_label,
+            ], now()->addHours(2));
+        }
+    }
+
+    /**
+     * Escucha en vivo cada 800ms las lecturas transmitidas desde el celular en modo pistola.
+     */
+    public function checkRemoteGunAuditScans(): void
+    {
+        if (! $this->is_auditing || ! $this->location_id || ! Auth::check()) {
+            return;
+        }
+
+        $userId = Auth::id();
+        $code = Cache::pull("scanner_gun_user_{$userId}");
+
+        if ($code) {
+            $code = trim($code);
+            $this->addScan($code);
+            $this->dispatch('audit-remote-gun-beep', ['code' => $code]);
+        }
     }
 
     public function addScan(?string $code = null)
@@ -80,6 +108,9 @@ class Audit extends Component
         if ($this->location_id) {
             Cache::forget("active_audit_{$this->location_id}");
         }
+        if (Auth::check()) {
+            Cache::forget('active_user_audit_'.Auth::id());
+        }
         $this->reset(['location_id', 'scanned_codes', 'is_auditing', 'current_scan', 'audit_notes', 'saved_audit']);
     }
 
@@ -87,6 +118,10 @@ class Audit extends Component
     {
         if (! $this->location_id || ! $this->is_auditing) {
             return;
+        }
+
+        if (Auth::check()) {
+            Cache::forget('active_user_audit_'.Auth::id());
         }
 
         $results = $this->getResults();

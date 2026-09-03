@@ -104,6 +104,21 @@ class Scanner extends Component
     }
 
     /**
+     * Detecta si en la PC del usuario hay una auditoría activa en curso
+     *
+     * @return array{location_id: int, label: string}|null
+     */
+    public function getActiveAuditProperty(): ?array
+    {
+        $userId = Auth::id();
+        if (! $userId) {
+            return null;
+        }
+
+        return Cache::get("active_user_audit_{$userId}");
+    }
+
+    /**
      * Procesa un código detectado por la cámara del teléfono o pistola.
      */
     public function processCode(string $code, LoanService $loanService): void

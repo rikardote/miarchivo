@@ -1,4 +1,10 @@
-<div @if($is_auditing) wire:poll.2s @endif>
+<div @if($is_auditing) wire:poll.800ms="checkRemoteGunAuditScans" @endif x-data="{
+    init() {
+        window.addEventListener('audit-remote-gun-beep', () => {
+            if (window.playAuditScanBeep) window.playAuditScanBeep();
+        });
+    }
+}">
     <x-mary-header title="Auditoría de Inventario" subtitle="Verifica la consistencia física de un estante o gaveta" separator>
         <x-slot:actions>
             @if($is_auditing)
@@ -109,6 +115,15 @@
                         <div class="flex flex-col gap-1 mb-4">
                             <h3 class="text-xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter">Escaneo</h3>
                             <p class="text-[10px] font-black uppercase tracking-widest text-primary">Paso 2: Procesar Códigos</p>
+                        </div>
+
+                        {{-- Indicador de Pistola Móvil Conectada --}}
+                        <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2.5 text-xs text-emerald-700 dark:text-emerald-300">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
+                            <div class="leading-tight">
+                                <strong class="block font-black uppercase text-[10px] tracking-wider">📱 Pistola Celular Conectada</strong>
+                                <span class="text-[11px] text-slate-600 dark:text-slate-300">Escanea con tu teléfono en <code>/scanner</code>; los expedientes se agregarán automáticamente aquí.</span>
+                            </div>
                         </div>
 
                         <div id="reader" class="hidden mb-6 rounded-2xl overflow-hidden bg-slate-50 border-4 border-slate-100 shadow-inner" wire:ignore></div>

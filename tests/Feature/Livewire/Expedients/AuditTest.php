@@ -3,6 +3,7 @@
 namespace Tests\Feature\Livewire\Expedients;
 
 use App\Livewire\Expedients\Audit;
+use App\Livewire\GlobalScannerModal;
 use App\Models\ArchiveLocation;
 use App\Models\Branch;
 use App\Models\Employee;
@@ -11,6 +12,7 @@ use App\Models\LocationAudit;
 use App\Models\User;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -90,5 +92,35 @@ class AuditTest extends TestCase
         $auditRecord = LocationAudit::first();
         $this->assertNotNull($auditRecord);
         $this->assertContains('EXP-99901-V1', $auditRecord->details['correct_codes']);
+    }
+
+    public function test_audit_receives_scans_from_mobile_gun(): void
+    {
+        $expedient = Expedient::factory()->create([
+            'expedient_code' => 'EXP-88801-V1',
+            'current_location_id' => $this->location->id,
+            'current_status' => 'available',
+        ]);
+
+        // Iniciar auditoría en la PC
+        $auditComponent = Livewire::actingAs($this->admin)
+            ->test(Audit::class)
+            ->set('location_id', $this->location->id)
+            ->call('startAudit')
+            ->assertSet('is_auditing', true);
+
+        // El celular escanea y coloca el código en el canal del usuario
+        Cache::put("scanner_gun_user_{$this->admin->id}", 'EXP-88801-V1', now()->addSeconds(30));
+
+        // El componente de auditoría lo recibe en vivo mediante checkRemoteGunAuditScans
+        $auditComponent->call('checkRemoteGunAuditScans')
+            ->assertDispatched('audit-remote-gun-beep')
+            ->assertSet('scanned_codes', ['EXP-88801-V1']);
+
+        // El modal global NO debe abrirse porque la auditoría está activa
+        Livewire::actingAs($this->admin)
+            ->test(GlobalScannerModal::class)
+            ->call('checkRemoteGunScans')
+            ->assertSet('isOpen', false);
     }
 }
