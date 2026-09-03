@@ -1,9 +1,9 @@
 <div>
-    <x-mary-header title="Perfil de Empleado" subtitle="{{ $employee->full_name }}" separator>
+    <x-page-header title="Perfil de Empleado" subtitle="{{ $employee->full_name }}" icon="o-identification" class="mb-10">
         <x-slot:actions>
             <x-mary-button icon="o-arrow-left" class="btn-ghost" link="{{ route('employees.index') }}">Volver</x-mary-button>
         </x-slot:actions>
-    </x-mary-header>
+    </x-page-header>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         

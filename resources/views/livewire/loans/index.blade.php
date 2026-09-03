@@ -1,5 +1,5 @@
 <div wire:poll.3s>
-    <x-mary-header title="Préstamos y Custodia" subtitle="Control de solicitudes, entregas físicas y cartera de préstamos" class="mb-6 sm:mb-8">
+    <x-page-header title="Préstamos y Custodia" subtitle="Control de solicitudes, entregas físicas y cartera de préstamos" icon="o-document-text" class="mb-6 sm:mb-8">
         <x-slot:actions>
             <x-mary-button icon="o-document-arrow-down" wire:click="exportActiveLoans" class="btn-ghost rounded-xl sm:rounded-2xl h-11 sm:h-14 px-3 sm:px-6 font-black uppercase text-[10px] tracking-widest border border-slate-100 dark:border-white/5 hover:bg-slate-50 transition-premium" spinner>
                 <span class="hidden sm:inline">Exportar Listado</span>
@@ -10,7 +10,7 @@
                 <span class="sm:hidden">Solicitar</span>
             </x-mary-button>
         </x-slot:actions>
-    </x-mary-header>
+    </x-page-header>
 
     <!-- Pestañas Operativas (Tabs de Navegación Rápida) -->
     <div class="flex flex-wrap items-center gap-2 mb-6">

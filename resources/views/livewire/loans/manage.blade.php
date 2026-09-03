@@ -1,9 +1,9 @@
 <div wire:poll.2s>
-    <x-mary-header title="Gestionar Préstamo" subtitle="Solicitud de {{ $loan->requester->name ?? 'Usuario desconocido' }}" separator>
+    <x-page-header title="Gestionar Préstamo" subtitle="Solicitud de {{ $loan->requester->name ?? 'Usuario desconocido' }}" icon="o-clipboard-document-check" class="mb-10">
         <x-slot:actions>
             <x-mary-button icon="o-arrow-left" class="btn-ghost" link="{{ route('loans.index') }}">Volver</x-mary-button>
         </x-slot:actions>
-    </x-mary-header>
+    </x-page-header>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         

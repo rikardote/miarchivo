@@ -1,11 +1,10 @@
 <div>
-    <div class="mb-10 flex justify-between items-center no-print">
-        <x-mary-header title="Inventario General" subtitle="Reporte detallado por ubicación física" />
-        <div class="flex gap-4">
+    <x-page-header title="Inventario General" subtitle="Reporte detallado por ubicación física" icon="o-document-chart-bar" class="mb-10 no-print">
+        <x-slot:actions>
             <x-mary-button label="Imprimir Reporte" icon="o-printer" onclick="window.print()" class="btn-primary rounded-xl px-8" />
             <x-mary-button label="Volver" icon="o-arrow-left" link="{{ route('locations.index') }}" class="btn-ghost" />
-        </div>
-    </div>
+        </x-slot:actions>
+    </x-page-header>
 
     <div class="bg-white p-4 rounded-3xl print:p-0 print:shadow-none shadow-xl border border-slate-100">
         <!-- Header for Print -->

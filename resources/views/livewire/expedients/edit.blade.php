@@ -1,9 +1,9 @@
 <div>
-    <x-mary-header title="Editar Expediente: {{ $expedient->expedient_code }}" subtitle="Actualizar ubicación y metadatos físicos" separator>
+    <x-page-header title="Editar Expediente: {{ $expedient->expedient_code }}" subtitle="Actualizar ubicación y metadatos físicos" icon="o-pencil-square" class="mb-10">
         <x-slot:actions>
             <x-mary-button icon="o-arrow-left" class="btn-ghost" link="{{ route('expedients.show', $expedient) }}">Cancelar</x-mary-button>
         </x-slot:actions>
-    </x-mary-header>
+    </x-page-header>
 
     <div class="max-w-2xl mx-auto">
         <x-mary-card title="Mover Expediente" class="mb-6 bg-base-100">

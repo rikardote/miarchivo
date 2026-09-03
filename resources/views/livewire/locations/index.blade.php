@@ -1,10 +1,10 @@
 <div>
-    <x-mary-header title="Ubicaciones Físicas" subtitle="Gestión de archivos, gavetas y cajones" class="mb-10">
+    <x-page-header title="Ubicaciones Físicas" subtitle="Gestión de archivos, gavetas y cajones" icon="o-archive-box" class="mb-10">
         <x-slot:actions>
             <x-mary-button label="Imprimir Inventario" icon="o-printer" link="{{ route('reports.inventory') }}" class="btn-outline rounded-2xl h-14 px-8 font-bold uppercase text-xs tracking-widest border-slate-200 hover:bg-slate-50 transition-premium" />
             <x-mary-button icon="o-plus" class="btn-primary shadow-2xl shadow-primary/20 rounded-2xl h-14 px-8 font-black uppercase text-xs tracking-widest border-none hover:scale-105 transition-premium" wire:click="create">Nueva Ubicación</x-mary-button>
         </x-slot:actions>
-    </x-mary-header>
+    </x-page-header>
 
     <x-mary-card class="premium-card p-6 overflow-hidden">
         <div class="grid grid-cols-1 md:grid-cols-6 gap-6 mb-10 p-2">

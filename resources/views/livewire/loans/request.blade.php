@@ -1,12 +1,12 @@
 <div>
-    <x-mary-header title="Nueva Solicitud" subtitle="Selecciona el expediente que requieres en préstamo" class="mb-6 sm:mb-10">
+    <x-page-header title="Nueva Solicitud" subtitle="Selecciona el expediente que requieres en préstamo" icon="o-document-plus" class="mb-6 sm:mb-10">
         <x-slot:actions>
             <x-mary-button icon="o-arrow-left" class="btn-ghost rounded-xl sm:rounded-2xl h-11 sm:h-14 px-4 sm:px-6 font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-premium border border-transparent hover:border-slate-100" link="{{ route('loans.index') }}">
                 <span class="hidden sm:inline">Cancelar</span>
                 <span class="sm:hidden">Atrás</span>
             </x-mary-button>
         </x-slot:actions>
-    </x-mary-header>
+    </x-page-header>
 
     {{-- Indicador de pasos --}}
     <div class="flex items-center gap-0 mb-8 sm:mb-12 max-w-lg">

@@ -1,5 +1,5 @@
 <div>
-    <x-mary-header title="Tablero de Control" subtitle="Resumen general del sistema de archivo" class="mb-10" />
+    <x-page-header title="Tablero de Control" subtitle="Resumen general del sistema de archivo" icon="o-chart-pie" class="mb-10" />
 
     @if($isAdmin)
         <!-- Dashboard ADMINISTRADOR -->

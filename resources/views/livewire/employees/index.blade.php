@@ -1,12 +1,12 @@
 <div>
-    <x-mary-header title="Plantilla de Personal" subtitle="Búsqueda y consulta de expedientes de trabajadores" class="mb-6 sm:mb-10">
+    <x-page-header title="Plantilla de Personal" subtitle="Búsqueda y consulta de expedientes de trabajadores" icon="o-identification" class="mb-6 sm:mb-10">
         <x-slot:actions>
             <x-mary-button icon="o-plus" class="btn-primary shadow-xl shadow-primary/20 rounded-xl sm:rounded-2xl h-11 sm:h-14 px-4 sm:px-8 font-black uppercase text-[10px] sm:text-xs tracking-widest border-none hover:scale-105 transition-premium" wire:click="$set('createEmployeeModal', true)">
                 <span class="hidden sm:inline">Nuevo Empleado</span>
                 <span class="sm:hidden">Nuevo</span>
             </x-mary-button>
         </x-slot:actions>
-    </x-mary-header>
+    </x-page-header>
 
     <x-mary-card class="premium-card p-3 sm:p-6 overflow-hidden">
         <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-10 p-1 sm:p-2">

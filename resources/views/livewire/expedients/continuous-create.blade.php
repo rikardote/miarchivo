@@ -1,5 +1,5 @@
 <div>
-    <x-mary-header title="Alta Continua de Expedientes" subtitle="Registro uno a uno: crea el expediente, imprime su etiqueta y guárdalo en la gaveta" separator />
+    <x-page-header title="Alta Continua de Expedientes" subtitle="Registro uno a uno: crea el expediente, imprime su etiqueta y guárdalo en la gaveta" icon="o-bolt" class="mb-10" />
 
     <div class="max-w-5xl">
         <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 overflow-hidden">

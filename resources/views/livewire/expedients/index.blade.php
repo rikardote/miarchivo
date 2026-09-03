@@ -1,5 +1,5 @@
 <div>
-    <x-mary-header title="Expedientes" subtitle="Gestión y búsqueda de expedientes físicos" class="mb-6 sm:mb-10">
+    <x-page-header title="Expedientes" subtitle="Gestión y búsqueda de expedientes físicos" icon="o-folder" class="mb-6 sm:mb-10">
         <x-slot:actions>
             <x-mary-button icon="o-information-circle" class="btn-ghost btn-circle btn-sm sm:btn-md text-primary hover:bg-primary/5 mr-1" wire:click="$set('showGlossary', true)" tooltip="Ver glosario de estados" />
             @can('create', \App\Models\Expedient::class)
@@ -13,7 +13,7 @@
                 </x-mary-button>
             @endcan
         </x-slot:actions>
-    </x-mary-header>
+    </x-page-header>
 
     @if(count($selected) > 0)
         <div class="bg-primary/5 border border-primary/20 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-10 flex flex-col md:flex-row justify-between items-center animate-in zoom-in-95 duration-500 gap-4 sm:gap-6">

@@ -1,10 +1,10 @@
 <div wire:poll.5s="syncItems">
-    <x-mary-header title="Solicitud Masiva" subtitle="Escanea múltiples expedientes para solicitar préstamo por lote" separator>
+    <x-page-header title="Solicitud Masiva" subtitle="Escanea múltiples expedientes para solicitar préstamo por lote" icon="o-rectangle-stack" class="mb-10">
         <x-slot:actions>
             <x-mary-button icon="o-trash" class="btn-ghost text-error" wire:click="clearList" confirm="¿Estás seguro de limpiar toda la lista?">Limpiar Lista</x-mary-button>
             <x-mary-button icon="o-arrow-left" class="btn-ghost" link="{{ route('loans.index') }}">Cancelar</x-mary-button>
         </x-slot:actions>
-    </x-mary-header>
+    </x-page-header>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Panel de Escaneo -->

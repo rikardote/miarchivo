@@ -1,5 +1,5 @@
 <div>
-    <x-mary-header title="Nuevo Expediente" subtitle="Búsqueda en sistema de nómina o captura manual y vinculación física" separator />
+    <x-page-header title="Nuevo Expediente" subtitle="Búsqueda en sistema de nómina o captura manual y vinculación física" icon="o-folder-plus" class="mb-10" />
 
     <div class="max-w-3xl">
         <x-mary-card shadow class="border-none shadow-xl shadow-slate-200/50 overflow-hidden">

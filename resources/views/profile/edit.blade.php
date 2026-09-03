@@ -1,9 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="text-2xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-tighter">
-            Perfil de Usuario
-        </h2>
-    </x-slot>
+    <x-page-header title="Perfil de Usuario" subtitle="Preferencias de cuenta y apariencia del sistema" icon="o-user" class="mb-8" />
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-10">

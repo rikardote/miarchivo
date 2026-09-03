@@ -1,9 +1,9 @@
 <div wire:poll.2s>
-    <x-mary-header title="Despacho y Extracción" subtitle="Centro operativo de surtido y recepción de expedientes en planta baja" class="mb-6 sm:mb-10">
+    <x-page-header title="Despacho y Extracción" subtitle="Centro operativo de surtido y recepción de expedientes en planta baja" icon="o-truck" class="mb-6 sm:mb-10">
         <x-slot:actions>
             <x-mary-button label="Hoja de Surtido" icon="o-printer" link="{{ route('loans.picking-list') }}" external class="btn-primary shadow-xl shadow-primary/20 rounded-xl sm:rounded-2xl h-11 sm:h-14 px-4 sm:px-6 font-black uppercase text-[10px] sm:text-xs tracking-widest" />
         </x-slot:actions>
-    </x-mary-header>
+    </x-page-header>
 
     <!-- Barra Superior de Escaneo Rápido -->
     <div class="premium-card p-4 sm:p-6 mb-6 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-3xl shadow-xl">

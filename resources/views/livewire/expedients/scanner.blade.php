@@ -1,5 +1,5 @@
 <div>
-    <x-mary-header title="Escáner QR" subtitle="Escanea la etiqueta física para acceder al expediente" class="mb-8" separator />
+    <x-page-header title="Escáner QR" subtitle="Escanea la etiqueta física para acceder al expediente" icon="o-qr-code" class="mb-8" />
 
     <div class="max-w-xl mx-auto">
         <x-mary-card class="premium-card border-none overflow-hidden">
