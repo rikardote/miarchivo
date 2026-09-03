@@ -474,85 +474,130 @@
                     </div>
                 </div>
 
-                {{-- CONTENIDO DEL TAB SELECCIONADO --}}
+                {{-- CONTENIDO DEL TAB SELECCIONADO (VISTA DE TABLA COMPACTA DE ALTA DENSIDAD) --}}
                 @if($activeTab === 'missing')
                     {{-- TAB: FALTANTES --}}
                     <div class="space-y-3">
-                        <div class="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <div class="flex items-center justify-between text-xs text-slate-500 font-bold px-1">
                             <span>Expedientes que el sistema tiene registrados en este cajón pero aún no has escaneado:</span>
-                            <span>{{ count($results['missing']) }} pendientes</span>
+                            <span class="badge badge-sm badge-error badge-outline font-black text-[10px]">{{ count($results['missing']) }} pendientes</span>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            @php
-                                $filteredMissing = collect($results['missing'])->filter(function($e) {
-                                    if (empty($this->searchFilter)) return true;
-                                    $s = mb_strtolower($this->searchFilter);
-                                    return str_contains(mb_strtolower($e->expedient_code), $s) || str_contains(mb_strtolower($e->employee?->full_name ?? ''), $s);
-                                });
-                            @endphp
+                        @php
+                            $filteredMissing = collect($results['missing'])->filter(function($e) {
+                                if (empty($this->searchFilter)) return true;
+                                $s = mb_strtolower($this->searchFilter);
+                                return str_contains(mb_strtolower($e->expedient_code), $s) || str_contains(mb_strtolower($e->employee?->full_name ?? ''), $s) || str_contains(mb_strtolower($e->employee?->rfc ?? ''), $s);
+                            });
+                        @endphp
 
-                            @forelse($filteredMissing as $exp)
-                                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200/70 dark:border-white/5 flex items-start justify-between gap-3">
-                                    <div class="space-y-1">
-                                        <span class="font-black font-mono text-sm text-slate-900 dark:text-white">{{ $exp->expedient_code }}</span>
-                                        <p class="text-xs font-bold text-slate-700 dark:text-slate-300 line-clamp-1">{{ $exp->employee?->full_name }}</p>
-                                        <span class="text-[10px] text-slate-400 font-mono">{{ $exp->employee?->rfc }}</span>
-                                    </div>
-                                    <span class="badge badge-sm badge-error badge-outline font-black text-[9px] uppercase tracking-wider shrink-0">Pendiente</span>
-                                </div>
-                            @empty
-                                <div class="col-span-full py-8 text-center text-slate-400">
-                                    @if(empty($results['missing']))
-                                        <div class="p-3 bg-emerald-500/10 text-emerald-500 rounded-2xl inline-block mb-2">
-                                            <x-mary-icon name="o-check-badge" class="w-8 h-8" />
-                                        </div>
-                                        <p class="text-sm font-black text-emerald-600 dark:text-emerald-400">¡Felicidades! Todos los expedientes esperados fueron escaneados en su sitio.</p>
-                                    @else
-                                        <p class="text-xs font-bold">No hay expedientes faltantes que coincidan con la búsqueda.</p>
-                                    @endif
-                                </div>
-                            @endforelse
+                        <div class="overflow-x-auto max-h-[550px] rounded-2xl border border-slate-200/70 dark:border-white/10 shadow-inner">
+                            <table class="table table-xs w-full">
+                                <thead class="sticky top-0 bg-slate-100 dark:bg-slate-800/95 backdrop-blur z-10 text-[10px] font-black uppercase text-slate-500">
+                                    <tr>
+                                        <th class="w-10 text-center">#</th>
+                                        <th>Código</th>
+                                        <th>Empleado</th>
+                                        <th>RFC</th>
+                                        <th class="text-center">Estado</th>
+                                        <th class="text-right">Acción Rápida</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 dark:divide-white/5">
+                                    @forelse($filteredMissing as $exp)
+                                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                                            <td class="text-center font-mono text-slate-400 text-[10px]">{{ $loop->iteration }}</td>
+                                            <td class="font-mono font-black text-xs text-slate-900 dark:text-white">{{ $exp->expedient_code }}</td>
+                                            <td class="font-bold text-xs text-slate-700 dark:text-slate-300">{{ $exp->employee?->full_name ?? 'Sin nombre' }}</td>
+                                            <td class="font-mono text-[11px] text-slate-400">{{ $exp->employee?->rfc ?? '—' }}</td>
+                                            <td class="text-center">
+                                                <span class="badge badge-xs badge-error badge-outline font-black text-[9px] uppercase tracking-wider">Pendiente</span>
+                                            </td>
+                                            <td class="text-right">
+                                                <button 
+                                                    type="button" 
+                                                    wire:click="$set('current_scan', '{{ $exp->expedient_code }}'); addScan()" 
+                                                    class="btn btn-ghost btn-xs text-primary font-bold text-[10px] hover:bg-primary/10 rounded-lg">
+                                                    + Marcar presente
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="py-12 text-center text-slate-400">
+                                                @if(empty($results['missing']))
+                                                    <div class="p-3 bg-emerald-500/10 text-emerald-500 rounded-2xl inline-block mb-2">
+                                                        <x-mary-icon name="o-check-badge" class="w-8 h-8" />
+                                                    </div>
+                                                    <p class="text-sm font-black text-emerald-600 dark:text-emerald-400">¡Felicidades! Todos los expedientes esperados fueron escaneados en su sitio.</p>
+                                                @else
+                                                    <p class="text-xs font-bold">No hay expedientes faltantes que coincidan con la búsqueda.</p>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
                 @elseif($activeTab === 'correct')
                     {{-- TAB: CONFIRMADOS --}}
                     <div class="space-y-3">
-                        <div class="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <div class="flex items-center justify-between text-xs text-slate-500 font-bold px-1">
                             <span>Expedientes escaneados físicamente que coinciden con su registro oficial:</span>
-                            <span>{{ count($results['correct']) }} verificados</span>
+                            <span class="badge badge-sm badge-success font-black text-[10px] text-slate-950">{{ count($results['correct']) }} verificados</span>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            @php
-                                $filteredCorrect = collect($results['correct'])->filter(function($e) {
-                                    if (empty($this->searchFilter)) return true;
-                                    $s = mb_strtolower($this->searchFilter);
-                                    return str_contains(mb_strtolower($e->expedient_code), $s) || str_contains(mb_strtolower($e->employee?->full_name ?? ''), $s);
-                                });
-                            @endphp
+                        @php
+                            $filteredCorrect = collect($results['correct'])->filter(function($e) {
+                                if (empty($this->searchFilter)) return true;
+                                $s = mb_strtolower($this->searchFilter);
+                                return str_contains(mb_strtolower($e->expedient_code), $s) || str_contains(mb_strtolower($e->employee?->full_name ?? ''), $s) || str_contains(mb_strtolower($e->employee?->rfc ?? ''), $s);
+                            });
+                        @endphp
 
-                            @forelse($filteredCorrect as $exp)
-                                <div class="p-3.5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-500/20 flex items-start justify-between gap-3 group">
-                                    <div class="space-y-1">
-                                        <span class="font-black font-mono text-sm text-emerald-700 dark:text-emerald-400">{{ $exp->expedient_code }}</span>
-                                        <p class="text-xs font-bold text-slate-700 dark:text-slate-300 line-clamp-1">{{ $exp->employee?->full_name }}</p>
-                                        <span class="text-[10px] text-slate-400 font-mono">{{ $exp->employee?->rfc }}</span>
-                                    </div>
-                                    <button 
-                                        type="button" 
-                                        wire:click="removeScan('{{ $exp->expedient_code }}')" 
-                                        class="btn btn-ghost btn-xs text-slate-400 hover:text-rose-500 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" 
-                                        tooltip="Descartar este escaneo">
-                                        <x-mary-icon name="o-trash" class="w-3.5 h-3.5" />
-                                    </button>
-                                </div>
-                            @empty
-                                <div class="col-span-full py-8 text-center text-slate-400">
-                                    <p class="text-xs font-bold">Aún no has escaneado ningún expediente en este cajón.</p>
-                                </div>
-                            @endforelse
+                        <div class="overflow-x-auto max-h-[550px] rounded-2xl border border-emerald-500/20 bg-emerald-50/5 dark:bg-emerald-950/10 shadow-inner">
+                            <table class="table table-xs w-full">
+                                <thead class="sticky top-0 bg-emerald-100/90 dark:bg-emerald-950/95 backdrop-blur z-10 text-[10px] font-black uppercase text-emerald-800 dark:text-emerald-300">
+                                    <tr>
+                                        <th class="w-10 text-center">#</th>
+                                        <th>Código</th>
+                                        <th>Empleado</th>
+                                        <th>RFC</th>
+                                        <th class="text-center">Verificación</th>
+                                        <th class="text-right">Descartar</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-emerald-500/10">
+                                    @forelse($filteredCorrect as $exp)
+                                        <tr class="hover:bg-emerald-500/5 transition-colors">
+                                            <td class="text-center font-mono text-slate-400 text-[10px]">{{ $loop->iteration }}</td>
+                                            <td class="font-mono font-black text-xs text-emerald-700 dark:text-emerald-400">{{ $exp->expedient_code }}</td>
+                                            <td class="font-bold text-xs text-slate-800 dark:text-slate-200">{{ $exp->employee?->full_name ?? 'Sin nombre' }}</td>
+                                            <td class="font-mono text-[11px] text-slate-400">{{ $exp->employee?->rfc ?? '—' }}</td>
+                                            <td class="text-center">
+                                                <span class="badge badge-xs badge-success font-black text-[9px] uppercase text-slate-950">Confirmado</span>
+                                            </td>
+                                            <td class="text-right">
+                                                <button 
+                                                    type="button" 
+                                                    wire:click="removeScan('{{ $exp->expedient_code }}')" 
+                                                    class="btn btn-ghost btn-xs text-slate-400 hover:text-rose-500 rounded-lg" 
+                                                    tooltip="Descartar este escaneo">
+                                                    <x-mary-icon name="o-trash" class="w-3.5 h-3.5" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="py-12 text-center text-slate-400">
+                                                <p class="text-xs font-bold">Aún no has escaneado ningún expediente en este cajón.</p>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -562,7 +607,7 @@
                         <div class="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-800 dark:text-amber-300">
                             <div>
                                 <strong class="font-black uppercase tracking-wider block">⚠️ Expedientes Ajenos Encontrados Aquí</strong>
-                                <span class="text-[11px] opacity-90">Fueron encontrados físicamente en este cajón, pero su registro oficial corresponde a otra gaveta.</span>
+                                <span class="text-[11px] opacity-90">Fueron escaneados físicamente en este cajón, pero su registro oficial pertenece a otra gaveta.</span>
                             </div>
                             @if(count($results['misplaced']) > 0)
                                 <button 
@@ -574,38 +619,64 @@
                             @endif
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            @forelse($results['misplaced'] as $exp)
-                                <div class="p-4 rounded-2xl bg-white dark:bg-slate-950 border border-amber-500/30 shadow-sm flex items-start justify-between gap-4">
-                                    <div class="space-y-1.5">
-                                        <span class="font-black font-mono text-base text-amber-600 dark:text-amber-400">{{ $exp->expedient_code }}</span>
-                                        <p class="text-xs font-black text-slate-800 dark:text-slate-100">{{ $exp->employee?->full_name }}</p>
-                                        <div class="text-[11px] font-bold text-slate-500">
-                                            📍 Su lugar oficial registrado es: <strong class="text-slate-800 dark:text-white">{{ $exp->currentLocation?->short_label ?? 'Sin ubicación' }}</strong>
-                                        </div>
-                                    </div>
+                        @php
+                            $filteredMisplaced = collect($results['misplaced'])->filter(function($e) {
+                                if (empty($this->searchFilter)) return true;
+                                $s = mb_strtolower($this->searchFilter);
+                                return str_contains(mb_strtolower($e->expedient_code), $s) || str_contains(mb_strtolower($e->employee?->full_name ?? ''), $s) || str_contains(mb_strtolower($e->employee?->rfc ?? ''), $s);
+                            });
+                        @endphp
 
-                                    <div class="flex flex-col items-end gap-1.5 shrink-0">
-                                        <button 
-                                            type="button" 
-                                            wire:click="fixMisplaced({{ $exp->id }})" 
-                                            class="btn btn-xs btn-warning rounded-xl font-black uppercase text-[10px] gap-1 shadow-sm">
-                                            <x-mary-icon name="o-arrow-path" class="w-3 h-3" />
-                                            <span>Reubicar Aquí</span>
-                                        </button>
-                                        <button 
-                                            type="button" 
-                                            wire:click="removeScan('{{ $exp->expedient_code }}')" 
-                                            class="btn btn-ghost btn-xs text-slate-400 hover:text-rose-500 text-[10px]">
-                                            Descartar
-                                        </button>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="col-span-full py-8 text-center text-slate-400">
-                                    <p class="text-xs font-bold">No se detectaron expedientes ajenos en este cajón.</p>
-                                </div>
-                            @endforelse
+                        <div class="overflow-x-auto max-h-[550px] rounded-2xl border border-amber-500/30 bg-amber-50/5 dark:bg-amber-950/10 shadow-inner">
+                            <table class="table table-xs w-full">
+                                <thead class="sticky top-0 bg-amber-100/90 dark:bg-amber-950/95 backdrop-blur z-10 text-[10px] font-black uppercase text-amber-800 dark:text-amber-300">
+                                    <tr>
+                                        <th class="w-10 text-center">#</th>
+                                        <th>Código</th>
+                                        <th>Empleado</th>
+                                        <th>Ubicación Oficial Registrada</th>
+                                        <th class="text-right">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-amber-500/10">
+                                    @forelse($filteredMisplaced as $exp)
+                                        <tr class="hover:bg-amber-500/5 transition-colors">
+                                            <td class="text-center font-mono text-slate-400 text-[10px]">{{ $loop->iteration }}</td>
+                                            <td class="font-mono font-black text-xs text-amber-600 dark:text-amber-400">{{ $exp->expedient_code }}</td>
+                                            <td class="font-bold text-xs text-slate-800 dark:text-slate-200">
+                                                {{ $exp->employee?->full_name ?? 'Sin nombre' }}
+                                                <span class="block font-mono text-[10px] text-slate-400">{{ $exp->employee?->rfc ?? '' }}</span>
+                                            </td>
+                                            <td class="text-xs font-bold text-slate-600 dark:text-slate-300">
+                                                📍 {{ $exp->currentLocation?->short_label ?? 'Sin ubicación' }}
+                                            </td>
+                                            <td class="text-right">
+                                                <div class="flex items-center justify-end gap-1.5">
+                                                    <button 
+                                                        type="button" 
+                                                        wire:click="fixMisplaced({{ $exp->id }})" 
+                                                        class="btn btn-xs btn-warning rounded-lg font-black uppercase text-[9px] gap-1 shadow-sm">
+                                                        <x-mary-icon name="o-arrow-path" class="w-3 h-3" />
+                                                        <span>Reubicar</span>
+                                                    </button>
+                                                    <button 
+                                                        type="button" 
+                                                        wire:click="removeScan('{{ $exp->expedient_code }}')" 
+                                                        class="btn btn-ghost btn-xs text-slate-400 hover:text-rose-500 rounded-lg">
+                                                        <x-mary-icon name="o-trash" class="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="py-12 text-center text-slate-400">
+                                                <p class="text-xs font-bold">No se detectaron expedientes ajenos en este cajón.</p>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 @endif
