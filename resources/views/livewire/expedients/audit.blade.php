@@ -308,24 +308,36 @@
         {{-- ========================================================= --}}
         <div class="space-y-6">
             {{-- HERO HUD: Ubicación actual, progreso y contadores --}}
-            <div class="p-6 rounded-3xl bg-gradient-to-br from-[#0F1E36] via-[#112240] to-[#0A1526] text-white shadow-xl border border-white/10 space-y-6">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                    {{-- Datos de la gaveta --}}
-                    <div class="space-y-1.5">
-                        <div class="flex items-center gap-2">
-                            <span class="px-2.5 py-0.5 rounded-lg bg-[#C4A462] text-[#0F1E36] font-black text-[10px] uppercase tracking-wider shadow-sm">
-                                AUDITORÍA EN CURSO
+            <div class="p-5 rounded-3xl bg-gradient-to-br from-[#0F1E36] via-[#112240] to-[#0A1526] text-white shadow-xl border border-white/10 space-y-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    {{-- Datos de la gaveta (Limpio y sin repeticiones) --}}
+                    <div class="space-y-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-2 py-0.5 rounded-md bg-[#C4A462] text-[#0F1E36] font-black text-[10px] uppercase tracking-wider shadow-sm">
+                                AUDITANDO
                             </span>
-                            <span class="text-xs text-slate-300 font-bold">{{ $currentLocation?->branch?->name }}</span>
+                            <span class="text-xs text-slate-300 font-semibold">{{ $currentLocation?->branch?->name }}</span>
+                            @if($currentLocation?->archive_name)
+                                <span class="text-slate-500">•</span>
+                                <span class="text-xs text-slate-400 font-medium">{{ $currentLocation->archive_name }}</span>
+                            @endif
                         </div>
-                        <h2 class="text-2xl lg:text-3xl font-black text-white tracking-tight">
-                            {{ $currentLocation?->full_label }}
-                        </h2>
-                        <p class="text-xs text-slate-300 font-medium flex items-center gap-2">
-                            <span>Archivo: <strong>{{ $currentLocation?->archive_name }}</strong></span>
-                            <span>•</span>
-                            <span>Rango Oficial: <strong class="text-[#C4A462]">{{ $currentLocation?->alpha_range ?: 'General' }}</strong></span>
-                        </p>
+
+                        <div class="flex flex-wrap items-center gap-2.5 pt-0.5">
+                            <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                                <x-mary-icon name="o-archive-box" class="w-5 h-5 text-[#C4A462]" />
+                                <span>{{ $currentLocation?->cabinet ?: 'Archivero' }}</span>
+                                @if($currentLocation?->drawer)
+                                    <span class="text-slate-400 font-normal text-base sm:text-lg">· Cajón {{ $currentLocation->drawer }}</span>
+                                @endif
+                            </h2>
+
+                            @if($currentLocation?->alpha_range)
+                                <span class="px-2.5 py-0.5 rounded-lg bg-white/10 border border-white/15 text-xs font-black text-[#C4A462] tracking-wider">
+                                    Rango: {{ $currentLocation->alpha_range }}
+                                </span>
+                            @endif
+                        </div>
                     </div>
 
                     {{-- Mini Tarjetas de Métricas en Vivo --}}
