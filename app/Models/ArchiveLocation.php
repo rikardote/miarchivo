@@ -53,8 +53,10 @@ class ArchiveLocation extends Model
 
     public function getFullLabelAttribute(): string
     {
+        $branchName = $this->relationLoaded('branch') ? $this->branch?->name : null;
+
         $parts = array_filter([
-            $this->branch->name ?? null,
+            $branchName,
             $this->location_type,
             $this->archive_name,
             $this->cabinet ? "Gaveta {$this->cabinet}" : null,

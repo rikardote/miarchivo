@@ -76,7 +76,7 @@ class Scanner extends Component
     {
         $userId = Auth::id() ?? 1;
         $this->pairingPin = request()->query('pin') ?? str_pad((string) (($userId * 73 + 1204) % 10000), 4, '0', STR_PAD_LEFT);
-        $this->locations = ArchiveLocation::where('is_active', true)->orderBy('archive_name')->get();
+        $this->locations = ArchiveLocation::with('branch')->where('is_active', true)->orderBy('archive_name')->get();
 
         // Operador: por defecto 100% autónomo en móvil para trabajar en pasillos/gavetas
         // Encargado: por defecto modo pistola para reflejar en su PC de mostrador
@@ -130,7 +130,7 @@ class Scanner extends Component
         }
 
         // Buscar por código exacto de expediente o por RFC / No. Empleado
-        $expedient = Expedient::with(['employee', 'currentLocation', 'loans.requester'])
+        $expedient = Expedient::with(['employee.branch', 'currentLocation.branch', 'loans.requester'])
             ->where('expedient_code', $code)
             ->orWhereHas('employee', function ($q) use ($code) {
                 $q->where('rfc', $code)
@@ -285,7 +285,7 @@ class Scanner extends Component
             $this->statusType = 'success';
             $this->statusMessage = "Devolución registrada para {$this->currentExpedient->expedient_code}";
             $this->success($this->statusMessage);
-            $this->currentExpedient->refresh();
+            $this->reloadCurrentExpedient();
             $this->activeLoan = null;
 
             $this->dispatch('scan-success', ['message' => $this->statusMessage, 'sound' => $this->soundEnabled, 'vibrate' => $this->vibrateEnabled, 'autoNext' => true]);
@@ -308,7 +308,7 @@ class Scanner extends Component
             $this->statusType = 'success';
             $this->statusMessage = "Expediente {$this->currentExpedient->expedient_code} archivado en gaveta oficial";
             $this->success($this->statusMessage);
-            $this->currentExpedient->refresh();
+            $this->reloadCurrentExpedient();
 
             $this->dispatch('scan-success', ['message' => $this->statusMessage, 'sound' => $this->soundEnabled, 'vibrate' => $this->vibrateEnabled, 'autoNext' => true]);
         } catch (\Throwable $e) {
@@ -332,7 +332,7 @@ class Scanner extends Component
             $this->statusType = 'success';
             $this->statusMessage = "Expediente {$this->currentExpedient->expedient_code} entregado a {$this->pendingLoan->requester?->name}";
             $this->success($this->statusMessage);
-            $this->currentExpedient->refresh();
+            $this->reloadCurrentExpedient();
             $this->pendingLoan = null;
 
             $this->dispatch('scan-success', ['message' => $this->statusMessage, 'sound' => $this->soundEnabled, 'vibrate' => $this->vibrateEnabled, 'autoNext' => true]);
@@ -352,7 +352,7 @@ class Scanner extends Component
 
         try {
             $loanService->relocateExpedient($this->currentExpedient, $this->targetLocationId);
-            $this->currentExpedient->refresh();
+            $this->reloadCurrentExpedient();
             $locationLabel = $this->currentExpedient->currentLocation?->short_label ?? 'Nueva ubicación';
             $this->statusType = 'success';
             $this->statusMessage = "Reubicado a {$locationLabel}";
@@ -361,6 +361,14 @@ class Scanner extends Component
             $this->dispatch('scan-success', ['message' => $this->statusMessage, 'sound' => $this->soundEnabled, 'vibrate' => $this->vibrateEnabled, 'autoNext' => true]);
         } catch (\Throwable $e) {
             $this->error('Error: '.$e->getMessage());
+        }
+    }
+
+    private function reloadCurrentExpedient(): void
+    {
+        if ($this->currentExpedient) {
+            $this->currentExpedient->refresh();
+            $this->currentExpedient->load(['employee.branch', 'currentLocation.branch', 'loans.requester']);
         }
     }
 
