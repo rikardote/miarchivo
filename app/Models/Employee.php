@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 
@@ -116,5 +117,42 @@ class Employee extends Model
                 ->orWhere('last_name', 'like', "%{$search}%")
                 ->orWhere('employee_number', 'like', "%{$search}%");
         });
+    }
+
+    public function getSlugAttribute(): string
+    {
+        $nameSlug = Str::slug("{$this->last_name} {$this->first_name}");
+
+        return $nameSlug ? "{$this->rfc}-{$nameSlug}" : (string) $this->rfc;
+    }
+
+    public function getRouteKey(): mixed
+    {
+        return $this->slug;
+    }
+
+    public function resolveRouteBinding($value, $field = null): ?self
+    {
+        if (is_numeric($value)) {
+            $found = $this->where($field ?? 'id', $value)->first();
+            if ($found) {
+                return $found;
+            }
+        }
+
+        $exact = $this->where('rfc', $value)->first();
+        if ($exact) {
+            return $exact;
+        }
+
+        $rfcPrefix = Str::before((string) $value, '-');
+        if ($rfcPrefix) {
+            $found = $this->where('rfc', $rfcPrefix)->first();
+            if ($found) {
+                return $found;
+            }
+        }
+
+        return null;
     }
 }

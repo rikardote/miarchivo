@@ -36,7 +36,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/expedients', Index::class)->name('expedients.index');
     Route::get('/expedients/create/{employee?}', Create::class)->name('expedients.create');
     Route::get('/expedients/continuous-create', ContinuousCreate::class)->name('expedients.continuous-create');
-    Route::get('/expedients/{expedient}', Show::class)->name('expedients.show');
     Route::get('/expedients/find/{code}', function ($code) {
         $expedient = Expedient::where('expedient_code', $code)->first();
         if (! $expedient) {
@@ -45,6 +44,7 @@ Route::middleware('auth')->group(function () {
 
         return redirect()->route('expedients.show', $expedient);
     })->name('expedients.find');
+    Route::get('/expedients/{expedient}', Show::class)->name('expedients.show');
     Route::get('/expedients/{expedient}/edit', Edit::class)->name('expedients.edit');
     Route::get('/expedients/{expedient}/print', PrintLabel::class)->name('expedients.print');
 
