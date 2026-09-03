@@ -20,16 +20,16 @@
 
         <div class="rounded-xl overflow-hidden border border-slate-200">
             <x-mary-table :headers="[
-                ['key' => 'name', 'label' => 'Empleado', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4 pl-4 sm:pl-6'],
+                ['key' => 'last_name', 'label' => 'Empleado', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4 pl-4 sm:pl-6'],
                 ['key' => 'rfc', 'label' => 'RFC', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4 hidden sm:table-cell'],
                 ['key' => 'branch.name', 'label' => 'Sede', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4 hidden md:table-cell'],
                 ['key' => 'employment_status', 'label' => 'Estatus', 'class' => 'text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 py-4'],
                 ['key' => 'actions', 'label' => '', 'class' => 'w-1 py-4 pr-3 sm:pr-6']
             ]" :rows="$employees" :sort-by="$sortBy" :with-pagination="$employees instanceof \Illuminate\Contracts\Pagination\Paginator" class="table-premium">
 
-                @scope('cell_name', $employee)
+                @scope('cell_last_name', $employee)
                     <div class="flex flex-col py-2 pl-2 sm:pl-4">
-                        <span class="font-bold text-slate-800 dark:text-slate-100 leading-tight text-sm sm:text-base">{{ $employee->first_name }} {{ $employee->last_name }}</span>
+                        <span class="font-bold text-slate-800 dark:text-slate-100 leading-tight text-sm sm:text-base">{{ $employee->last_name }} {{ $employee->first_name }}</span>
                         <div class="flex items-center gap-1.5 mt-1 flex-wrap">
                             <span class="sm:hidden text-[10px] font-black text-primary uppercase tracking-widest">{{ $employee->rfc }}</span>
                             @if(($employee->source ?? 'local') === 'api')

@@ -12,21 +12,27 @@ use Mary\Traits\Toast;
 
 class Index extends Component
 {
-    use WithPagination;
     use Toast;
+    use WithPagination;
 
     public string $search = '';
+
     public bool $onlyWithExpedient = false;
-    public array $sortBy = ['column' => 'first_name', 'direction' => 'asc'];
+
+    public array $sortBy = ['column' => 'last_name', 'direction' => 'asc'];
 
     // Resultados cacheados de la última consulta a la API (para acciones bajo demanda)
     public array $apiResults = [];
 
     // Modal de Creación Manual
     public bool $createEmployeeModal = false;
+
     public string $rfc = '';
+
     public string $first_name = '';
+
     public string $last_name = '';
+
     public ?string $employee_number = null;
 
     public function mount()
@@ -58,7 +64,7 @@ class Index extends Component
     public function saveEmployee()
     {
         $this->validate([
-            'rfc' => ['required', 'string', new ValidRfc(), 'unique:employees,rfc'],
+            'rfc' => ['required', 'string', new ValidRfc, 'unique:employees,rfc'],
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
             'employee_number' => 'nullable|string|max:50|unique:employees,employee_number',
@@ -93,19 +99,21 @@ class Index extends Component
 
         $employee = Employee::where('rfc', $rfc)->first();
 
-        if (!$employee) {
+        if (! $employee) {
             $selected = collect($this->apiResults)->firstWhere('rfc', $rfc);
 
-            if (!$selected || empty($selected['raw'])) {
+            if (! $selected || empty($selected['raw'])) {
                 $this->warning('No fue posible recuperar el empleado de la API. Intenta buscar de nuevo.');
+
                 return;
             }
 
             $employee = app(EmployeeApiService::class)->syncEmployee($selected['raw']);
         }
 
-        if (!$employee) {
+        if (! $employee) {
             $this->error('No fue posible registrar al empleado.');
+
             return;
         }
 
@@ -133,15 +141,15 @@ class Index extends Component
                 $apiRows = collect($apiService->search($searchTerm))
                     ->sortByDesc('id')
                     ->map(function ($item) {
-                        $rfc10 = !empty($item['id_legal'])
+                        $rfc10 = ! empty($item['id_legal'])
                             ? mb_strtoupper(mb_substr(trim($item['id_legal']), 0, 10), 'UTF-8')
                             : null;
 
                         return [
                             'rfc' => $rfc10,
                             'employee_number' => $item['id_empleado'] ?? null,
-                            'first_name' => trim(($item['nombre'] ?? '') . ' ' . ($item['apellido_1'] ?? '') . ' ' . ($item['apellido_2'] ?? '')),
-                            'last_name' => '',
+                            'first_name' => $item['nombre'] ?? '',
+                            'last_name' => trim(($item['apellido_1'] ?? '').' '.($item['apellido_2'] ?? '')),
                             'employment_status' => str_contains(mb_strtoupper($item['estado_empleado'] ?? 'ACTIVO'), 'ACTIVO') ? 'active' : 'inactive',
                             'position' => $item['n_puesto_plaza'] ?? null,
                             'work_center' => $item['n_centro_trabajo'] ?? null,
@@ -161,7 +169,7 @@ class Index extends Component
                             ],
                         ];
                     })
-                    ->filter(fn ($row) => !empty($row['rfc']))
+                    ->filter(fn ($row) => ! empty($row['rfc']))
                     ->unique('rfc')
                     ->values();
             } catch (\Throwable $e) {
@@ -179,6 +187,9 @@ class Index extends Component
             $employees = $localEmployees
                 ->concat($apiRows->map(fn ($row) => (object) $row))
                 ->unique('rfc')
+                ->sortBy(function ($emp) {
+                    return mb_strtoupper(($emp->last_name ?? '').' '.($emp->first_name ?? ''), 'UTF-8');
+                })
                 ->values();
 
             $apiSearched = true;
@@ -187,6 +198,7 @@ class Index extends Component
                 ->with(['branch', 'expedients'])
                 ->when($this->onlyWithExpedient, fn (Builder $q) => $q->whereHas('expedients'))
                 ->orderBy($this->sortBy['column'], $this->sortBy['direction'])
+                ->when($this->sortBy['column'] === 'last_name', fn (Builder $q) => $q->orderBy('first_name', 'asc'))
                 ->paginate(15)
                 ->through(fn ($emp) => $emp->setAttribute('source', 'local'));
         }
