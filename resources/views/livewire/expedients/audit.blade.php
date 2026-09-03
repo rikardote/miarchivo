@@ -453,34 +453,44 @@
 
             {{-- WORKSPACE DE EXPEDIENTES (TABS INTERACTIVOS) --}}
             <div class="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/70 dark:border-white/5 shadow-sm space-y-4">
-                {{-- Navegación de Tabs y Buscador --}}
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/5 pb-4">
-                    <div class="flex items-center gap-2 overflow-x-auto py-1">
+                {{-- Navegación de Tabs Minimalista y Buscador --}}
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/5 pb-3">
+                    {{-- Segmented Tab Control (Elegante y Compacto) --}}
+                    <div class="inline-flex p-1 rounded-2xl bg-slate-100 dark:bg-slate-950 border border-slate-200/70 dark:border-white/5 shadow-inner">
                         {{-- Tab: Faltantes --}}
                         <button 
                             type="button" 
                             wire:click="$set('activeTab', 'missing')" 
-                            class="px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 {{ $activeTab === 'missing' ? 'bg-rose-500 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}">
-                            <span>⏳ Faltantes por Escanear</span>
-                            <span class="badge badge-xs {{ $activeTab === 'missing' ? 'bg-white text-rose-600' : 'badge-ghost' }} font-bold">{{ count($results['missing']) }}</span>
+                            class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ $activeTab === 'missing' ? 'bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 shadow-sm border border-slate-200/60 dark:border-white/10' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200' }}">
+                            <span class="w-2 h-2 rounded-full bg-rose-500 shrink-0"></span>
+                            <span>Faltantes</span>
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-black {{ $activeTab === 'missing' ? 'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300' : 'bg-slate-200/70 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                                {{ count($results['missing']) }}
+                            </span>
                         </button>
 
                         {{-- Tab: Confirmados --}}
                         <button 
                             type="button" 
                             wire:click="$set('activeTab', 'correct')" 
-                            class="px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 {{ $activeTab === 'correct' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}">
-                            <span>✅ Confirmados en Sitio</span>
-                            <span class="badge badge-xs {{ $activeTab === 'correct' ? 'bg-white text-emerald-700' : 'badge-ghost' }} font-bold">{{ count($results['correct']) }}</span>
+                            class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ $activeTab === 'correct' ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-200/60 dark:border-white/10' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200' }}">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                            <span>Confirmados</span>
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-black {{ $activeTab === 'correct' ? 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300' : 'bg-slate-200/70 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                                {{ count($results['correct']) }}
+                            </span>
                         </button>
 
-                        {{-- Tab: En Cajón Incorrecto --}}
+                        {{-- Tab: Fuera de Lugar --}}
                         <button 
                             type="button" 
                             wire:click="$set('activeTab', 'misplaced')" 
-                            class="px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 {{ $activeTab === 'misplaced' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}">
-                            <span>⚠️ Cajón Incorrecto</span>
-                            <span class="badge badge-xs {{ $activeTab === 'misplaced' ? 'bg-slate-950 text-amber-400' : 'badge-ghost' }} font-bold">{{ count($results['misplaced']) }}</span>
+                            class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 {{ $activeTab === 'misplaced' ? 'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-sm border border-slate-200/60 dark:border-white/10' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200' }}">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+                            <span>Fuera de Lugar</span>
+                            <span class="px-1.5 py-0.5 rounded-md text-[10px] font-black {{ $activeTab === 'misplaced' ? 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300' : 'bg-slate-200/70 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                                {{ count($results['misplaced']) }}
+                            </span>
                         </button>
                     </div>
 
