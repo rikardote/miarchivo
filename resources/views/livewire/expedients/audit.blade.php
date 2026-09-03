@@ -307,10 +307,10 @@
         {{-- VISTA DE AUDITORÍA ACTIVA (HEADS-UP DISPLAY INTERACTIVO) --}}
         {{-- ========================================================= --}}
         <div class="space-y-6">
-            {{-- HERO HUD: Ubicación actual, progreso y contadores --}}
-            <div class="p-5 rounded-3xl bg-gradient-to-br from-[#0F1E36] via-[#112240] to-[#0A1526] text-white shadow-xl border border-white/10 space-y-4">
-                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    {{-- Datos de la gaveta (Limpio y sin repeticiones) --}}
+            {{-- HERO HUD: Ubicación actual, contadores de métricas y barra de progreso --}}
+            <div class="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#0F1E36] via-[#112240] to-[#0A1526] text-white shadow-xl border border-white/10 space-y-5">
+                {{-- Fila 1: Encabezado Limpio de Ubicación --}}
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div class="space-y-1">
                         <div class="flex flex-wrap items-center gap-2">
                             <span class="px-2 py-0.5 rounded-md bg-[#C4A462] text-[#0F1E36] font-black text-[10px] uppercase tracking-wider shadow-sm">
@@ -340,31 +340,41 @@
                         </div>
                     </div>
 
-                    {{-- Mini Tarjetas de Métricas en Vivo --}}
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                        <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-center">
-                            <div class="text-[10px] font-black uppercase tracking-wider text-slate-400">Total Esperados</div>
-                            <div class="text-2xl font-black text-white tracking-tight mt-0.5">{{ $expectedCount }}</div>
-                        </div>
-
-                        <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center">
-                            <div class="text-[10px] font-black uppercase tracking-wider text-emerald-400">Confirmados</div>
-                            <div class="text-2xl font-black text-emerald-300 tracking-tight mt-0.5">{{ count($results['correct']) }}</div>
-                        </div>
-
-                        <div class="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-center">
-                            <div class="text-[10px] font-black uppercase tracking-wider text-rose-400">Faltantes</div>
-                            <div class="text-2xl font-black text-rose-300 tracking-tight mt-0.5">{{ count($results['missing']) }}</div>
-                        </div>
-
-                        <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center">
-                            <div class="text-[10px] font-black uppercase tracking-wider text-amber-400">Cajón Incorrecto</div>
-                            <div class="text-2xl font-black text-amber-300 tracking-tight mt-0.5">{{ count($results['misplaced']) }}</div>
-                        </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button 
+                            type="button" 
+                            wire:click="resetAudit" 
+                            class="btn btn-sm btn-ghost text-slate-300 hover:text-white hover:bg-white/10 rounded-xl text-xs font-bold gap-1">
+                            <x-mary-icon name="o-arrow-left" class="w-4 h-4" />
+                            <span>Cambiar Gaveta</span>
+                        </button>
                     </div>
                 </div>
 
-                {{-- Barra de Progreso del Cajón --}}
+                {{-- Fila 2: Tarjetas de Métricas en Fila Completa Dedicada (Sin desbordamiento) --}}
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-3 border-t border-white/10">
+                    <div class="p-3.5 sm:p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-col justify-between">
+                        <span class="text-xs font-bold text-slate-400">Total Esperados</span>
+                        <span class="text-2xl lg:text-3xl font-black text-white tracking-tight mt-1">{{ $expectedCount }}</span>
+                    </div>
+
+                    <div class="p-3.5 sm:p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col justify-between">
+                        <span class="text-xs font-bold text-emerald-400">Confirmados</span>
+                        <span class="text-2xl lg:text-3xl font-black text-emerald-300 tracking-tight mt-1">{{ count($results['correct']) }}</span>
+                    </div>
+
+                    <div class="p-3.5 sm:p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex flex-col justify-between">
+                        <span class="text-xs font-bold text-rose-400">Faltantes</span>
+                        <span class="text-2xl lg:text-3xl font-black text-rose-300 tracking-tight mt-1">{{ count($results['missing']) }}</span>
+                    </div>
+
+                    <div class="p-3.5 sm:p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex flex-col justify-between">
+                        <span class="text-xs font-bold text-amber-400">Cajón Incorrecto</span>
+                        <span class="text-2xl lg:text-3xl font-black text-amber-300 tracking-tight mt-1">{{ count($results['misplaced']) }}</span>
+                    </div>
+                </div>
+
+                {{-- Fila 3: Barra de Progreso del Cajón --}}
                 <div class="space-y-1.5 pt-2 border-t border-white/10">
                     <div class="flex items-center justify-between text-xs font-bold">
                         <span class="text-slate-300">Progreso de Conciliación Física</span>
