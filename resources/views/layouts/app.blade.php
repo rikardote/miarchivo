@@ -129,6 +129,7 @@
                     @endcan
                     @can('expedients.create')
                         <x-mary-menu-item title="Alta de Expediente" icon="o-plus" link="{{ route('expedients.create') }}" active="{{ request()->routeIs('expedients.create') }}" class="text-xs font-bold py-3" />
+                        <x-mary-menu-item title="Captura Rápida" icon="o-bolt" link="{{ route('expedients.continuous-create') }}" active="{{ request()->routeIs('expedients.continuous-create') }}" class="text-xs font-bold py-3" />
                     @endcan
                 </x-mary-menu-sub>
                 @endcan

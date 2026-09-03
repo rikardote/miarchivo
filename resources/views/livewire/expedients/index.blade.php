@@ -3,6 +3,10 @@
         <x-slot:actions>
             <x-mary-button icon="o-information-circle" class="btn-ghost btn-circle btn-sm sm:btn-md text-primary hover:bg-primary/5 mr-1" wire:click="$set('showGlossary', true)" tooltip="Ver glosario de estados" />
             @can('create', \App\Models\Expedient::class)
+                <x-mary-button icon="o-bolt" class="btn-ghost border border-primary/20 text-primary rounded-xl sm:rounded-2xl h-11 sm:h-14 px-3 sm:px-6 font-black uppercase text-[10px] sm:text-xs tracking-widest hover:bg-primary/5 transition-premium mr-1" link="{{ route('expedients.continuous-create') }}">
+                    <span class="hidden sm:inline">Captura Rápida</span>
+                    <span class="sm:hidden">Rápida</span>
+                </x-mary-button>
                 <x-mary-button icon="o-plus" class="btn-primary shadow-xl shadow-primary/20 rounded-xl sm:rounded-2xl h-11 sm:h-14 px-4 sm:px-8 font-black uppercase text-[10px] sm:text-xs tracking-widest border-none hover:scale-105 transition-premium" link="{{ route('expedients.create') }}">
                     <span class="hidden sm:inline">Nuevo Expediente</span>
                     <span class="sm:hidden">Nuevo</span>
