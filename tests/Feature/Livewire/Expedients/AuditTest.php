@@ -123,4 +123,16 @@ class AuditTest extends TestCase
             ->call('checkRemoteGunScans')
             ->assertSet('isOpen', false);
     }
+
+    public function test_audit_can_filter_by_cabinet_blocks(): void
+    {
+        Livewire::actingAs($this->admin)
+            ->test(Audit::class)
+            ->assertSet('selectedCabinetBlock', 0)
+            ->call('selectCabinetBlock', 1)
+            ->assertSet('selectedCabinetBlock', 1)
+            ->assertSet('selectedCabinet', null)
+            ->call('selectCabinetBlock', null)
+            ->assertSet('selectedCabinetBlock', null);
+    }
 }

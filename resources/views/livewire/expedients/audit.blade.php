@@ -100,7 +100,7 @@
                             @if(!is_null($selectedCabinetBlock) || !empty($selectedCabinet))
                                 <button 
                                     type="button" 
-                                    wire:click="$set('selectedCabinetBlock', null); $set('selectedCabinet', null)" 
+                                    wire:click="selectCabinetBlock(null)" 
                                     class="text-[10px] font-black text-primary hover:underline uppercase">
                                     Mostrar Todos
                                 </button>
@@ -110,16 +110,16 @@
                             @foreach($cabinetBlocks as $block)
                                 <button 
                                     type="button" 
-                                    wire:click="$set('selectedCabinetBlock', {{ $block['index'] }}); $set('selectedCabinet', null)" 
-                                    class="px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 {{ $selectedCabinetBlock === $block['index'] && is_null($selectedCabinet) ? 'bg-primary text-white shadow-sm ring-2 ring-primary/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}">
+                                    wire:click="selectCabinetBlock({{ $block['index'] }})" 
+                                    class="px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1.5 {{ (!is_null($selectedCabinetBlock) && (int)$selectedCabinetBlock === (int)$block['index'] && is_null($selectedCabinet)) ? 'bg-primary text-white shadow-sm ring-2 ring-primary/30' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}">
                                     <x-mary-icon name="o-archive-box" class="w-3.5 h-3.5" />
                                     <span>{{ $block['label'] }}</span>
                                 </button>
                             @endforeach
                             <button 
                                 type="button" 
-                                wire:click="$set('selectedCabinetBlock', null); $set('selectedCabinet', null)" 
-                                class="px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all {{ is_null($selectedCabinetBlock) && is_null($selectedCabinet) ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}">
+                                wire:click="selectCabinetBlock(null)" 
+                                class="px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all {{ (is_null($selectedCabinetBlock) && is_null($selectedCabinet)) ? 'bg-primary text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200' }}">
                                 Todos ({{ count($cabinets) }})
                             </button>
                         </div>

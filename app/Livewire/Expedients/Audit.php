@@ -53,6 +53,24 @@ class Audit extends Component
         $this->selectedCabinet = $this->selectedCabinet === $cabinet ? null : $cabinet;
     }
 
+    public function selectCabinetBlock(?int $index): void
+    {
+        $this->selectedCabinetBlock = $index;
+        $this->selectedCabinet = null;
+    }
+
+    public function updatedSelectedBranch(): void
+    {
+        $this->selectedCabinet = null;
+        $this->selectedCabinetBlock = 0;
+    }
+
+    public function updatedSelectedType(): void
+    {
+        $this->selectedCabinet = null;
+        $this->selectedCabinetBlock = 0;
+    }
+
     public function mount()
     {
         $this->authorize('changeLocation', Expedient::class);
