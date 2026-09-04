@@ -3,7 +3,7 @@
 @theme {
     --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     
-    --color-primary: #0F1E36;
+    --color-primary: #073256;
     --color-primary-content: #ffffff;
     --color-secondary: #C4A462;
     --color-secondary-content: #ffffff;
@@ -78,7 +78,7 @@
 
     /* Fixed Sidebar Active Item */
     .sidebar-item-active {
-        @apply !bg-[#0F1E36]/10 !text-[#0F1E36] font-bold border-none rounded-xl mx-4;
+        @apply !bg-[#073256]/10 !text-[#073256] font-bold border-none rounded-xl mx-4;
     }
 
     .btn-premium {
@@ -186,42 +186,45 @@
 /* Strictly Dark Theme Overrides */
 [data-theme='dark'] {
     --color-primary: #38bdf8;
-    --color-primary-content: #0f172a;
+    --color-primary-content: #073256;
     body {
-        @apply bg-slate-950 text-slate-300;
+        @apply bg-[#041d33] text-slate-200;
     }
     h1, h2, h3, h4 {
         @apply text-white;
     }
     .premium-card {
-        @apply bg-slate-900 border-slate-800 shadow-none;
+        @apply bg-[#073256] border-[#0c4472]/70 shadow-none;
     }
     .glass {
-        @apply bg-slate-900/90 border-slate-800 shadow-none;
+        @apply bg-[#073256]/95 border-[#0c4472]/70 shadow-none backdrop-blur-md;
     }
     .sidebar-glass {
-        @apply bg-slate-900 border-r border-slate-800 shadow-none;
+        @apply bg-[#073256] border-r border-[#0c4472]/70 shadow-none;
     }
     .sidebar-item-active {
         @apply !bg-[#C4A462]/15 !text-[#C4A462];
     }
     .table-premium th {
-        @apply bg-slate-900 border-slate-800 text-slate-400;
+        @apply bg-[#052642] border-[#0c4472]/70 text-slate-300;
     }
     .table-premium td {
-        @apply border-slate-800 text-slate-300;
+        @apply border-[#0c4472]/40 text-slate-200;
     }
     .mary-dropdown-content {
-        @apply bg-slate-900 border-slate-800 shadow-xl;
+        @apply bg-[#073256] border-[#0c4472]/80 shadow-xl text-slate-200;
+    }
+    .modal-box {
+        @apply bg-[#073256] border-[#0c4472]/80 text-slate-200;
     }
     * {
-        scrollbar-color: rgba(51, 65, 85, 0.4) transparent;
+        scrollbar-color: rgba(12, 68, 114, 0.4) transparent;
     }
     ::-webkit-scrollbar-thumb {
-        background: rgba(51, 65, 85, 0.4);
+        background: rgba(12, 68, 114, 0.5);
     }
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(71, 85, 105, 0.8);
+        background: rgba(22, 108, 184, 0.8);
     }
 }
 

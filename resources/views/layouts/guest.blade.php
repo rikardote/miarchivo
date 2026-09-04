@@ -44,10 +44,10 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+    <body class="font-sans antialiased bg-slate-50 dark:bg-[#041d33] text-slate-900 dark:text-slate-100">
         <div class="min-h-screen flex flex-col md:flex-row">
             <!-- Left Side: Visual/Branding -->
-            <div class="hidden md:flex md:w-1/2 bg-primary items-center justify-center p-12 relative overflow-hidden">
+            <div class="hidden md:flex md:w-1/2 bg-[#073256] items-center justify-center p-12 relative overflow-hidden">
                 <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.15)_0%,transparent_50%)]"></div>
                 <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
                 <div class="absolute -top-24 -right-24 w-96 h-96 bg-black/10 rounded-full blur-3xl"></div>
@@ -62,7 +62,7 @@
                     <div class="mt-12 flex items-center gap-4">
                         <div class="flex -space-x-3">
                             @for($i = 1; $i <= 4; $i++)
-                                <div class="w-10 h-10 rounded-full border-2 border-primary bg-slate-200"></div>
+                                <div class="w-10 h-10 rounded-full border-2 border-[#073256] bg-slate-200"></div>
                             @endfor
                         </div>
                         <span class="text-sm font-bold text-white/70 tracking-wide uppercase italic">+2,500 Expedientes Resguardados</span>
@@ -71,14 +71,14 @@
             </div>
 
             <!-- Right Side: Login Form -->
-            <div class="w-full md:w-1/2 flex items-center justify-center p-8 bg-white md:bg-slate-50">
+            <div class="w-full md:w-1/2 flex items-center justify-center p-8 bg-white md:bg-slate-50 dark:bg-[#041d33] md:dark:bg-[#041d33]">
                 <div class="w-full max-w-md">
                     <div class="md:hidden mb-10 flex justify-center">
                         <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Logo Institucional" class="h-12 w-auto object-contain rounded-xl shadow-sm dark:hidden" />
                         <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo Institucional" class="h-12 w-auto object-contain rounded-xl shadow-sm hidden dark:block" />
                     </div>
                     
-                    <div class="bg-white md:shadow-2xl md:shadow-slate-200/50 rounded-[2.5rem] p-8 md:p-12 border border-transparent md:border-slate-100">
+                    <div class="bg-white dark:bg-[#073256] md:shadow-2xl md:shadow-slate-200/50 dark:shadow-2xl dark:shadow-black/40 rounded-[2.5rem] p-8 md:p-12 border border-transparent md:border-slate-100 dark:border-[#0c4472]/70">
                         {{ $slot }}
                     </div>
                     

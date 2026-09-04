@@ -44,7 +44,7 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-950 min-h-screen flex flex-col selection:bg-[#0F1E36] selection:text-white">
+<body class="font-sans antialiased text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#041d33] min-h-screen flex flex-col selection:bg-[#073256] selection:text-white">
     
     <!-- Header flotante con fecha y toggle de tema -->
     <header class="w-full p-4 sm:p-6 lg:p-10 flex items-center justify-between sm:justify-end gap-3 absolute top-0 z-30">
@@ -53,11 +53,11 @@
             <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo" class="h-8 w-auto object-contain rounded-lg hidden dark:block" />
         </div>
         <div class="flex items-center gap-3">
-            <div class="hidden sm:block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest bg-white/70 dark:bg-slate-900/70 px-4 py-2 rounded-full backdrop-blur-md border border-slate-200/60 dark:border-white/5 shadow-sm">
+            <div class="hidden sm:block text-xs font-black text-slate-500 dark:text-slate-300 uppercase tracking-widest bg-white/70 dark:bg-[#073256]/80 px-4 py-2 rounded-full backdrop-blur-md border border-slate-200/60 dark:border-[#0c4472]/60 shadow-sm">
                 ISSSTE BAJA CALIFORNIA &copy; {{ date('Y') }}
             </div>
-            <div class="bg-white/80 dark:bg-slate-900/80 p-1.5 rounded-2xl backdrop-blur-md border border-slate-200/60 dark:border-white/5 shadow-sm">
-                <x-mary-theme-toggle darkTheme="dark" lightTheme="light" class="btn btn-ghost btn-sm btn-circle text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" />
+            <div class="bg-white/80 dark:bg-[#073256]/80 p-1.5 rounded-2xl backdrop-blur-md border border-slate-200/60 dark:border-[#0c4472]/60 shadow-sm">
+                <x-mary-theme-toggle darkTheme="dark" lightTheme="light" class="btn btn-ghost btn-sm btn-circle text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#0c4472]/50" />
             </div>
         </div>
     </header>
@@ -71,7 +71,7 @@
         </div>
         
         <!-- Left Side: Hero Institucional -->
-        <div class="w-full md:w-5/12 lg:w-1/2 bg-[#0F1E36] p-8 sm:p-12 lg:p-20 flex flex-col justify-between relative overflow-hidden min-h-[380px] md:min-h-screen">
+        <div class="w-full md:w-5/12 lg:w-1/2 bg-[#073256] p-8 sm:p-12 lg:p-20 flex flex-col justify-between relative overflow-hidden min-h-[380px] md:min-h-screen">
             <!-- Destellos decorativos -->
             <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 rounded-full bg-white opacity-5 mix-blend-overlay"></div>
             <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-[#C4A462] opacity-15 blur-3xl"></div>
@@ -100,11 +100,11 @@
         </div>
 
         <!-- Right Side: Formulario de Acceso -->
-        <div class="w-full md:w-7/12 lg:w-1/2 bg-slate-50 dark:bg-slate-950 p-6 sm:p-12 lg:p-20 flex flex-col justify-center items-center relative">
+        <div class="w-full md:w-7/12 lg:w-1/2 bg-slate-50 dark:bg-[#041d33] p-6 sm:p-12 lg:p-20 flex flex-col justify-center items-center relative">
             
             <div class="w-full max-w-md">
                 
-                <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 sm:p-10 shadow-2xl shadow-slate-900/5 dark:shadow-none border border-slate-200/80 dark:border-white/5">
+                <div class="bg-white dark:bg-[#073256] rounded-3xl p-8 sm:p-10 shadow-2xl shadow-slate-900/5 dark:shadow-2xl dark:shadow-black/40 border border-slate-200/80 dark:border-[#0c4472]/70">
                     
                     <div class="mb-8">
                         <div class="mb-5">
@@ -112,7 +112,7 @@
                             <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo Institucional" class="h-12 sm:h-14 w-auto object-contain rounded-xl hidden dark:block shadow-sm" />
                         </div>
                         <h2 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">Iniciar Sesión</h2>
-                        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1.5 font-medium">Ingresa tus credenciales para acceder a la plataforma.</p>
+                        <p class="text-slate-500 dark:text-slate-300 text-sm mt-1.5 font-medium">Ingresa tus credenciales para acceder a la plataforma.</p>
                     </div>
 
                     <!-- Estado de Sesión -->
@@ -143,7 +143,7 @@
                                     autofocus 
                                     autocomplete="username"
                                     placeholder="usuario@issste.gob.mx"
-                                    class="block w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-[#C4A462] focus:ring-4 focus:ring-[#C4A462]/10 transition-all text-sm font-medium" 
+                                    class="block w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 dark:border-[#0c4472] bg-slate-50/50 dark:bg-[#041d33] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 focus:outline-none focus:border-[#C4A462] focus:ring-4 focus:ring-[#C4A462]/10 transition-all text-sm font-medium" 
                                 />
                             </div>
                             @if ($errors->has('email'))
@@ -161,7 +161,7 @@
                                     Contraseña
                                 </label>
                                 @if (Route::has('password.request'))
-                                    <a href="{{ route('password.request') }}" class="text-xs font-bold text-[#0F1E36] dark:text-[#C4A462] hover:underline">
+                                    <a href="{{ route('password.request') }}" class="text-xs font-bold text-[#073256] dark:text-[#C4A462] hover:underline">
                                         ¿Olvidaste tu contraseña?
                                     </a>
                                 @endif
@@ -177,7 +177,7 @@
                                     required 
                                     autocomplete="current-password"
                                     placeholder="••••••••"
-                                    class="block w-full pl-11 pr-12 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-[#C4A462] focus:ring-4 focus:ring-[#C4A462]/10 transition-all text-sm font-medium" 
+                                    class="block w-full pl-11 pr-12 py-3.5 rounded-2xl border border-slate-200 dark:border-[#0c4472] bg-slate-50/50 dark:bg-[#041d33] text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-400 focus:outline-none focus:border-[#C4A462] focus:ring-4 focus:ring-[#C4A462]/10 transition-all text-sm font-medium" 
                                 />
                                 <button 
                                     type="button" 
@@ -208,9 +208,9 @@
                                     id="remember_me" 
                                     type="checkbox" 
                                     name="remember"
-                                    class="w-4 h-4 rounded-lg border-slate-300 dark:border-slate-700 text-[#0F1E36] focus:ring-[#C4A462] focus:ring-offset-0 cursor-pointer" 
+                                    class="w-4 h-4 rounded-lg border-slate-300 dark:border-[#0c4472] dark:bg-[#041d33] text-[#073256] dark:text-[#C4A462] focus:ring-[#C4A462] focus:ring-offset-0 cursor-pointer" 
                                 />
-                                <span class="ms-2.5 text-xs font-bold text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                                <span class="ms-2.5 text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
                                     Mantener sesión iniciada
                                 </span>
                             </label>
@@ -220,7 +220,7 @@
                         <div class="pt-3">
                             <button 
                                 type="submit" 
-                                class="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl shadow-xl shadow-[#0F1E36]/20 dark:shadow-none text-xs font-black uppercase tracking-widest text-white bg-[#0F1E36] hover:bg-[#091322] active:scale-[0.99] focus:outline-none focus:ring-4 focus:ring-[#0F1E36]/20 transition-all cursor-pointer">
+                                class="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-2xl shadow-xl shadow-[#073256]/20 dark:shadow-none text-xs font-black uppercase tracking-widest text-white bg-[#073256] hover:bg-[#0a416e] dark:bg-[#C4A462] dark:hover:bg-[#b08f4c] dark:text-[#073256] active:scale-[0.99] focus:outline-none focus:ring-4 focus:ring-[#C4A462]/20 transition-all cursor-pointer">
                                 <span>Ingresar al Sistema</span>
                                 <x-mary-icon name="o-arrow-right" class="w-4 h-4" />
                             </button>

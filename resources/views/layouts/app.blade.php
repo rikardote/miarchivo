@@ -71,8 +71,8 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
-    <x-mary-nav sticky class="glass border-b border-slate-200 dark:border-white/10 z-[60] px-3 sm:px-6 !h-16 sm:!h-20">
+<body class="font-sans antialiased min-h-screen bg-slate-50 dark:bg-[#041d33] text-slate-800 dark:text-slate-100">
+    <x-mary-nav sticky class="glass border-b border-slate-200 dark:border-[#0c4472]/70 z-[60] px-3 sm:px-6 !h-16 sm:!h-20">
         <x-slot:brand>
             <a href="{{ route('dashboard') }}" class="flex items-center group cursor-pointer shrink-0 py-1" title="MiArchivo - Panel Principal">
                 <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Archivo Institucional ISSSTE" class="h-8 sm:h-11 md:h-12 w-auto object-contain rounded-xl dark:hidden hover:opacity-95 transition-opacity" />
@@ -101,7 +101,7 @@
         <x-slot:sidebar drawer="main-drawer" class="sidebar-glass z-50">
 
             <!-- Mobile Drawer Header with Close Button -->
-            <div class="lg:hidden flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-white/10 shrink-0">
+            <div class="lg:hidden flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-[#0c4472]/70 shrink-0">
                 <div class="flex items-center">
                     <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Logo" class="h-7 w-auto object-contain rounded-lg dark:hidden" />
                     <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo" class="h-7 w-auto object-contain rounded-lg hidden dark:block" />
