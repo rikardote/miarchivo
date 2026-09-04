@@ -130,17 +130,36 @@
         <!-- Sidebar -->
         <x-slot:sidebar drawer="main-drawer" class="sidebar-glass z-50">
 
-            <x-mary-menu active-class="sidebar-item-active" class="px-6 space-y-3">
+            <!-- Mobile Drawer Header with Close Button -->
+            <div class="lg:hidden flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-black text-base shadow-sm">
+                        <x-mary-icon name="o-archive-box" class="w-5 h-5" />
+                    </div>
+                    <div>
+                        <div class="font-black text-sm text-slate-900 dark:text-white leading-none">MiArchivo</div>
+                        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Navegación</div>
+                    </div>
+                </div>
+                <label for="main-drawer" class="btn btn-ghost btn-circle btn-sm text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer" aria-label="Cerrar menú">
+                    <x-mary-icon name="o-x-mark" class="w-5 h-5" />
+                </label>
+            </div>
+
+            <x-mary-menu active-class="sidebar-item-active" class="px-6 space-y-3 pb-16">
                 <x-mary-menu-item title="Dashboard" icon="o-chart-pie" link="{{ route('dashboard') }}" active="{{ request()->routeIs('dashboard') }}" class="rounded-3xl text-slate-600 dark:text-slate-300 dark:text-white/50 hover:text-primary dark:hover:text-white hover:bg-white dark:hover:bg-white/5 py-4 transition-premium font-black text-sm" />
 
 
-                @canany(['expedients.create', 'expedients.change-location'])
-                <x-mary-menu-sub title="Expedientes" icon="o-folder" open="{{ request()->routeIs('expedients.*') }}" class="text-slate-600 dark:text-white/70 font-black text-sm">
+                @canany(['expedients.view', 'expedients.create', 'expedients.change-location'])
+                <x-mary-menu-sub title="Expedientes" icon="o-folder" open="{{ request()->routeIs('expedients.*') || request()->routeIs('reports.inventory') }}" class="text-slate-600 dark:text-white/70 font-black text-sm">
                     <x-mary-menu-item title="Buscador Central" icon="o-magnifying-glass" link="{{ route('expedients.index') }}" active="{{ request()->routeIs('expedients.index') }}" class="text-xs font-bold py-3" />
                     @can('expedients.change-location')
                         <x-mary-menu-item title="Escáner Inteligente" icon="o-qr-code" link="{{ route('expedients.scanner') }}" active="{{ request()->routeIs('expedients.scanner') }}" class="text-xs font-bold py-3" />
                         <x-mary-menu-item title="Escáner Móvil (PWA)" icon="o-device-phone-mobile" link="{{ route('mobile.scanner') }}" active="{{ request()->routeIs('mobile.scanner') }}" class="text-xs font-bold py-3 text-[#C4A462]" />
                         <x-mary-menu-item title="Auditoría de Control" icon="o-check-badge" link="{{ route('expedients.audit') }}" active="{{ request()->routeIs('expedients.audit') }}" class="text-xs font-bold py-3" />
+                    @endcan
+                    @can('locations.view')
+                        <x-mary-menu-item title="Inventario General" icon="o-chart-bar-square" link="{{ route('reports.inventory') }}" active="{{ request()->routeIs('reports.inventory') }}" class="text-xs font-bold py-3" />
                     @endcan
                     @can('expedients.create')
                         <x-mary-menu-item title="Alta de Expediente" icon="o-plus" link="{{ route('expedients.create') }}" active="{{ request()->routeIs('expedients.create') }}" class="text-xs font-bold py-3" />
@@ -184,7 +203,7 @@
                     @endcan
                 @endcanany
 
-                <div class="px-2 pt-6 mt-4 border-t border-slate-100 dark:border-white/5">
+                <div class="px-2 pt-6 mt-4 pb-12 border-t border-slate-100 dark:border-white/5">
                     <form method="POST" action="{{ route('logout') }}" class="w-full">
                         @csrf
                         <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-error hover:bg-error/10 text-xs font-black uppercase tracking-wider transition-colors text-left cursor-pointer">
