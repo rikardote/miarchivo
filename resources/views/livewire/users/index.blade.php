@@ -34,11 +34,13 @@
                 @endscope
 
                 @scope('cell_roles', $user)
-                    <div class="flex flex-wrap gap-2 py-2">
+                    <div class="flex flex-wrap gap-1.5 py-2">
                         @foreach($user->roles as $role)
-                            <div class="px-3 py-1 rounded-lg bg-primary/5 text-primary text-[9px] font-black uppercase border border-primary/10 shadow-sm">
-                                {{ $role->name }}
-                            </div>
+                            @php $meta = $this->getRoleMeta($role->name, $role->permissions->count()); @endphp
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase border shadow-2xs {{ $meta['badge_color'] }}">
+                                <x-mary-icon :name="$meta['icon']" class="w-3.5 h-3.5 shrink-0" />
+                                <span>{{ $meta['title'] }}</span>
+                            </span>
                         @endforeach
                     </div>
                 @endscope
@@ -67,38 +69,190 @@
     </x-mary-card>
 
     <!-- Modal para Usuarios -->
-    <x-mary-modal wire:model="userModal" class="p-6">
-        <div class="space-y-8 mt-4">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-primary text-white rounded-2xl flex items-center justify-center font-black text-xl shadow-xl shadow-primary/30">
-                    <x-mary-icon name="o-shield-check" class="w-7 h-7" />
-                </div>
-                <div>
-                    <h3 class="text-2xl font-black text-slate-900 dark:text-white dark:text-white tracking-tighter leading-none">{{ $editingUser ? 'Editar Usuario' : 'Nuevo Usuario' }}</h3>
-                    <p class="text-[10px] font-black text-slate-500 dark:text-slate-400 dark:text-slate-400 uppercase tracking-widest mt-1">Gestión de identidad y permisos</p>
+    <x-mary-modal wire:model="userModal" class="p-6 sm:p-8" box-class="max-w-2xl w-full">
+        <div class="space-y-6">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center font-black shadow-sm">
+                        <x-mary-icon name="{{ $editingUser ? 'o-user-circle' : 'o-user-plus' }}" class="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-none">
+                            {{ $editingUser ? 'Editar Usuario' : 'Nuevo Usuario' }}
+                        </h3>
+                        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">
+                            Credenciales de acceso y asignación de roles
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <x-mary-form wire:submit="saveUser" class="space-y-6">
-                <x-mary-input label="Nombre Completo" wire:model="name" icon="o-user" class="rounded-2xl h-14 px-5 border-slate-100" />
-                <x-mary-input label="Correo Institucional" wire:model="email" icon="o-envelope" class="rounded-2xl h-14 px-5 border-slate-100" />
-                <x-mary-input label="Contraseña" wire:model="password" type="password" icon="o-key" hint="{{ $editingUser ? 'Dejar en blanco para mantener actual' : 'Mínimo 8 caracteres' }}" class="rounded-2xl h-14 px-5 border-slate-100" />
+            <x-mary-form wire:submit="saveUser" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <x-mary-input label="Nombre Completo" wire:model="name" icon="o-user" placeholder="Ej. Juan Pérez González" class="rounded-xl h-12" />
+                    </div>
+                    <x-mary-input label="Correo Institucional" wire:model="email" icon="o-envelope" placeholder="usuario@correo.gob.mx" class="rounded-xl h-12" />
+                    <x-mary-input label="Contraseña" wire:model="password" type="password" icon="o-key" placeholder="••••••••" hint="{{ $editingUser ? 'Dejar en blanco para mantener actual' : 'Mínimo 8 caracteres' }}" class="rounded-xl h-12" />
+                </div>
                 
-                <div class="p-6 bg-slate-50 dark:bg-white/5 rounded-[1.5rem] border border-slate-100 dark:border-white/5">
-                    <x-mary-radio 
-                        label="Nivel de Acceso (Rol)" 
-                        wire:model="selectedRole" 
-                        :options="$roles"
-                        option-label="name"
-                        option-value="name"
-                        class="radio-primary gap-4"
-                    />
+                {{-- Sección de Roles --}}
+                <div class="space-y-3 pt-3 border-t border-slate-100 dark:border-white/10">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <label class="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                                <x-mary-icon name="o-shield-check" class="w-4 h-4 text-primary" />
+                                <span>Roles y Niveles de Acceso</span>
+                            </label>
+                            <p class="text-[11px] text-slate-400">
+                                Selecciona uno o varios perfiles operativos asignados a este usuario.
+                            </p>
+                        </div>
+                        <button 
+                            type="button"
+                            wire:click="openNewRoleModal" 
+                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-primary bg-primary/10 hover:bg-primary/20 transition-colors self-start sm:self-auto cursor-pointer"
+                        >
+                            <x-mary-icon name="o-plus" class="w-3.5 h-3.5" />
+                            <span>Definir Nuevo Rol</span>
+                        </button>
+                    </div>
+
+                    @error('selectedRoles')
+                        <p class="text-xs font-bold text-rose-500">{{ $message }}</p>
+                    @enderror
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[280px] overflow-y-auto pr-1">
+                        @foreach($roles as $role)
+                            @php
+                                $meta = $this->getRoleMeta($role->name, $role->permissions->count());
+                                $isSelected = in_array($role->name, $selectedRoles);
+                            @endphp
+                            <div 
+                                wire:click="toggleRole('{{ $role->name }}')"
+                                class="relative cursor-pointer select-none rounded-xl border p-3.5 transition-all duration-200 flex flex-col justify-between gap-2 {{ $isSelected ? 'border-primary/60 bg-primary/5 shadow-xs ring-1 ring-primary/30' : 'border-slate-200 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 hover:border-slate-300 dark:hover:border-white/20' }}"
+                            >
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 {{ $isSelected ? 'bg-primary text-white shadow-xs' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400' }}">
+                                            <x-mary-icon :name="$meta['icon']" class="w-4 h-4" />
+                                        </div>
+                                        <div>
+                                            <div class="text-xs font-black text-slate-900 dark:text-white leading-tight">
+                                                {{ $meta['title'] }}
+                                            </div>
+                                            <span class="font-mono text-[10px] text-slate-400">
+                                                {{ $role->name }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="shrink-0 pt-0.5">
+                                        <input 
+                                            type="checkbox" 
+                                            class="checkbox checkbox-primary checkbox-xs rounded" 
+                                            @checked($isSelected)
+                                            tabindex="-1"
+                                            readonly
+                                        />
+                                    </div>
+                                </div>
+
+                                <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug line-clamp-2">
+                                    {{ $meta['description'] }}
+                                </p>
+
+                                <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/5 text-[10px]">
+                                    <span class="text-slate-400 font-semibold">Permisos:</span>
+                                    <span class="font-mono font-bold text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800">
+                                        {{ $role->permissions->count() }}
+                                    </span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
 
                 <x-slot:actions>
-                    <div class="flex gap-4 w-full mt-4">
-                        <x-mary-button label="Cancelar" @click="$wire.userModal = false" class="btn-ghost rounded-xl" />
-                        <x-mary-button label="Guardar Usuario" type="submit" class="btn-primary rounded-xl" spinner="saveUser" />
+                    <div class="flex items-center justify-end gap-3 w-full pt-4 border-t border-slate-100 dark:border-white/10">
+                        <x-mary-button label="Cancelar" @click="$wire.userModal = false" class="btn-ghost rounded-xl px-5" />
+                        <x-mary-button label="Guardar Usuario" type="submit" class="btn-primary rounded-xl px-6 font-bold shadow-lg shadow-primary/20" spinner="saveUser" />
+                    </div>
+                </x-slot:actions>
+            </x-mary-form>
+        </div>
+    </x-mary-modal>
+
+    <!-- Modal para Definir Nuevo Rol -->
+    <x-mary-modal wire:model="newRoleModal" class="p-6 sm:p-8" box-class="max-w-2xl w-full">
+        <div class="space-y-6">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-black">
+                        <x-mary-icon name="o-key" class="w-5 h-5" />
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-black text-slate-900 dark:text-white tracking-tight leading-none">
+                            Definir Nuevo Rol
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-1">
+                            Crea un perfil de acceso y asigna sus permisos granulares
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <x-mary-form wire:submit="saveNewRole" class="space-y-4">
+                <x-mary-input 
+                    label="Identificador del Rol (Slug único)" 
+                    wire:model="newRoleName" 
+                    icon="o-identification" 
+                    placeholder="ej. gestor_digital, supervisor" 
+                    hint="Solo letras, números, guiones y guiones bajos (sin espacios)" 
+                    class="rounded-xl h-12"
+                />
+
+                <div class="space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                            Permisos Disponibles por Módulo
+                        </label>
+                        <span class="text-[11px] font-mono text-slate-400">
+                            {{ count($newRolePermissions) }} seleccionado(s)
+                        </span>
+                    </div>
+
+                    <div class="space-y-3 max-h-[340px] overflow-y-auto pr-1">
+                        @foreach($availablePermissions as $group => $perms)
+                            <div class="rounded-xl border border-slate-200 dark:border-white/10 p-3 bg-slate-50/50 dark:bg-white/5">
+                                <div class="text-[11px] font-black text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-1.5 uppercase tracking-wider">
+                                    <span class="w-2 h-2 rounded-full bg-primary"></span>
+                                    <span>{{ $group }}</span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    @foreach($perms as $perm)
+                                        <label class="flex items-center gap-2 p-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-white/5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+                                            <input 
+                                                type="checkbox" 
+                                                wire:model="newRolePermissions" 
+                                                value="{{ $perm->name }}" 
+                                                class="checkbox checkbox-primary checkbox-xs rounded"
+                                            />
+                                            <span class="font-mono text-[11px] text-slate-700 dark:text-slate-300">
+                                                {{ $perm->name }}
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <x-slot:actions>
+                    <div class="flex items-center justify-end gap-3 w-full pt-4 border-t border-slate-100 dark:border-white/10">
+                        <x-mary-button label="Cancelar" @click="$wire.newRoleModal = false" class="btn-ghost rounded-xl px-5" />
+                        <x-mary-button label="Crear Rol" type="submit" class="btn-primary rounded-xl px-6 font-bold shadow-lg shadow-primary/20" spinner="saveNewRole" />
                     </div>
                 </x-slot:actions>
             </x-mary-form>

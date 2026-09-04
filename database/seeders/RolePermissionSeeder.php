@@ -5,13 +5,14 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
         // Reset cached roles and permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Define permissions
         $permissions = [
@@ -66,7 +67,7 @@ class RolePermissionSeeder extends Seeder
         $superuser->givePermissionTo(Permission::all());
 
         $admin = Role::firstOrCreate(['name' => 'admin']);
-        $admin->givePermissionTo([
+        $admin->syncPermissions([
             'expedients.view', 'expedients.create', 'expedients.update', 'expedients.delete',
             'expedients.change-location',
             'loans.view', 'loans.create', 'loans.approve', 'loans.deliver', 'loans.return',
@@ -74,6 +75,7 @@ class RolePermissionSeeder extends Seeder
             'employees.view', 'employees.sync',
             'locations.view', 'locations.create', 'locations.update', 'locations.delete',
             'movements.view',
+            'users.view', 'users.create', 'users.update',
             'dashboard.view',
         ]);
 
@@ -85,6 +87,15 @@ class RolePermissionSeeder extends Seeder
             'loans.view',
             'loans.deliver',
             'loans.return',
+            'movements.view',
+        ]);
+
+        $auditor = Role::firstOrCreate(['name' => 'auditor']);
+        $auditor->syncPermissions([
+            'dashboard.view',
+            'expedients.view',
+            'expedients.change-location',
+            'locations.view',
             'movements.view',
         ]);
 
