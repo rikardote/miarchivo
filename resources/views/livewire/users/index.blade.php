@@ -341,8 +341,8 @@
                     </div>
                 </div>
 
-                <!-- Lista de Expedientes -->
-                <div class="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+                <!-- Lista de Expedientes con Scrollbar -->
+                <div class="space-y-3 max-h-[55vh] sm:max-h-[440px] overflow-y-auto pr-1">
                     @forelse($custodyLoans as $loan)
                         @php
                             $isOverdue = $loan->due_date && $loan->due_date->isPast();
