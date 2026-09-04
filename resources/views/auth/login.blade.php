@@ -49,8 +49,8 @@
     <!-- Header flotante con fecha y toggle de tema -->
     <header class="w-full p-4 sm:p-6 lg:p-10 flex items-center justify-between sm:justify-end gap-3 absolute top-0 z-30">
         <div class="sm:hidden flex items-center">
-            <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Logo" class="h-8 w-auto object-contain rounded-lg dark:hidden" />
-            <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo" class="h-8 w-auto object-contain rounded-lg hidden dark:block" />
+            <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Logo" class="h-7 w-auto object-contain rounded-lg dark:hidden" />
+            <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo" class="h-7 w-auto object-contain rounded-lg hidden dark:block" />
         </div>
         <div class="flex items-center gap-3">
             <div class="hidden sm:block text-xs font-black text-slate-500 dark:text-slate-300 uppercase tracking-widest bg-white/70 dark:bg-[#073256]/80 px-4 py-2 rounded-full backdrop-blur-md border border-slate-200/60 dark:border-[#0c4472]/60 shadow-sm">
@@ -79,7 +79,7 @@
 
             <!-- Logo Superior Izquierdo -->
             <div class="relative z-20 hidden sm:block">
-                <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo Institucional" class="h-14 lg:h-16 w-auto object-contain rounded-xl hover:opacity-95 transition-opacity">
+                <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo Institucional" class="h-10 lg:h-11 w-auto object-contain rounded-xl hover:opacity-95 transition-opacity">
             </div>
             
             <div class="relative z-20 max-w-lg my-auto py-8 sm:py-12">

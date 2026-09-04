@@ -75,8 +75,8 @@
     <x-mary-nav sticky class="glass border-b border-slate-200/80 dark:border-[#0c4472]/70 z-[60] px-3 sm:px-6 !h-16 sm:!h-20">
         <x-slot:brand>
             <a href="{{ route('dashboard') }}" class="flex items-center group cursor-pointer shrink-0 py-1" title="MiArchivo - Panel Principal">
-                <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Archivo Institucional ISSSTE" class="h-9 sm:h-12 md:h-14 w-auto object-contain dark:hidden hover:opacity-95 transition-opacity" />
-                <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Archivo Institucional ISSSTE" class="h-9 sm:h-12 md:h-14 w-auto object-contain hidden dark:block hover:opacity-95 transition-opacity" />
+                <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Archivo Institucional ISSSTE" class="h-7 sm:h-8 md:h-9 w-auto object-contain dark:hidden hover:opacity-95 transition-opacity" />
+                <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Archivo Institucional ISSSTE" class="h-7 sm:h-8 md:h-9 w-auto object-contain hidden dark:block hover:opacity-95 transition-opacity" />
             </a>
         </x-slot:brand>
         <x-slot:actions>
@@ -105,8 +105,8 @@
             <!-- Mobile Drawer Header with Close Button -->
             <div class="lg:hidden flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-[#0c4472]/80 shrink-0">
                 <div class="flex items-center">
-                    <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Logo" class="h-8 w-auto object-contain dark:hidden" />
-                    <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo" class="h-8 w-auto object-contain hidden dark:block" />
+                    <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Logo" class="h-7 w-auto object-contain dark:hidden" />
+                    <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo" class="h-7 w-auto object-contain hidden dark:block" />
                 </div>
                 <label for="main-drawer" class="btn btn-ghost btn-circle btn-sm text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer" aria-label="Cerrar menú">
                     <x-mary-icon name="o-x-mark" class="w-5 h-5" />
