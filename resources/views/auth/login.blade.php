@@ -107,10 +107,6 @@
                 <div class="bg-white dark:bg-[#073256] rounded-3xl p-8 sm:p-10 shadow-2xl shadow-slate-900/5 dark:shadow-2xl dark:shadow-black/40 border border-slate-200/80 dark:border-[#0c4472]/70">
                     
                     <div class="mb-8">
-                        <div class="mb-5">
-                            <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Logo Institucional" class="h-12 sm:h-14 w-auto object-contain rounded-xl dark:hidden shadow-sm" />
-                            <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo Institucional" class="h-12 sm:h-14 w-auto object-contain rounded-xl hidden dark:block shadow-sm" />
-                        </div>
                         <h2 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">Iniciar Sesión</h2>
                         <p class="text-slate-500 dark:text-slate-300 text-sm mt-1.5 font-medium">Ingresa tus credenciales para acceder a la plataforma.</p>
                     </div>
