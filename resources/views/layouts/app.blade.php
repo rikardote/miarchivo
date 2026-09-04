@@ -89,8 +89,6 @@
 
                 <livewire:notifications-bell />
 
-                <x-mary-theme-toggle darkTheme="dark" lightTheme="light" class="btn btn-ghost btn-circle btn-sm sm:btn-md !h-9 !w-9 sm:!h-10 sm:!w-10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-primary dark:hover:text-white cursor-pointer transition-colors" />
-
                 <label for="main-drawer" class="lg:hidden btn btn-ghost btn-circle btn-sm sm:btn-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 cursor-pointer">
                     <x-mary-icon name="o-bars-3" class="w-5 h-5 sm:w-6 sm:h-6" />
                 </label>
