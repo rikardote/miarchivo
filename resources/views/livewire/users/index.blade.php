@@ -260,81 +260,206 @@
     </x-mary-modal>
 
     <!-- Modal de Expedientes en Custodia por Usuario -->
-    <x-mary-modal wire:model="custodyModal" class="p-6 sm:p-8 modal-wide">
+    <x-mary-modal wire:model="custodyModal" class="p-6 sm:p-8" box-class="max-w-3xl w-full">
         @if($custodyUser)
+            @php
+                $totalLoans = count($custodyLoans);
+                $overdueLoans = $custodyLoans->filter(fn($l) => $l->due_date && $l->due_date->isPast());
+                $overdueCount = $overdueLoans->count();
+                $activeCount = $totalLoans - $overdueCount;
+            @endphp
             <div class="space-y-6">
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center font-black text-lg shadow-lg shadow-primary/20">
+                <!-- Header del Usuario y Custodia -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 dark:border-white/10">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-white flex items-center justify-center font-black text-lg shadow-md shadow-primary/20 shrink-0">
                             {{ strtoupper(substr($custodyUser->name, 0, 1)) }}
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] font-black uppercase tracking-widest text-primary">Expedientes en Posesión</span>
-                                <span class="badge badge-neutral badge-sm font-mono text-[10px]">{{ count($custodyLoans) }} en préstamo</span>
                             </div>
-                            <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">{{ $custodyUser->name }}</h3>
-                            <p class="text-xs text-slate-400 font-medium">{{ $custodyUser->email }}</p>
+                            <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                                {{ $custodyUser->name }}
+                            </h3>
+                            <div class="flex flex-wrap items-center gap-2 mt-0.5 text-xs text-slate-400">
+                                <span class="flex items-center gap-1">
+                                    <x-mary-icon name="o-envelope" class="w-3.5 h-3.5" />
+                                    {{ $custodyUser->email }}
+                                </span>
+                                @if($custodyUser->roles->isNotEmpty())
+                                    <span>•</span>
+                                    <div class="flex items-center gap-1">
+                                        @foreach($custodyUser->roles as $role)
+                                            <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-[9px] font-bold uppercase text-slate-600 dark:text-slate-300">
+                                                {{ $role->name }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                    <button 
+                        type="button" 
+                        @click="$wire.custodyModal = false" 
+                        class="btn btn-ghost btn-circle btn-sm self-end sm:self-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                    >
+                        <x-mary-icon name="o-x-mark" class="w-5 h-5" />
+                    </button>
+                </div>
+
+                <!-- Resumen de Métricas / KPIs -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="p-3.5 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-slate-200/60 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300">
+                            <x-mary-icon name="o-folder" class="w-5 h-5" />
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total en Custodia</div>
+                            <div class="text-lg font-black text-slate-900 dark:text-white leading-none mt-0.5">
+                                {{ $totalLoans }} {{ $totalLoans === 1 ? 'carpeta' : 'carpetas' }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-2xl border border-emerald-100 dark:border-emerald-950/40 bg-emerald-50/40 dark:bg-emerald-950/20 flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-700 dark:text-emerald-300">
+                            <x-mary-icon name="o-check-circle" class="w-5 h-5" />
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">En Tiempo / Vigentes</div>
+                            <div class="text-lg font-black text-emerald-700 dark:text-emerald-300 leading-none mt-0.5">
+                                {{ $activeCount }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-2xl border {{ $overdueCount > 0 ? 'border-rose-200 dark:border-rose-900/50 bg-rose-50/60 dark:bg-rose-950/30' : 'border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/5' }} flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl {{ $overdueCount > 0 ? 'bg-rose-100 dark:bg-rose-900/50 text-rose-700 dark:text-rose-300 animate-pulse' : 'bg-slate-200/60 dark:bg-slate-800 text-slate-400' }} flex items-center justify-center">
+                            <x-mary-icon name="o-exclamation-triangle" class="w-5 h-5" />
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold {{ $overdueCount > 0 ? 'text-rose-700 dark:text-rose-400' : 'text-slate-400' }} uppercase tracking-wider">Vencidos / Retraso</div>
+                            <div class="text-lg font-black {{ $overdueCount > 0 ? 'text-rose-700 dark:text-rose-300' : 'text-slate-700 dark:text-slate-300' }} leading-none mt-0.5">
+                                {{ $overdueCount }}
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Lista de Expedientes -->
                 <div class="space-y-3 max-h-[420px] overflow-y-auto pr-1">
                     @forelse($custodyLoans as $loan)
                         @php
                             $isOverdue = $loan->due_date && $loan->due_date->isPast();
                             $daysDiff = $loan->due_date ? abs((int) now()->diffInDays($loan->due_date, false)) : null;
                         @endphp
-                        <div class="p-4 rounded-2xl border {{ $isOverdue ? 'border-rose-200 bg-rose-50/50 dark:border-rose-900/30 dark:bg-rose-950/20' : 'border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30' }} flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                            <div class="space-y-1">
+                        <div class="p-4 rounded-2xl border transition-all duration-200 {{ $isOverdue ? 'border-rose-200 bg-rose-50/30 dark:border-rose-900/40 dark:bg-rose-950/20 shadow-xs' : 'border-slate-200/80 dark:border-white/10 bg-white dark:bg-slate-900/40 hover:border-slate-300 dark:hover:border-white/20' }}">
+                            <!-- Fila Superior: Código, Tomo y Estado -->
+                            <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100 dark:border-white/5">
                                 <div class="flex items-center gap-2">
-                                    <span class="font-mono font-black text-xs px-2 py-0.5 rounded bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                                    <span class="font-mono font-black text-xs px-2.5 py-1 rounded-lg bg-slate-900 text-white dark:bg-white dark:text-slate-900 tracking-wider shadow-2xs">
                                         {{ $loan->expedient->expedient_code }}
                                     </span>
-                                    <span class="badge badge-neutral badge-sm font-mono text-[9px] uppercase">
+                                    <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 font-mono text-[10px] font-bold uppercase">
                                         Tomo {{ $loan->expedient->volume_number }}
                                     </span>
+                                </div>
+
+                                <div>
                                     @if($isOverdue)
-                                        <span class="badge badge-error badge-sm font-black uppercase text-[9px]">
-                                            ¡Vencido hace {{ $daysDiff }} día(s)!
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-[10px] font-black uppercase tracking-wider">
+                                            <x-mary-icon name="o-clock" class="w-3.5 h-3.5" />
+                                            <span>Vencido hace {{ $daysDiff }} día(s)</span>
                                         </span>
                                     @elseif($daysDiff !== null)
-                                        <span class="badge badge-success badge-sm font-bold uppercase text-[9px]">
-                                            Resta(n) {{ $daysDiff }} día(s)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-black uppercase tracking-wider">
+                                            <x-mary-icon name="o-check-circle" class="w-3.5 h-3.5" />
+                                            <span>{{ $daysDiff === 0 ? 'Vence hoy' : "Resta(n) {$daysDiff} día(s)" }}</span>
                                         </span>
                                     @endif
                                 </div>
-                                <p class="text-sm font-black text-slate-900 dark:text-slate-100 uppercase">
-                                    {{ $loan->expedient->employee->last_name }}, {{ $loan->expedient->employee->first_name }}
-                                </p>
-                                <div class="flex flex-wrap items-center gap-x-3 text-[10px] font-bold text-slate-400">
-                                    <span>RFC: <strong class="text-slate-600 dark:text-slate-300">{{ $loan->expedient->employee->rfc }}</strong></span>
-                                    @if($loan->delivered_at)
-                                        <span>• Entregado: {{ $loan->delivered_at->format('d/m/Y') }}</span>
+                            </div>
+
+                            <!-- Fila Central: Información del Empleado y Ubicación -->
+                            <div class="py-3 space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <x-mary-icon name="o-identification" class="w-4 h-4 text-slate-400 shrink-0" />
+                                    <span class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                                        {{ $loan->expedient->employee->last_name }}, {{ $loan->expedient->employee->first_name }}
+                                    </span>
+                                </div>
+
+                                <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+                                    <div class="flex items-center gap-1">
+                                        <span class="font-bold text-slate-400">RFC:</span>
+                                        <span class="font-mono font-bold text-slate-700 dark:text-slate-200">{{ $loan->expedient->employee->rfc }}</span>
+                                    </div>
+
+                                    @if($loan->expedient->currentLocation)
+                                        <div class="flex items-center gap-1">
+                                            <x-mary-icon name="o-map-pin" class="w-3.5 h-3.5 text-primary shrink-0" />
+                                            <span class="text-slate-600 dark:text-slate-300 font-medium">
+                                                {{ $loan->expedient->currentLocation->short_label ?? $loan->expedient->currentLocation->archive_name }}
+                                            </span>
+                                        </div>
                                     @endif
+
+                                    @if($loan->delivered_at)
+                                        <div class="flex items-center gap-1">
+                                            <x-mary-icon name="o-arrow-up-tray" class="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                                            <span>Entregado: <strong class="text-slate-700 dark:text-slate-200">{{ $loan->delivered_at->format('d/m/Y') }}</strong></span>
+                                        </div>
+                                    @endif
+
                                     @if($loan->due_date)
-                                        <span>• Vencimiento: <strong class="{{ $isOverdue ? 'text-rose-600 dark:text-rose-400' : 'text-slate-600 dark:text-slate-300' }}">{{ $loan->due_date->format('d/m/Y') }}</strong></span>
+                                        <div class="flex items-center gap-1">
+                                            <x-mary-icon name="o-calendar" class="w-3.5 h-3.5 {{ $isOverdue ? 'text-rose-500' : 'text-slate-400' }} shrink-0" />
+                                            <span>Vence: <strong class="{{ $isOverdue ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-200' }}">{{ $loan->due_date->format('d/m/Y') }}</strong></span>
+                                        </div>
                                     @endif
                                 </div>
+
                                 @if($loan->observations)
-                                    <p class="text-xs italic text-slate-500 mt-1">"{{ $loan->observations }}"</p>
+                                    <div class="mt-2 p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                                        <x-mary-icon name="o-chat-bubble-left-ellipsis" class="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+                                        <span class="italic">"{{ $loan->observations }}"</span>
+                                    </div>
                                 @endif
                             </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <x-mary-button label="Ver Carpeta" icon="o-eye" link="{{ route('expedients.show', $loan->expedient) }}" class="btn-ghost btn-xs font-bold uppercase" />
-                                <x-mary-button label="Gestionar" icon="o-arrow-path" link="{{ route('loans.manage', $loan) }}" class="btn-primary btn-xs font-bold uppercase" />
+
+                            <!-- Fila Inferior: Acciones Rápidas -->
+                            <div class="flex items-center justify-end gap-2 pt-2.5 border-t border-slate-100 dark:border-white/5">
+                                <x-mary-button 
+                                    label="Ver Carpeta" 
+                                    icon="o-eye" 
+                                    link="{{ route('expedients.show', $loan->expedient) }}" 
+                                    class="btn-ghost btn-xs font-bold uppercase rounded-lg text-slate-600 dark:text-slate-300 hover:text-primary" 
+                                />
+                                <x-mary-button 
+                                    label="Gestionar Préstamo" 
+                                    icon="o-arrow-path" 
+                                    link="{{ route('loans.manage', $loan) }}" 
+                                    class="btn-primary btn-xs font-bold uppercase rounded-lg shadow-xs" 
+                                />
                             </div>
                         </div>
                     @empty
-                        <div class="text-center py-8 text-slate-400">
-                            <x-mary-icon name="o-check-circle" class="w-10 h-10 mx-auto mb-2 text-emerald-500 opacity-60" />
-                            <p class="text-xs font-bold">Este usuario no tiene ningún expediente físico en su poder en este momento.</p>
+                        <div class="text-center py-12 px-4 rounded-2xl border border-dashed border-slate-200 dark:border-white/10">
+                            <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-500 flex items-center justify-center">
+                                <x-mary-icon name="o-check-badge" class="w-8 h-8" />
+                            </div>
+                            <h4 class="text-sm font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight">Sin carpetas en posesión</h4>
+                            <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1">Este usuario no tiene ningún expediente físico en su poder en este momento. Todas las carpetas han sido devueltas al archivo.</p>
                         </div>
                     @endforelse
                 </div>
 
-                <div class="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
-                    <x-mary-button label="Cerrar" @click="$wire.custodyModal = false" class="btn-ghost rounded-xl px-6" />
+                <!-- Footer -->
+                <div class="flex justify-end pt-4 border-t border-slate-100 dark:border-white/10">
+                    <x-mary-button label="Cerrar" @click="$wire.custodyModal = false" class="btn-ghost rounded-xl px-6 font-bold" />
                 </div>
             </div>
         @endif

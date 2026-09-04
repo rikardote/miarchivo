@@ -206,13 +206,13 @@ class Index extends Component
 
     public function showCustody(User $user)
     {
-        $this->custodyUser = $user->load(['heldExpedients.employee']);
+        $this->custodyUser = $user->load(['heldExpedients.employee', 'roles']);
         $this->custodyLoans = LoanRequest::where(function ($query) use ($user) {
             $query->where('requester_id', $user->id)
                 ->orWhereIn('expedient_id', $user->heldExpedients->pluck('id'));
         })
             ->where('status', LoanStatus::Delivered)
-            ->with(['expedient.employee'])
+            ->with(['expedient.employee', 'expedient.currentLocation'])
             ->get();
 
         $this->custodyModal = true;
