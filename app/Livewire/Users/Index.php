@@ -201,32 +201,39 @@ class Index extends Component
 
     public bool $custodyModal = false;
 
-    public ?User $custodyUser = null;
+    public ?int $custodyUserId = null;
 
-    public $custodyLoans = [];
-
-    public function showCustody(User $user)
+    public function updatedCustodyModal($value): void
     {
-        $this->custodyUser = $user->load(['heldExpedients.employee', 'roles']);
-        $this->custodyLoans = LoanRequest::where(function ($query) use ($user) {
+        if (! $value) {
+            $this->custodyUserId = null;
+        }
+    }
+
+    public function showCustody(User $user): void
+    {
+        $this->custodyUserId = $user->id;
+        $this->custodyModal = true;
+    }
+
+    public function exportCustodyReport()
+    {
+        if (! $this->custodyUserId) {
+            return;
+        }
+
+        $user = User::with(['heldExpedients.employee', 'roles'])->find($this->custodyUserId);
+        if (! $user) {
+            return;
+        }
+
+        $loans = LoanRequest::where(function ($query) use ($user) {
             $query->where('requester_id', $user->id)
                 ->orWhereIn('expedient_id', $user->heldExpedients->pluck('id'));
         })
             ->where('status', LoanStatus::Delivered)
             ->with(['expedient.employee', 'expedient.currentLocation'])
             ->get();
-
-        $this->custodyModal = true;
-    }
-
-    public function exportCustodyReport()
-    {
-        if (! $this->custodyUser) {
-            return;
-        }
-
-        $user = $this->custodyUser;
-        $loans = $this->custodyLoans;
 
         $filename = 'custodia_'.Str::slug($user->name).'_'.now()->format('Y-m-d_His').'.csv';
 
@@ -329,10 +336,28 @@ class Index extends Component
                 };
             });
 
+        $custodyUser = null;
+        $custodyLoans = collect();
+
+        if ($this->custodyModal && $this->custodyUserId) {
+            $custodyUser = User::with(['heldExpedients.employee', 'roles'])->find($this->custodyUserId);
+            if ($custodyUser) {
+                $custodyLoans = LoanRequest::where(function ($query) use ($custodyUser) {
+                    $query->where('requester_id', $custodyUser->id)
+                        ->orWhereIn('expedient_id', $custodyUser->heldExpedients->pluck('id'));
+                })
+                    ->where('status', LoanStatus::Delivered)
+                    ->with(['expedient.employee', 'expedient.currentLocation'])
+                    ->get();
+            }
+        }
+
         return view('livewire.users.index', [
             'users' => $query->paginate(10),
             'roles' => Role::with('permissions')->get(),
             'availablePermissions' => $availablePermissions,
+            'custodyUser' => $custodyUser,
+            'custodyLoans' => $custodyLoans,
         ]);
     }
 }
