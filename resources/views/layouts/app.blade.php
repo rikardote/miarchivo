@@ -171,8 +171,55 @@
                     @endcan
                 @endcanany
 
-                <div class="pt-6 mt-4 border-t border-slate-100 dark:border-white/10 space-y-2">
-                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200/60 dark:border-white/5 transition-all group cursor-pointer" title="Mi Perfil">
+                <div x-data="{ userMenuOpen: false }" @click.outside="userMenuOpen = false" class="relative pt-6 mt-4 border-t border-slate-100 dark:border-white/10">
+                    <!-- Dropdown Content (Upward Popup) -->
+                    <div 
+                        x-show="userMenuOpen" 
+                        x-cloak 
+                        x-transition:enter="transition ease-out duration-150"
+                        x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                        x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                        x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                        class="absolute bottom-full left-0 right-0 mb-2 p-2 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-2xl z-50 space-y-1 backdrop-blur-xl"
+                    >
+                        <div class="px-3 py-2 border-b border-slate-100 dark:border-white/5">
+                            <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Sesión iniciada</div>
+                            <div class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{{ Auth::user()->name }}</div>
+                            <div class="text-[10px] text-slate-400 dark:text-slate-500 truncate">{{ Auth::user()->email }}</div>
+                        </div>
+
+                        <a 
+                            href="{{ route('profile.edit') }}" 
+                            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary transition-colors text-xs font-bold cursor-pointer"
+                        >
+                            <x-mary-icon name="o-user" class="w-4 h-4 text-slate-500 dark:text-slate-400" />
+                            <span>Mi Perfil</span>
+                        </a>
+
+                        <div class="h-[1px] bg-slate-100 dark:bg-white/5 my-1"></div>
+
+                        <form method="POST" action="{{ route('logout') }}" class="w-full">
+                            @csrf
+                            <button 
+                                type="submit" 
+                                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-error hover:bg-error/10 text-xs font-black uppercase tracking-wider transition-colors text-left cursor-pointer"
+                            >
+                                <x-mary-icon name="o-arrow-right-on-rectangle" class="w-4 h-4 text-error" />
+                                <span>Cerrar Sesión</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Trigger Button / User Card -->
+                    <button 
+                        type="button" 
+                        @click="userMenuOpen = !userMenuOpen" 
+                        class="w-full flex items-center gap-3 p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-white/5 dark:hover:bg-white/10 border border-slate-200/60 dark:border-white/5 transition-all text-left cursor-pointer group"
+                        :class="{ 'ring-2 ring-primary/20 bg-slate-100 dark:bg-white/10': userMenuOpen }"
+                        title="Opciones de usuario"
+                    >
                         <div class="relative shrink-0">
                             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 flex items-center justify-center border border-slate-200 dark:border-white/10 shadow-sm group-hover:scale-105 transition-transform">
                                 <x-mary-icon name="o-user" class="w-5 h-5 text-slate-600 dark:text-slate-300 group-hover:text-primary transition-colors" />
@@ -183,16 +230,8 @@
                             <span class="text-xs font-black text-slate-800 dark:text-slate-100 truncate group-hover:text-primary transition-colors">{{ Auth::user()->name }}</span>
                             <span class="text-[10px] text-[#C4A462] font-bold uppercase tracking-wider truncate mt-0.5">{{ Auth::user()->getRoleNames()->first() ?? 'Usuario' }}</span>
                         </div>
-                        <x-mary-icon name="o-chevron-right" class="w-4 h-4 text-slate-400 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
-                    </a>
-
-                    <form method="POST" action="{{ route('logout') }}" class="w-full">
-                        @csrf
-                        <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-error hover:bg-error/10 text-xs font-black uppercase tracking-wider transition-colors text-left cursor-pointer">
-                            <x-mary-icon name="o-arrow-right-on-rectangle" class="w-4 h-4 text-error" />
-                            <span>Cerrar Sesión</span>
-                        </button>
-                    </form>
+                        <x-mary-icon name="o-chevron-up" class="w-4 h-4 text-slate-400 group-hover:text-primary transition-transform duration-200 shrink-0" ::class="{ 'rotate-180': !userMenuOpen }" />
+                    </button>
                 </div>
 
             </x-mary-menu>
