@@ -75,8 +75,8 @@
     <x-mary-nav sticky class="glass border-b border-slate-200 dark:border-white/10 z-[60] px-3 sm:px-6 !h-16 sm:!h-20">
         <x-slot:brand>
             <a href="{{ route('dashboard') }}" class="flex items-center group cursor-pointer shrink-0 py-1" title="MiArchivo - Panel Principal">
-                <img src="{{ asset('logo_claro_archivo_2026.png') }}" alt="Archivo Institucional ISSSTE" class="h-11 sm:h-16 w-auto object-contain rounded-2xl shadow-sm group-hover:scale-105 transition-all dark:hidden" />
-                <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Archivo Institucional ISSSTE" class="h-11 sm:h-16 w-auto object-contain rounded-2xl shadow-sm group-hover:scale-105 transition-all hidden dark:block" />
+                <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Archivo Institucional ISSSTE" class="h-8 sm:h-11 md:h-12 w-auto object-contain rounded-xl dark:hidden hover:opacity-95 transition-opacity" />
+                <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Archivo Institucional ISSSTE" class="h-8 sm:h-11 md:h-12 w-auto object-contain rounded-xl hidden dark:block hover:opacity-95 transition-opacity" />
             </a>
         </x-slot:brand>
         <x-slot:actions>
@@ -101,14 +101,10 @@
         <x-slot:sidebar drawer="main-drawer" class="sidebar-glass z-50">
 
             <!-- Mobile Drawer Header with Close Button -->
-            <div class="lg:hidden flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 shrink-0">
-                <div class="flex items-center gap-3">
-                    <img src="{{ asset('logo_claro_archivo_2026.png') }}" alt="Logo" class="w-9 h-9 object-contain rounded-xl shadow-sm dark:hidden" />
-                    <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Logo" class="w-9 h-9 object-contain rounded-xl shadow-sm hidden dark:block" />
-                    <div>
-                        <div class="font-black text-sm text-slate-900 dark:text-white leading-none">MiArchivo</div>
-                        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Navegación</div>
-                    </div>
+            <div class="lg:hidden flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-white/10 shrink-0">
+                <div class="flex items-center">
+                    <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Logo" class="h-7 w-auto object-contain rounded-lg dark:hidden" />
+                    <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo" class="h-7 w-auto object-contain rounded-lg hidden dark:block" />
                 </div>
                 <label for="main-drawer" class="btn btn-ghost btn-circle btn-sm text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer" aria-label="Cerrar menú">
                     <x-mary-icon name="o-x-mark" class="w-5 h-5" />
