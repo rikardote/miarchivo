@@ -54,7 +54,7 @@
                 
                 <div class="relative z-10 text-white max-w-lg">
                     <div class="mb-8">
-                        <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Logo" class="h-20 w-auto rounded-2xl shadow-xl" />
+                        <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo Institucional" class="h-16 w-auto object-contain rounded-xl shadow-lg" />
                     </div>
                     <h2 class="text-5xl font-black tracking-tight leading-tight mb-6">Sistema Integral de Gestión de Archivo</h2>
                     <p class="text-xl text-white/80 font-medium leading-relaxed">Control eficiente, seguro y digitalizado para el resguardo de expedientes institucionales.</p>
@@ -74,8 +74,8 @@
             <div class="w-full md:w-1/2 flex items-center justify-center p-8 bg-white md:bg-slate-50">
                 <div class="w-full max-w-md">
                     <div class="md:hidden mb-10 flex justify-center">
-                        <img src="{{ asset('logo_claro_archivo_2026.png') }}" alt="Logo" class="h-16 w-auto rounded-2xl shadow-md dark:hidden" />
-                        <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Logo" class="h-16 w-auto rounded-2xl shadow-md hidden dark:block" />
+                        <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Logo Institucional" class="h-12 w-auto object-contain rounded-xl shadow-sm dark:hidden" />
+                        <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo Institucional" class="h-12 w-auto object-contain rounded-xl shadow-sm hidden dark:block" />
                     </div>
                     
                     <div class="bg-white md:shadow-2xl md:shadow-slate-200/50 rounded-[2.5rem] p-8 md:p-12 border border-transparent md:border-slate-100">
