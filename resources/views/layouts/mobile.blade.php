@@ -12,8 +12,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MiArchivo">
-    <link rel="apple-touch-icon" href="/60issste.png">
-    <link rel="icon" type="image/png" href="/60issste.png">
+    <link rel="apple-touch-icon" href="{{ asset('logo_oscuro_archivo_2026.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('logo_oscuro_archivo_2026.png') }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

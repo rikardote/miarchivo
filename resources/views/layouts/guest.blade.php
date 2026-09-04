@@ -29,6 +29,13 @@
             })();
         </script>
 
+        <!-- Favicon & App Icons -->
+        <link rel="icon" type="image/png" href="{{ asset('logo_claro_archivo_2026.png') }}" media="(prefers-color-scheme: light)">
+        <link rel="icon" type="image/png" href="{{ asset('logo_oscuro_archivo_2026.png') }}" media="(prefers-color-scheme: dark)">
+        <link rel="icon" type="image/png" href="{{ asset('logo_claro_archivo_2026.png') }}">
+        <link rel="apple-touch-icon" href="{{ asset('logo_claro_archivo_2026.png') }}">
+        <link rel="manifest" href="/manifest.json">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,7 +54,7 @@
                 
                 <div class="relative z-10 text-white max-w-lg">
                     <div class="mb-8">
-                        <img src="{{ asset('60issste.png') }}" alt="Logo" class="h-24 w-auto brightness-0 invert" />
+                        <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Logo" class="h-20 w-auto rounded-2xl shadow-xl" />
                     </div>
                     <h2 class="text-5xl font-black tracking-tight leading-tight mb-6">Sistema Integral de Gestión de Archivo</h2>
                     <p class="text-xl text-white/80 font-medium leading-relaxed">Control eficiente, seguro y digitalizado para el resguardo de expedientes institucionales.</p>
@@ -67,7 +74,8 @@
             <div class="w-full md:w-1/2 flex items-center justify-center p-8 bg-white md:bg-slate-50">
                 <div class="w-full max-w-md">
                     <div class="md:hidden mb-10 flex justify-center">
-                        <img src="{{ asset('60issste.png') }}" alt="Logo" class="h-16 w-auto" />
+                        <img src="{{ asset('logo_claro_archivo_2026.png') }}" alt="Logo" class="h-16 w-auto rounded-2xl shadow-md dark:hidden" />
+                        <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Logo" class="h-16 w-auto rounded-2xl shadow-md hidden dark:block" />
                     </div>
                     
                     <div class="bg-white md:shadow-2xl md:shadow-slate-200/50 rounded-[2.5rem] p-8 md:p-12 border border-transparent md:border-slate-100">

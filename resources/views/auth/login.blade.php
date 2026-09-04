@@ -29,6 +29,13 @@
         })();
     </script>
 
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" href="{{ asset('logo_claro_archivo_2026.png') }}" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" href="{{ asset('logo_oscuro_archivo_2026.png') }}" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" href="{{ asset('logo_claro_archivo_2026.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo_claro_archivo_2026.png') }}">
+    <link rel="manifest" href="/manifest.json">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -41,8 +48,10 @@
     
     <!-- Header flotante con fecha y toggle de tema -->
     <header class="w-full p-4 sm:p-6 lg:p-10 flex items-center justify-between sm:justify-end gap-3 absolute top-0 z-30">
-        <div class="sm:hidden">
-            <img src="{{ asset('60issste.png') }}" alt="Logo" class="h-9 w-auto object-contain" />
+        <div class="sm:hidden flex items-center gap-2.5">
+            <img src="{{ asset('logo_claro_archivo_2026.png') }}" alt="Logo" class="h-9 w-9 object-contain rounded-xl shadow-sm dark:hidden" />
+            <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Logo" class="h-9 w-9 object-contain rounded-xl shadow-sm hidden dark:block" />
+            <span class="font-black text-base tracking-tight text-slate-900 dark:text-white leading-none">Archivo<span class="text-[#C4A462]">.</span></span>
         </div>
         <div class="flex items-center gap-3">
             <div class="hidden sm:block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest bg-white/70 dark:bg-slate-900/70 px-4 py-2 rounded-full backdrop-blur-md border border-slate-200/60 dark:border-white/5 shadow-sm">
@@ -70,8 +79,14 @@
             <div class="absolute top-1/2 left-1/3 w-64 h-64 rounded-full bg-blue-500/10 blur-2xl"></div>
 
             <!-- Logo Superior Izquierdo -->
-            <div class="relative z-20 hidden sm:block">
-                <img src="{{ asset('60issste.png') }}" alt="Logo Institucional" class="h-14 lg:h-20 w-auto object-contain drop-shadow-xl brightness-0 invert opacity-95 hover:opacity-100 transition-opacity">
+            <div class="relative z-20 hidden sm:flex items-center gap-4">
+                <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Logo Institucional" class="h-16 lg:h-20 w-auto object-contain rounded-2xl shadow-2xl hover:scale-105 transition-transform">
+                <div class="flex flex-col">
+                    <div class="font-black text-2xl lg:text-3xl tracking-tighter text-white leading-none">
+                        Archivo<span class="text-[#C4A462]">.</span>
+                    </div>
+                    <div class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mt-1">ISSSTE BAJA CALIFORNIA</div>
+                </div>
             </div>
             
             <div class="relative z-20 max-w-lg my-auto py-8 sm:py-12">
@@ -99,8 +114,15 @@
                 <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 sm:p-10 shadow-2xl shadow-slate-900/5 dark:shadow-none border border-slate-200/80 dark:border-white/5">
                     
                     <div class="mb-8">
-                        <div class="inline-block p-3 rounded-2xl bg-[#0F1E36]/10 dark:bg-[#C4A462]/10 text-[#0F1E36] dark:text-[#C4A462] mb-4">
-                            <x-mary-icon name="o-lock-closed" class="w-6 h-6" />
+                        <div class="flex items-center gap-3.5 mb-5">
+                            <img src="{{ asset('logo_claro_archivo_2026.png') }}" alt="Logo" class="h-12 w-12 object-contain rounded-2xl shadow-md dark:hidden" />
+                            <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Logo" class="h-12 w-12 object-contain rounded-2xl shadow-md hidden dark:block" />
+                            <div>
+                                <div class="font-black text-xl tracking-tight text-slate-900 dark:text-white leading-none">
+                                    Archivo<span class="text-[#C4A462]">.</span>
+                                </div>
+                                <div class="text-[9px] font-bold text-[#C4A462] uppercase tracking-widest mt-1">Portal Institucional</div>
+                            </div>
                         </div>
                         <h2 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">Iniciar Sesión</h2>
                         <p class="text-slate-500 dark:text-slate-400 text-sm mt-1.5 font-medium">Ingresa tus credenciales para acceder a la plataforma.</p>

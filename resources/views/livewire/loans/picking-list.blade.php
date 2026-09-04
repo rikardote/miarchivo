@@ -16,7 +16,7 @@
     <div class="border-b-2 border-slate-900 pb-6 mb-6">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <img src="{{ asset('60issste.png') }}" alt="Logo ISSSTE" class="h-14 w-auto object-contain" />
+                <img src="{{ asset('logo_claro_archivo_2026.png') }}" alt="Logo ISSSTE" class="h-14 w-auto object-contain rounded-xl" />
                 <div>
                     <h1 class="text-xl font-black uppercase tracking-tight text-slate-900">ISSSTE BAJA CALIFORNIA</h1>
                     <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Subdelegación de Administración • Departamento de Recursos Humanos</p>

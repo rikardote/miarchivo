@@ -205,7 +205,7 @@
             <a href="{{ route('dashboard') }}" class="p-1 -ml-1 text-slate-400 hover:text-white rounded-lg transition-colors" title="Volver al Panel">
                 <x-mary-icon name="o-arrow-left" class="w-5 h-5" />
             </a>
-            <img src="{{ asset('60issste.png') }}" alt="Logo" class="h-6 w-auto object-contain" />
+            <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Logo" class="h-6 w-6 object-contain rounded-md shadow-sm" />
             <div>
                 <h1 class="text-xs font-black tracking-tight text-white leading-none">
                     Escáner Móvil <span class="text-[#C4A462]">PWA</span>

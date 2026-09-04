@@ -29,6 +29,13 @@
         })();
     </script>
 
+    <!-- Favicon & App Icons -->
+    <link rel="icon" type="image/png" href="{{ asset('logo_claro_archivo_2026.png') }}" media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/png" href="{{ asset('logo_oscuro_archivo_2026.png') }}" media="(prefers-color-scheme: dark)">
+    <link rel="icon" type="image/png" href="{{ asset('logo_claro_archivo_2026.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('logo_claro_archivo_2026.png') }}">
+    <link rel="manifest" href="/manifest.json">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -68,7 +75,8 @@
     <x-mary-nav sticky class="glass border-b border-slate-200 dark:border-white/10 z-[60] px-3 sm:px-6 !h-16 sm:!h-20">
         <x-slot:brand>
             <div class="flex items-center gap-2 sm:gap-3 group cursor-pointer shrink-0">
-                <img src="{{ asset('60issste.png') }}" alt="Logo" class="h-8 sm:h-12 w-auto object-contain" />
+                <img src="{{ asset('logo_claro_archivo_2026.png') }}" alt="Logo" class="h-8 sm:h-12 w-auto object-contain rounded-xl shadow-sm dark:hidden" />
+                <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Logo" class="h-8 sm:h-12 w-auto object-contain rounded-xl shadow-sm hidden dark:block" />
                 <div class="hidden sm:flex flex-col">
                     <div class="font-black text-xl sm:text-2xl tracking-tighter text-slate-900 dark:text-white leading-none">
                         Archivo<span class="text-[#C4A462]">.</span>
@@ -101,9 +109,8 @@
             <!-- Mobile Drawer Header with Close Button -->
             <div class="lg:hidden flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 shrink-0">
                 <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-black text-base shadow-sm">
-                        <x-mary-icon name="o-archive-box" class="w-5 h-5" />
-                    </div>
+                    <img src="{{ asset('logo_claro_archivo_2026.png') }}" alt="Logo" class="w-9 h-9 object-contain rounded-xl shadow-sm dark:hidden" />
+                    <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Logo" class="w-9 h-9 object-contain rounded-xl shadow-sm hidden dark:block" />
                     <div>
                         <div class="font-black text-sm text-slate-900 dark:text-white leading-none">MiArchivo</div>
                         <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">Navegación</div>

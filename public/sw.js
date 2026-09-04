@@ -1,7 +1,8 @@
-const CACHE_NAME = 'miarchivo-scanner-v1';
+const CACHE_NAME = 'miarchivo-scanner-v2';
 const STATIC_ASSETS = [
     '/manifest.json',
-    '/60issste.png',
+    '/logo_claro_archivo_2026.png',
+    '/logo_oscuro_archivo_2026.png',
     '/vendor/html5-qrcode/html5-qrcode.min.js'
 ];
 
