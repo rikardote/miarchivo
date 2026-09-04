@@ -5,6 +5,7 @@ namespace App\Livewire\Users;
 use App\Enums\LoanStatus;
 use App\Models\LoanRequest;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Spatie\Permission\Models\Permission;
@@ -216,6 +217,79 @@ class Index extends Component
             ->get();
 
         $this->custodyModal = true;
+    }
+
+    public function exportCustodyReport()
+    {
+        if (! $this->custodyUser) {
+            return;
+        }
+
+        $user = $this->custodyUser;
+        $loans = $this->custodyLoans;
+
+        $filename = 'custodia_'.Str::slug($user->name).'_'.now()->format('Y-m-d_His').'.csv';
+
+        return response()->streamDownload(function () use ($user, $loans) {
+            $file = fopen('php://output', 'w');
+            fwrite($file, "\xEF\xBB\xBF");
+
+            fputcsv($file, ['REPORTE DE EXPEDIENTES EN CUSTODIA / POSESIÓN FÍSICA']);
+            fputcsv($file, ['Usuario / Custodio:', $user->name]);
+            fputcsv($file, ['Correo Institucional:', $user->email]);
+            fputcsv($file, ['Fecha de Emisión:', now()->format('d/m/Y H:i:s')]);
+            fputcsv($file, ['Total Carpetas en Custodia:', count($loans)]);
+            fputcsv($file, []);
+
+            fputcsv($file, [
+                'Folio Préstamo',
+                'Código Expediente',
+                'Tomo',
+                'Empleado Titular',
+                'RFC',
+                'Ubicación en Archivo',
+                'Fecha de Entrega',
+                'Fecha de Vencimiento',
+                'Estatus del Préstamo',
+                'Días de Atraso / Restantes',
+                'Observaciones',
+            ]);
+
+            foreach ($loans as $loan) {
+                $isOverdue = $loan->due_date && $loan->due_date->isPast();
+                $daysDiff = $loan->due_date ? abs((int) now()->diffInDays($loan->due_date, false)) : null;
+
+                $statusText = $isOverdue
+                    ? 'VENCIDO'
+                    : 'EN TIEMPO';
+
+                $daysText = $isOverdue
+                    ? "Vencido hace {$daysDiff} día(s)"
+                    : ($daysDiff !== null ? "Resta(n) {$daysDiff} día(s)" : 'Sin fecha límite');
+
+                $locationText = $loan->expedient?->currentLocation
+                    ? ($loan->expedient->currentLocation->short_label ?? $loan->expedient->currentLocation->archive_name)
+                    : 'Sin asignar';
+
+                fputcsv($file, [
+                    $loan->id,
+                    $loan->expedient?->expedient_code ?? 'N/A',
+                    $loan->expedient?->volume_number ?? 1,
+                    $loan->expedient?->employee ? ($loan->expedient->employee->last_name.', '.$loan->expedient->employee->first_name) : 'N/A',
+                    $loan->expedient?->employee?->rfc ?? 'N/A',
+                    $locationText,
+                    $loan->delivered_at ? $loan->delivered_at->format('d/m/Y H:i') : 'N/A',
+                    $loan->due_date ? $loan->due_date->format('d/m/Y') : 'N/A',
+                    $statusText,
+                    $daysText,
+                    $loan->observations ?? '',
+                ]);
+            }
+
+            fclose($file);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
     }
 
     public function clearFilters()

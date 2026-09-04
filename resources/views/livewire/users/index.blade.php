@@ -450,8 +450,21 @@
                 </div>
 
                 <!-- Footer -->
-                <div class="flex justify-end pt-4 border-t border-slate-100 dark:border-white/10">
-                    <x-mary-button label="Cerrar" @click="$wire.custodyModal = false" class="btn-ghost rounded-xl px-6 font-bold" />
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-white/10">
+                    <div>
+                        @if($totalLoans > 0)
+                            <x-mary-button 
+                                label="Exportar Reporte (CSV)" 
+                                icon="o-arrow-down-tray" 
+                                wire:click="exportCustodyReport" 
+                                class="btn-outline btn-primary rounded-xl px-4 h-11 text-xs font-black uppercase tracking-wider w-full sm:w-auto" 
+                                spinner="exportCustodyReport" 
+                            />
+                        @endif
+                    </div>
+                    <div class="flex justify-end">
+                        <x-mary-button label="Cerrar" @click="$wire.custodyModal = false" class="btn-ghost rounded-xl px-6 font-bold w-full sm:w-auto" />
+                    </div>
                 </div>
             </div>
         @endif

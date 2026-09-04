@@ -57,4 +57,30 @@ class UserCustodyTest extends TestCase
             ->assertSet('custodyModal', true)
             ->assertSee('RAML800101-V1');
     }
+
+    public function test_it_can_export_user_custody_report_to_csv(): void
+    {
+        $employee = Employee::factory()->create(['rfc' => 'RAML800101']);
+        $expedient = Expedient::factory()->create([
+            'employee_id' => $employee->id,
+            'expedient_code' => 'RAML800101-V1',
+            'current_holder_id' => $this->custodian->id,
+        ]);
+
+        LoanRequest::factory()->create([
+            'expedient_id' => $expedient->id,
+            'requester_id' => $this->custodian->id,
+            'status' => LoanStatus::Delivered,
+            'delivered_at' => now()->subDay(),
+            'due_date' => now()->addDays(3),
+        ]);
+
+        $component = Livewire::actingAs($this->admin)
+            ->test(Index::class)
+            ->call('showCustody', $this->custodian->id);
+
+        $response = $component->call('exportCustodyReport');
+
+        $response->assertFileDownloaded();
+    }
 }
