@@ -42,9 +42,13 @@
     }
     
     .sidebar-glass {
-        @apply bg-white border-r border-slate-200 shadow-sm !w-[320px] !min-w-[320px] !max-w-[320px] overflow-x-hidden transition-none;
+        @apply bg-white border-r border-slate-200 shadow-sm !w-[320px] !min-w-[320px] !max-w-[320px] overflow-x-hidden overflow-y-auto transition-none;
+        /* Mobile: allow scroll within the drawer overlay */
+        @media (max-width: 1023px) {
+            @apply h-full max-h-screen pb-8;
+        }
         @media (min-width: 1024px) {
-            @apply fixed top-20 left-0 h-[calc(100vh-5rem)] overflow-y-auto z-[40];
+            @apply fixed top-20 left-0 h-[calc(100vh-5rem)] z-[40];
         }
     }
 
