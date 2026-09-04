@@ -107,14 +107,6 @@
                     
                     <div class="p-2 min-w-[220px] space-y-1">
                         <x-mary-menu-item title="Mi Perfil" icon="o-user" link="/profile" class="rounded-xl text-sm font-bold" />
-                        
-                        <div class="flex items-center justify-between px-3.5 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer">
-                            <span class="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2.5">
-                                <x-mary-icon name="o-moon" class="w-4 h-4 text-slate-500 dark:text-slate-400" />
-                                <span>Modo Oscuro</span>
-                            </span>
-                            <x-mary-theme-toggle darkTheme="dark" lightTheme="light" class="btn btn-ghost btn-xs btn-circle text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700" />
-                        </div>
 
                         <x-mary-menu-separator class="my-1.5 opacity-50" />
                         <form method="POST" action="{{ route('logout') }}" class="w-full">
