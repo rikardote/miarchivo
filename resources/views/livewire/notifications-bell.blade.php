@@ -1,6 +1,6 @@
 <div wire:poll.60s class="relative z-[100]">
-    <x-mary-dropdown right class="btn-ghost btn-circle btn-sm sm:btn-md !h-9 !w-9 sm:!h-10 sm:!w-10">
-        <x-slot:label>
+    <x-mary-dropdown right>
+        <x-slot:trigger class="btn btn-ghost btn-circle btn-sm sm:btn-md !h-9 !w-9 sm:!h-10 sm:!w-10">
             <div class="relative flex items-center justify-center" wire:click="markAsRead">
                 <x-mary-icon name="o-bell" class="w-5 h-5 cursor-pointer text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-white transition-colors" />
                 @if($this->unreadCount > 0)
@@ -9,7 +9,7 @@
                     </span>
                 @endif
             </div>
-        </x-slot:label>
+        </x-slot:trigger>
 
         <div class="p-4 w-80 md:w-96">
             <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100 dark:border-white/5">
