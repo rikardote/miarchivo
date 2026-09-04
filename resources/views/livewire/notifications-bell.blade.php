@@ -2,9 +2,9 @@
     <x-mary-dropdown right>
         <x-slot:trigger class="btn btn-ghost btn-circle btn-sm sm:btn-md !h-9 !w-9 sm:!h-10 sm:!w-10">
             <div class="relative flex items-center justify-center" wire:click="markAsRead">
-                <x-mary-icon name="o-bell" class="w-5 h-5 cursor-pointer text-slate-200 hover:text-[#C4A462] transition-colors" />
+                <x-mary-icon name="o-bell" class="w-5 h-5 cursor-pointer text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-white transition-colors" />
                 @if($this->unreadCount > 0)
-                    <span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-black px-1 rounded-full border-2 border-[#073256] min-w-[16px] h-[16px] flex items-center justify-center shadow-md">
+                    <span class="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-black px-1 rounded-full border-2 border-white dark:border-[#073256] min-w-[16px] h-[16px] flex items-center justify-center shadow-md">
                         {{ $this->unreadCount }}
                     </span>
                 @endif

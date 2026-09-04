@@ -72,23 +72,26 @@
     </style>
 </head>
 <body class="font-sans antialiased min-h-screen bg-slate-100 dark:bg-[#041d33] text-slate-800 dark:text-slate-100">
-    <x-mary-nav sticky class="glass border-b border-[#0c4472]/80 z-[60] px-3 sm:px-6 !h-16 sm:!h-20">
+    <x-mary-nav sticky class="glass border-b border-slate-200/80 dark:border-[#0c4472]/70 z-[60] px-3 sm:px-6 !h-16 sm:!h-20">
         <x-slot:brand>
             <a href="{{ route('dashboard') }}" class="flex items-center group cursor-pointer shrink-0 py-1" title="MiArchivo - Panel Principal">
-                <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Archivo Institucional ISSSTE" class="h-8 sm:h-11 md:h-12 w-auto object-contain rounded-xl hover:opacity-95 transition-opacity" />
+                <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Archivo Institucional ISSSTE" class="h-9 sm:h-12 md:h-14 w-auto object-contain dark:hidden hover:opacity-95 transition-opacity" />
+                <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Archivo Institucional ISSSTE" class="h-9 sm:h-12 md:h-14 w-auto object-contain hidden dark:block hover:opacity-95 transition-opacity" />
             </a>
         </x-slot:brand>
         <x-slot:actions>
-            <div class="flex items-center gap-1 sm:gap-2 shrink-0 flex-nowrap">
+            <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0 flex-nowrap">
                 @canany(['loans.deliver', 'loans.return', 'expedients.change-location', 'loans.approve'])
-                    <button type="button" onclick="window.Livewire && Livewire.dispatch('open-global-scanner')" class="btn btn-ghost btn-circle btn-sm sm:btn-md !h-9 !w-9 sm:!h-10 sm:!w-10 text-slate-200 hover:bg-white/10 hover:text-[#C4A462] cursor-pointer transition-colors" title="Escáner Rápido (Ctrl+K)">
+                    <button type="button" onclick="window.Livewire && Livewire.dispatch('open-global-scanner')" class="btn btn-ghost btn-circle btn-sm sm:btn-md !h-9 !w-9 sm:!h-10 sm:!w-10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-primary dark:hover:text-white cursor-pointer transition-colors" title="Escáner Rápido (Ctrl+K)">
                         <x-mary-icon name="o-qr-code" class="w-5 h-5" />
                     </button>
                 @endcanany
 
                 <livewire:notifications-bell />
 
-                <label for="main-drawer" class="lg:hidden btn btn-ghost btn-circle btn-sm sm:btn-md text-slate-200 hover:text-white hover:bg-white/10 cursor-pointer">
+                <x-mary-theme-toggle darkTheme="dark" lightTheme="light" class="btn btn-ghost btn-circle btn-sm sm:btn-md !h-9 !w-9 sm:!h-10 sm:!w-10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-primary dark:hover:text-white cursor-pointer transition-colors" />
+
+                <label for="main-drawer" class="lg:hidden btn btn-ghost btn-circle btn-sm sm:btn-md text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 cursor-pointer">
                     <x-mary-icon name="o-bars-3" class="w-5 h-5 sm:w-6 sm:h-6" />
                 </label>
             </div>
@@ -100,21 +103,22 @@
         <x-slot:sidebar drawer="main-drawer" class="sidebar-glass z-50">
 
             <!-- Mobile Drawer Header with Close Button -->
-            <div class="lg:hidden flex items-center justify-between px-5 py-4 border-b border-[#0c4472]/80 shrink-0">
+            <div class="lg:hidden flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-[#0c4472]/80 shrink-0">
                 <div class="flex items-center">
-                    <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo" class="h-7 w-auto object-contain rounded-lg" />
+                    <img src="{{ asset('logo_horizontal_claro.png') }}" alt="Logo" class="h-8 w-auto object-contain dark:hidden" />
+                    <img src="{{ asset('logo_horizontal_oscuro.png') }}" alt="Logo" class="h-8 w-auto object-contain hidden dark:block" />
                 </div>
-                <label for="main-drawer" class="btn btn-ghost btn-circle btn-sm text-slate-300 hover:text-white cursor-pointer" aria-label="Cerrar menú">
+                <label for="main-drawer" class="btn btn-ghost btn-circle btn-sm text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer" aria-label="Cerrar menú">
                     <x-mary-icon name="o-x-mark" class="w-5 h-5" />
                 </label>
             </div>
 
             <x-mary-menu active-class="sidebar-item-active" class="px-6 space-y-3 pb-16">
-                <x-mary-menu-item title="Dashboard" icon="o-chart-pie" link="{{ route('dashboard') }}" active="{{ request()->routeIs('dashboard') }}" class="rounded-3xl text-slate-200 hover:text-white hover:bg-white/10 py-4 transition-premium font-black text-sm" />
+                <x-mary-menu-item title="Dashboard" icon="o-chart-pie" link="{{ route('dashboard') }}" active="{{ request()->routeIs('dashboard') }}" class="rounded-3xl text-slate-600 dark:text-slate-300 dark:text-white/50 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 py-4 transition-premium font-black text-sm" />
 
 
                 @canany(['expedients.view', 'expedients.create', 'expedients.change-location'])
-                <x-mary-menu-sub title="Expedientes" icon="o-folder" open="{{ request()->routeIs('expedients.*') || request()->routeIs('reports.inventory') }}" class="text-slate-200 font-black text-sm">
+                <x-mary-menu-sub title="Expedientes" icon="o-folder" open="{{ request()->routeIs('expedients.*') || request()->routeIs('reports.inventory') }}" class="text-slate-600 dark:text-white/70 font-black text-sm">
                     <x-mary-menu-item title="Buscador Central" icon="o-magnifying-glass" link="{{ route('expedients.index') }}" active="{{ request()->routeIs('expedients.index') }}" class="text-xs font-bold py-3" />
                     @can('expedients.change-location')
                         <x-mary-menu-item title="Escáner Inteligente" icon="o-qr-code" link="{{ route('expedients.scanner') }}" active="{{ request()->routeIs('expedients.scanner') }}" class="text-xs font-bold py-3" />
@@ -132,7 +136,7 @@
                 @endcanany
 
                 @canany(['loans.approve', 'loans.deliver', 'loans.return'])
-                    <x-mary-menu-sub title="Préstamos" icon="o-document-text" open="{{ request()->routeIs('loans.*') }}" class="text-slate-200 font-black text-sm">
+                    <x-mary-menu-sub title="Préstamos" icon="o-document-text" open="{{ request()->routeIs('loans.*') }}" class="text-slate-600 dark:text-white/70 font-black text-sm">
                         @can('loans.create')
                             <x-mary-menu-item title="Bandeja Personal" icon="o-inbox" link="{{ route('loans.index', ['mine' => 1]) }}" active="{{ request()->fullUrlIs(route('loans.index', ['mine' => 1])) }}" class="text-xs font-bold py-3" />
                         @endcan
@@ -146,27 +150,27 @@
                     </x-mary-menu-sub>
                 @else
                     @can('loans.create')
-                        <x-mary-menu-item title="Préstamos" icon="o-document-text" link="{{ route('loans.index', ['mine' => 1]) }}" active="{{ request()->routeIs('loans.*') }}" class="rounded-3xl text-slate-200 hover:text-white hover:bg-white/10 py-4 transition-premium font-black text-sm" />
+                        <x-mary-menu-item title="Préstamos" icon="o-document-text" link="{{ route('loans.index', ['mine' => 1]) }}" active="{{ request()->routeIs('loans.*') }}" class="rounded-3xl text-slate-600 dark:text-slate-300 dark:text-white/50 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 py-4 transition-premium font-black text-sm" />
                     @endcan
                 @endcanany
 
                 @canany(['employees.view', 'locations.view', 'users.view'])
-                    <div class="px-6 py-4 mt-6 mb-2 text-[10px] font-black text-[#C4A462] uppercase tracking-[0.4em] border-t border-[#0c4472]/60 pt-6">Sistema</div>
+                    <div class="px-6 py-4 mt-6 mb-2 text-[10px] font-black text-slate-400 dark:text-[#C4A462] uppercase tracking-[0.4em] border-t border-slate-100 dark:border-[#0c4472]/60 pt-6">Sistema</div>
                     
                     @can('employees.view')
-                        <x-mary-menu-item title="Plantilla" icon="o-identification" link="{{ route('employees.index') }}" active="{{ request()->routeIs('employees.*') }}" class="rounded-3xl text-slate-200 hover:text-white hover:bg-white/10 transition-premium font-black text-sm" />
+                        <x-mary-menu-item title="Plantilla" icon="o-identification" link="{{ route('employees.index') }}" active="{{ request()->routeIs('employees.*') }}" class="rounded-3xl text-slate-600 dark:text-slate-300 dark:text-white/50 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-premium font-black text-sm" />
                     @endcan
 
                     @can('locations.view')
-                        <x-mary-menu-item title="Archiveros" icon="o-archive-box" link="{{ route('locations.index') }}" active="{{ request()->routeIs('locations.*') }}" class="rounded-3xl text-slate-200 hover:text-white hover:bg-white/10 transition-premium font-black text-sm" />
+                        <x-mary-menu-item title="Archiveros" icon="o-archive-box" link="{{ route('locations.index') }}" active="{{ request()->routeIs('locations.*') }}" class="rounded-3xl text-slate-600 dark:text-slate-300 dark:text-white/50 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-premium font-black text-sm" />
                     @endcan
 
                     @can('users.view')
-                        <x-mary-menu-item title="Usuarios" icon="o-users" link="{{ route('users.index') }}" active="{{ request()->routeIs('users.*') }}" class="rounded-3xl text-slate-200 hover:text-white hover:bg-white/10 transition-premium font-black text-sm" />
+                        <x-mary-menu-item title="Usuarios" icon="o-users" link="{{ route('users.index') }}" active="{{ request()->routeIs('users.*') }}" class="rounded-3xl text-slate-600 dark:text-slate-300 dark:text-white/50 hover:text-primary dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-premium font-black text-sm" />
                     @endcan
                 @endcanany
 
-                <div x-data="{ userMenuOpen: false }" @click.outside="userMenuOpen = false" class="relative pt-6 mt-4 border-t border-[#0c4472]/60">
+                <div x-data="{ userMenuOpen: false }" @click.outside="userMenuOpen = false" class="relative pt-6 mt-4 border-t border-slate-100 dark:border-[#0c4472]/60">
                     <!-- Dropdown Content (Upward Popup) -->
                     <div 
                         x-show="userMenuOpen" 
@@ -177,31 +181,31 @@
                         x-transition:leave="transition ease-in duration-100"
                         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                         x-transition:leave-end="opacity-0 translate-y-2 scale-95"
-                        class="absolute bottom-full left-0 right-0 mb-2 p-2 rounded-2xl bg-[#073256] border border-[#0c4472] shadow-2xl z-50 space-y-1 backdrop-blur-xl text-white"
+                        class="absolute bottom-full left-0 right-0 mb-2 p-2 rounded-2xl bg-white dark:bg-[#073256] border border-slate-200 dark:border-[#0c4472] shadow-2xl z-50 space-y-1 backdrop-blur-xl text-slate-800 dark:text-white"
                     >
-                        <div class="px-3 py-2 border-b border-white/10">
-                            <div class="text-[10px] font-black uppercase tracking-wider text-slate-300">Sesión iniciada</div>
-                            <div class="text-xs font-bold text-white truncate">{{ Auth::user()->name }}</div>
-                            <div class="text-[10px] text-slate-300 truncate">{{ Auth::user()->email }}</div>
+                        <div class="px-3 py-2 border-b border-slate-100 dark:border-white/10">
+                            <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-300">Sesión iniciada</div>
+                            <div class="text-xs font-bold text-slate-800 dark:text-white truncate">{{ Auth::user()->name }}</div>
+                            <div class="text-[10px] text-slate-400 dark:text-slate-300 truncate">{{ Auth::user()->email }}</div>
                         </div>
 
                         <a 
                             href="{{ route('profile.edit') }}" 
-                            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-200 hover:bg-white/10 hover:text-[#C4A462] transition-colors text-xs font-bold cursor-pointer"
+                            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-primary dark:hover:text-[#C4A462] transition-colors text-xs font-bold cursor-pointer"
                         >
-                            <x-mary-icon name="o-user" class="w-4 h-4 text-slate-300" />
+                            <x-mary-icon name="o-user" class="w-4 h-4 text-slate-400 dark:text-slate-300" />
                             <span>Mi Perfil</span>
                         </a>
 
-                        <div class="h-[1px] bg-white/10 my-1"></div>
+                        <div class="h-[1px] bg-slate-100 dark:bg-white/10 my-1"></div>
 
                         <form method="POST" action="{{ route('logout') }}" class="w-full">
                             @csrf
                             <button 
                                 type="submit" 
-                                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-rose-400 hover:bg-rose-500/15 text-xs font-black uppercase tracking-wider transition-colors text-left cursor-pointer"
+                                class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/15 text-xs font-black uppercase tracking-wider transition-colors text-left cursor-pointer"
                             >
-                                <x-mary-icon name="o-arrow-right-on-rectangle" class="w-4 h-4 text-rose-400" />
+                                <x-mary-icon name="o-arrow-right-on-rectangle" class="w-4 h-4 text-rose-500 dark:text-rose-400" />
                                 <span>Cerrar Sesión</span>
                             </button>
                         </form>
@@ -211,21 +215,21 @@
                     <button 
                         type="button" 
                         @click="userMenuOpen = !userMenuOpen" 
-                        class="w-full flex items-center gap-3 p-2.5 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/10 transition-all text-left cursor-pointer group"
-                        :class="{ 'ring-2 ring-[#C4A462]/30 bg-white/15': userMenuOpen }"
+                        class="w-full flex items-center gap-3 p-2.5 rounded-2xl bg-slate-50 hover:bg-slate-100 dark:bg-white/10 dark:hover:bg-white/15 border border-slate-200/70 dark:border-white/10 transition-all text-left cursor-pointer group"
+                        :class="{ 'ring-2 ring-primary/20 dark:ring-[#C4A462]/30 bg-slate-100 dark:bg-white/15': userMenuOpen }"
                         title="Opciones de usuario"
                     >
                         <div class="relative shrink-0">
-                            <div class="w-10 h-10 rounded-xl bg-[#0c4472] flex items-center justify-center border border-white/15 shadow-sm group-hover:scale-105 transition-transform">
-                                <x-mary-icon name="o-user" class="w-5 h-5 text-white/90 group-hover:text-[#C4A462] transition-colors" />
+                            <div class="w-10 h-10 rounded-xl bg-slate-200/80 dark:bg-[#0c4472] flex items-center justify-center border border-slate-300/60 dark:border-white/15 shadow-sm group-hover:scale-105 transition-transform">
+                                <x-mary-icon name="o-user" class="w-5 h-5 text-slate-700 dark:text-white/90 group-hover:text-primary dark:group-hover:text-[#C4A462] transition-colors" />
                             </div>
-                            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-[#073256] rounded-full"></div>
+                            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-[#073256] rounded-full"></div>
                         </div>
                         <div class="flex flex-col min-w-0 flex-1">
-                            <span class="text-xs font-black text-white truncate group-hover:text-[#C4A462] transition-colors">{{ Auth::user()->name }}</span>
+                            <span class="text-xs font-black text-slate-800 dark:text-white truncate group-hover:text-primary dark:group-hover:text-[#C4A462] transition-colors">{{ Auth::user()->name }}</span>
                             <span class="text-[10px] text-[#C4A462] font-bold uppercase tracking-wider truncate mt-0.5">{{ Auth::user()->getRoleNames()->first() ?? 'Usuario' }}</span>
                         </div>
-                        <x-mary-icon name="o-chevron-up" class="w-4 h-4 text-slate-300 group-hover:text-[#C4A462] transition-transform duration-200 shrink-0" ::class="{ 'rotate-180': !userMenuOpen }" />
+                        <x-mary-icon name="o-chevron-up" class="w-4 h-4 text-slate-400 dark:text-slate-300 group-hover:text-primary dark:group-hover:text-[#C4A462] transition-transform duration-200 shrink-0" ::class="{ 'rotate-180': !userMenuOpen }" />
                     </button>
                 </div>
 
