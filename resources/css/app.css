@@ -19,6 +19,23 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @layer base {
+    :root,
+    [data-theme],
+    [data-theme='light'] {
+        --color-primary: #073256 !important;
+        --color-primary-content: #ffffff !important;
+        --color-secondary: #C4A462 !important;
+        --color-secondary-content: #ffffff !important;
+        --color-accent: #C4A462 !important;
+        --color-accent-content: #ffffff !important;
+        --p: #073256 !important;
+        --pc: #ffffff !important;
+        --s: #C4A462 !important;
+        --sc: #ffffff !important;
+        --a: #C4A462 !important;
+        --ac: #ffffff !important;
+    }
+
     html {
         color-scheme: light;
     }
@@ -83,6 +100,52 @@
 
     .btn-premium {
         @apply transition-transform duration-200 active:scale-95 rounded-xl font-bold text-sm shadow-sm;
+    }
+
+    /* Primary Button - Institutional Navy Blue (#073256) matching login submit button */
+    .btn-primary {
+        --btn-color: #073256 !important;
+        --btn-fg: #ffffff !important;
+        background-color: #073256 !important;
+        border-color: #073256 !important;
+        color: #ffffff !important;
+        box-shadow: 0 10px 25px -5px rgba(7, 50, 86, 0.25) !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .btn-primary:hover {
+        --btn-color: #0a416e !important;
+        --btn-fg: #ffffff !important;
+        background-color: #0a416e !important;
+        border-color: #0a416e !important;
+        color: #ffffff !important;
+    }
+
+    .btn-primary:active {
+        --btn-color: #05243d !important;
+        --btn-fg: #ffffff !important;
+        background-color: #05243d !important;
+        border-color: #05243d !important;
+        transform: scale(0.98);
+    }
+
+    .btn-primary:focus-visible {
+        outline: 2px solid #C4A462 !important;
+        outline-offset: 2px !important;
+    }
+
+    .btn-outline.btn-primary {
+        background-color: transparent !important;
+        border-color: #073256 !important;
+        color: #073256 !important;
+        --btn-color: #073256 !important;
+        --btn-fg: #073256 !important;
+    }
+
+    .btn-outline.btn-primary:hover {
+        background-color: #073256 !important;
+        border-color: #073256 !important;
+        color: #ffffff !important;
     }
     
     .table-premium th {
@@ -185,13 +248,48 @@
 
 /* Strictly Dark Theme Overrides */
 [data-theme='dark'] {
-    --color-primary: #38bdf8;
-    --color-primary-content: #073256;
+    --color-primary: #C4A462 !important;
+    --color-primary-content: #073256 !important;
+    --p: #C4A462 !important;
+    --pc: #073256 !important;
     body {
         @apply bg-[#041d33] text-slate-200;
     }
     h1, h2, h3, h4 {
         @apply text-white;
+    }
+    .btn-primary {
+        --btn-color: #C4A462 !important;
+        --btn-fg: #073256 !important;
+        background-color: #C4A462 !important;
+        border-color: #C4A462 !important;
+        color: #073256 !important;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4) !important;
+    }
+    .btn-primary:hover {
+        --btn-color: #b08f4c !important;
+        --btn-fg: #073256 !important;
+        background-color: #b08f4c !important;
+        border-color: #b08f4c !important;
+        color: #073256 !important;
+    }
+    .btn-primary:active {
+        --btn-color: #997c3f !important;
+        --btn-fg: #073256 !important;
+        background-color: #997c3f !important;
+        border-color: #997c3f !important;
+    }
+    .btn-outline.btn-primary {
+        background-color: transparent !important;
+        border-color: #C4A462 !important;
+        color: #C4A462 !important;
+        --btn-color: #C4A462 !important;
+        --btn-fg: #C4A462 !important;
+    }
+    .btn-outline.btn-primary:hover {
+        background-color: #C4A462 !important;
+        border-color: #C4A462 !important;
+        color: #073256 !important;
     }
     .premium-card {
         @apply bg-[#073256] border-[#0c4472]/70 shadow-none;
