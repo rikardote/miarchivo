@@ -74,16 +74,10 @@
 <body class="font-sans antialiased min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100">
     <x-mary-nav sticky class="glass border-b border-slate-200 dark:border-white/10 z-[60] px-3 sm:px-6 !h-16 sm:!h-20">
         <x-slot:brand>
-            <div class="flex items-center gap-2 sm:gap-3 group cursor-pointer shrink-0">
-                <img src="{{ asset('logo_claro_archivo_2026.png') }}" alt="Logo" class="h-8 sm:h-12 w-auto object-contain rounded-xl shadow-sm dark:hidden" />
-                <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Logo" class="h-8 sm:h-12 w-auto object-contain rounded-xl shadow-sm hidden dark:block" />
-                <div class="hidden sm:flex flex-col">
-                    <div class="font-black text-xl sm:text-2xl tracking-tighter text-slate-900 dark:text-white leading-none">
-                        Archivo<span class="text-[#C4A462]">.</span>
-                    </div>
-                    <div class="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 mt-1">ISSSTE BAJA CALIFORNIA</div>
-                </div>
-            </div>
+            <a href="{{ route('dashboard') }}" class="flex items-center group cursor-pointer shrink-0 py-1" title="MiArchivo - Panel Principal">
+                <img src="{{ asset('logo_claro_archivo_2026.png') }}" alt="Archivo Institucional ISSSTE" class="h-11 sm:h-16 w-auto object-contain rounded-2xl shadow-sm group-hover:scale-105 transition-all dark:hidden" />
+                <img src="{{ asset('logo_oscuro_archivo_2026.png') }}" alt="Archivo Institucional ISSSTE" class="h-11 sm:h-16 w-auto object-contain rounded-2xl shadow-sm group-hover:scale-105 transition-all hidden dark:block" />
+            </a>
         </x-slot:brand>
         <x-slot:actions>
             <div class="flex items-center gap-1 sm:gap-2 shrink-0 flex-nowrap">
